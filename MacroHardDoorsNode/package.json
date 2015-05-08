@@ -1,0 +1,10 @@
+{
+  "name": "MacroHardDoorsNode",
+  "version": "0.0.0",
+  "description": "MacroHardDoorsNode",
+  "main": "node.js",
+  "author": {
+    "name": "Gregorio",
+    "email": ""
+  }
+}

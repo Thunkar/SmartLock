@@ -188,3 +188,6 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+MacroHardDoorsServer/.ntvs_analysis.dat
+MacroHardDoorsNode/.ntvs_analysis.dat
+.vs/config/applicationhost.config
