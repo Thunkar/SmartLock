@@ -10,6 +10,7 @@ var tokenSchema = new Schema({
 
 var userSchema = new Schema({
     alias: { type: String, default: "", unique: true, dropDups: true },
+    password: {type: String, default: ""},
     name: {type: String, default: ""},
     tokens: [tokenSchema],
     privileges: [String]
