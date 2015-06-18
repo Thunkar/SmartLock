@@ -28,7 +28,7 @@ exports.createNewAdmin = function (req, res) {
         token: authController.generateToken(),
         name: req.body.name,
     });
-    adminModel.save(function (err) {
+    newAdmin.save(function (err) {
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
@@ -59,7 +59,6 @@ exports.addNewToken = function (req, res) {
     var newToken = new tokenModel({
         name: req.body.name,
         doors: req.body.doors,
-        uses: req.body.uses,
         validity: req.body.validity,
         user: req.body.user
     });
@@ -79,12 +78,12 @@ exports.addNewToken = function (req, res) {
 };
 
 exports.revokeToken = function (req, res) {
-    tokenModel.remove({ _id: req.param.token }, function (err) {
+    tokenModel.findByIdAndRemove(req.params.token, function (err) {
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        return res.status(200).jsonp(tokens);
+        return res.status(200).jsonp("Removed");
     });
 };
 

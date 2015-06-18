@@ -14,7 +14,8 @@
     "express": "^4.12.3",
     "express-session": "^1.11.1",
     "method-override": "^2.3.2",
-    "mongoose": "^4.0.2",
+    "moment": "^2.10.3",
+    "mongoose": "^4.0.5",
     "scribe-js": "^2.0.4"
   }
 }

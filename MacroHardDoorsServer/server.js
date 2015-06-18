@@ -8,9 +8,11 @@
     cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
     doorModel = require('./models/doorModel.js')(app, mongoose),
+    doorModel = mongoose.model('DoorModel'),
     userModel = require('./models/userModel.js')(app, mongoose),
     adminModel = require('./models/adminModel.js')(app, mongoose),
-    tokenModel = require('./models/tokenModel.js')(app, mongoose);
+    tokenModel = require('./models/tokenModel.js')(app, mongoose),
+    doorCommController = require('./controllers/doorCommController.js');
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
@@ -21,7 +23,6 @@ app.use(scribe.express.logger());
 app.enable('trust proxy');
 
 var console = process.console;
-exports.console = console;
 
 console.addLogger('system', null, {
     alwaysTime: true,
@@ -33,23 +34,36 @@ console.addLogger('system', null, {
     defaultTags: ['System']
 });
 
-console.file().time().system("Reading config file")
+console.file().time().system("Reading config file");
 var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
 exports.env = env;
+console.file().time().system("Configuration loaded");
 
 mongoose.connect(env.dbAddress, function (err) {
     if (err) {
         console.error("could not connect to DB: " + err);
     }
-    else
+    else {
         console.time().file().system("Connected to DB");
+        console.time().file().system("Cleaning up...");
+        doorModel.remove({}, function (err) {
+            if (err) {
+                console.time().file().error(err.message);
+                process.exit(1);
+            }
+            doorCommController.check();
+            console.time().file().system("Ready to receive handshakes");
+        });
+    }
 });
 
 
 var doors = require('./routes/doors.js'),
+    doorComms = require('./routes/doorComms.js')
     users = require('./routes/users.js');
 
 app.use("/api/doors", doors);
+app.use("/api/doorcomms", doorComms)
 app.use("/api/users", users);
 app.use(express.static(__dirname + "/frontend"));
 
@@ -58,5 +72,5 @@ app.get('/', function (req, res) {
 });
 
 app.listen(env.port, function () {
-    console.time().file().system('Main server listening');
+    console.time().file().system('Main server listening on port: ' + env.port);
 });

@@ -3,7 +3,8 @@
 
 var router = express.Router();
 
-router.route('/handshake').post(doorController.handshake);
-router.route('/heartbeat').post(doorController.heartbeat);
+router.route('/').get(doorController.getDoorsInfo);
+router.route('/open').post(doorController.open);
+
 
 module.exports = router;
