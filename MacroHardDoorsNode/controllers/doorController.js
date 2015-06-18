@@ -51,6 +51,12 @@ function doHeartbeat() {
                 process.exit(1);
             }
         }
+        else if (response.statusCode != 200) {
+            if (++failedHeartbeats > 10) {
+                console.file().time().error("No response from server, killing myself...");
+                process.exit(1);
+            }
+        }
         else {
             console.file().time().log("Server responded: " + body);
             if (body === "OPEN") openDoor();

@@ -123,3 +123,5 @@ exports.setDoorStatus = function (req, res) {
         });
     });
 };
+
+exports.hearbeats = heartbeats;

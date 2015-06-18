@@ -53,6 +53,9 @@ exports.getDoorsInfo = function (req, res) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
-        return res.status(200).send(doors);
+        for (var i = 0; i < doors.length; i++) {
+            doors[i].available = doorCommController.hearbeats[doors[i].id] != undefined;
+        }
+        return res.status(200).jsonp(doors);
     });
 };
