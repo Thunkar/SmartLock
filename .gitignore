@@ -191,3 +191,5 @@ ModelManifest.xml
 MacroHardDoorsServer/.ntvs_analysis.dat
 MacroHardDoorsNode/.ntvs_analysis.dat
 .vs/config/applicationhost.config
+MacroHardDoorsServer/logs/
+MacroHardDoorsServer/config.cnf

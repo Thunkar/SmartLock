@@ -1,37 +1,109 @@
-﻿var app = require("../app.js"),
+﻿var app = require("../server.js"),
     mongoose = require('mongoose'),
-    user = mongoose.model('UserModel'),
-    admin = mongoose.model('AdminModel'),
+    userModel = mongoose.model('UserModel'),
+    adminModel = mongoose.model('AdminModel'),
+    tokenModel = mongoose.model('TokenModel'),
+    authController = require('./authController.js')
     console = process.console;
 
-var createSessionId = function () {
-    var pickFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+#%&";
-    var id = "";
-    for (var i = 0; i < 40; i++) {
-        id += pickFrom.charAt(Math.random() * 59);
-    }
-    return id;
-}
-
-exports.loginRequired = function (req, res, next) {
-    if (!req.session.user) res.status(403).send("Not authorized");
-    else next();
-}
 
 exports.doAdminLogin = function (req, res) {
-    admin.findOne({ alias: req.body.alias }, function (err, admin) {
+    adminModel.findOne({ alias: req.body.alias }, function (err, admin) {
         if (err) {
             res.status(500).send(err.message);
             return console.time().file().error(err.message);
         }
         if (admin.password === req.body.password) {
-            req.session.user = { id: createSessionId(), alias: admin.alias };
+            req.session.user = { token: admin.token, alias: admin.alias, isAdmin: true };
             res.status(200).send("Success");
         }
         else res.status(401).send("Not authorized");
     });
 };
 
+exports.createNewAdmin = function (req, res) {
+    var newAdmin = new adminModel({
+        alias: req.body.alias,
+        password: req.body.password,
+        token: authController.generateToken(),
+        name: req.body.name,
+    });
+    adminModel.save(function (err) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        return res.status(200).send("Success");
+    });
+};
+
 exports.createNewUser = function (req, res) {
-    user.
-}
+    var newUser = new userModel({
+        alias: req.body.alias,
+        password: req.body.password,
+        token: authController.generateToken(),
+        name: req.body.name,
+        tokens: []
+    });
+    newUser.save(function (err) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        return res.status(200).send("Success");
+    });
+};
+
+
+exports.addNewToken = function (req, res) {
+    var newToken = new tokenModel({
+        name: req.body.name,
+        doors: req.body.doors,
+        uses: req.body.uses,
+        validity: req.body.validity,
+        user: req.body.user
+    });
+    newToken.save(function (err, token) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        userModel.update({ alias: req.body.user }, { $push: { tokens: token.id } }, function (err) {
+            if (err) {
+                console.file().time().err(err.message);
+                return res.status(500).send(err.message);
+            }
+            return res.status(200).send("Success");
+        });
+    });
+};
+
+exports.revokeToken = function (req, res) {
+    tokenModel.remove({ _id: req.param.token }, function (err) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        return res.status(200).jsonp(tokens);
+    });
+};
+
+exports.getUserTokens = function (req, res) {
+    tokenModel.find({ user: req.params.user }, function (err, tokens) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        return res.status(200).jsonp(tokens);
+    });
+};
+
+exports.getUsers = function (req, res) {
+    userModel.find({}, function (err, users) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        return res.status(200).jsonp(users);
+    });
+};

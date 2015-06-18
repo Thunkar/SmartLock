@@ -1,14 +1,16 @@
 ﻿var scribe = require('scribe-js')(),
     express = require('express'),
     app = express(),
+    fs = require('fs'),
     bodyParser = require('body-parser'),
     methodOverride = require("method-override"),
     session = require('express-session'),
-    cookieParser = require('cookie-parser');
+    cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
-    nodeModel = require('./models/nodeModel.js')(app, mongoose),
+    doorModel = require('./models/doorModel.js')(app, mongoose),
     userModel = require('./models/userModel.js')(app, mongoose),
-    adminModel = require('./models/adminModel.js')(app, mongoose);
+    adminModel = require('./models/adminModel.js')(app, mongoose),
+    tokenModel = require('./models/tokenModel.js')(app, mongoose);
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
@@ -16,6 +18,7 @@ app.use(methodOverride());
 app.use(cookieParser('macroharddoors'));
 app.use(session());
 app.use(scribe.express.logger());
+app.enable('trust proxy');
 
 var console = process.console;
 exports.console = console;
@@ -30,7 +33,11 @@ console.addLogger('system', null, {
     defaultTags: ['System']
 });
 
-mongoose.connect('mongodb://localhost:27017/doors', function (err) {
+console.file().time().system("Reading config file")
+var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
+exports.env = env;
+
+mongoose.connect(env.dbAddress, function (err) {
     if (err) {
         console.error("could not connect to DB: " + err);
     }
@@ -39,10 +46,10 @@ mongoose.connect('mongodb://localhost:27017/doors', function (err) {
 });
 
 
-var nodes = require('./routes/nodes.js'),
+var doors = require('./routes/doors.js'),
     users = require('./routes/users.js');
 
-app.use("/api/nodes", nodes);
+app.use("/api/doors", doors);
 app.use("/api/users", users);
 app.use(express.static(__dirname + "/frontend"));
 
@@ -50,6 +57,6 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/frontend/index.html');
 });
 
-app.listen(5000, function () {
+app.listen(env.port, function () {
     console.time().file().system('Main server listening');
 });

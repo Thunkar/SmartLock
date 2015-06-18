@@ -31,12 +31,14 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="controllers\authController.js" />
+    <Compile Include="controllers\doorController.js" />
     <Compile Include="controllers\userController.js" />
-    <Compile Include="controllers\nodeController.js" />
     <Compile Include="models\adminModel.js" />
+    <Compile Include="models\tokenModel.js" />
     <Compile Include="models\userModel.js" />
-    <Compile Include="models\nodeModel.js" />
-    <Compile Include="routes\nodes.js" />
+    <Compile Include="models\doorModel.js" />
+    <Compile Include="routes\doors.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="server.js" />
     <Content Include="package.json" />
