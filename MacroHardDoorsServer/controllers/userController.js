@@ -5,7 +5,10 @@
     tokenModel = mongoose.model('TokenModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
+    fs = require('fs'),
     console = process.console;
+
+var storagePath = './uploads/';
 
 
 exports.doAdminLogin = function (req, res) {
@@ -55,6 +58,35 @@ exports.createNewUser = function (req, res) {
         }
         stats.generateEvent(stats.eventType.newUser, newUser.alias, null, null, null);
         return res.status(200).send("Success");
+    });
+};
+
+exports.editUser = function (req, res) {
+    userModel.findOne({ alias: req.params.user }, function (err, user) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        if (!user) return res.status(404).send("User not found");
+        var updatedUser = {
+            name: req.body.name || user.name,
+            profilePic: user.profilePic,
+            password: req.body.password || user.password
+        };
+        if (req.files.profilePic) {
+            updatedUser.profilePic = req.files.profilePic.name;
+            fs.unlink(storagePath + user.profilePic, function (err) { if (err) console.file().time().error(err.message) });
+        }
+        user.name = updatedUser.name;
+        user.profilePic = updatedUser.profilePic;
+        user.password = updatedUser.password;
+        user.save(function (err) {
+            if (err) {
+                console.file().time().err(err.message);
+                return res.status(500).send(err.message);
+            }
+            return res.status(200).send("Success");
+        });
     });
 };
 
