@@ -1,0 +1,1 @@
+DoorsAdmin.controller('doorsController', function ($scope,$location) {});

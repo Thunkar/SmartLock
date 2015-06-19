@@ -1,0 +1,64 @@
+  <script type="text/ng-template" id="addUser.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Add User</h3>
+    </div>
+    <div class="modal-body form-horizontal" style="overflow:hidden">
+      <div class="form-group">
+          <div class="form-group" style="margin-bottom:10px">
+            <label class="control-label col-sm-3">Name:</label>
+            <div class="col-sm-6">
+                <input class="form-control" placeholder="Enter user name" ng-model="name">
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+            <label class="control-label col-sm-3">Alias:</label>
+            <div class="col-sm-6">
+                <input class="form-control" placeholder="Enter user alias" ng-model="alias">
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+            <label class="control-label col-sm-3">Password:</label>
+            <div class="col-sm-6">
+                <input class="form-control" type="password" placeholder="Enter password" ng-model="password">
+        </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+        <label class="control-label col-sm-3"  for="image" class="rem">Image:</label>
+            <div class="col-sm-6">
+                <input  type="file" accept="image/*" id="image" name="image"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click="ok()">OK</button>
+  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>
+</script>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Users</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="row" ng-repeat="row in usersRows">
+    <div class="col-sm-4" ng-repeat="user in row">
+        <div class="panel panel-primary " >
+            <div class="panel-heading">
+                {{user.alias}}
+            </div>
+            <div class="panel-body">
+            <div class="row">
+                <img class="col-xs-6 img-responsive" ng-src="{{user.profilePic}}"/>
+                <div  class="col-xs-6"><p>Full name:</p> <p> {{user.name}} </p></div>
+            </div>
+            </div>
+            <div class="panel-footer">
+              <button class="btn btn-danger pull-left" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
+                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="btn btn-success pull-right" ng-click="addUser()">Add user</button>

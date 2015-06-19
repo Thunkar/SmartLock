@@ -1,0 +1,58 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">{{user.alias}} - {{user.name}}</h1>
+    </div>
+</div>
+<div class="row">
+	<div class="col-sm-5 ">
+      <img class="userImage img-responsive" ng-src="{{user.profilePic}}">
+    </div>
+    <div class="col-sm-7 ">
+     	<form class="form-horizontal">
+     		 <div class="form-group">
+          <div class="form-group" style="margin-bottom:10px">
+            <label class="control-label col-sm-3">Name:</label>
+            <div class="col-sm-6">
+                <input class="form-control" placeholder="Update user name" ng-model="editedUser.name">
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+            <label class="control-label col-sm-3">Password:</label>
+            <div class="col-sm-6">
+                <input class="form-control" type="password" placeholder="Update password" ng-model="editedUser.password">
+        </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+        <label class="control-label col-sm-3"  for="image" class="rem">Image:</label>
+            <div class="col-sm-6">
+                <input  type="file" accept="image/*" id="image" name="image"/>
+            </div>
+        </div>
+     	</div>
+     	</form>
+     	<button class="btn btn-success pull-right" ng-click="saveProfile()">Save profile</button>
+    </div>
+</div>
+<div class="row">
+    <h2 >Tokens</h2>
+</div>
+<div class="row" ng-repeat="row in tokensRows">
+    <div class="col-sm-4" ng-repeat="token in row">
+        <div class="panel panel-primary " >
+            <div class="panel-heading">
+                {{token.name}}
+            </div>
+            <div class="panel-body">
+            <div class="row">
+                <label class="control-label col-sm-3"></label>
+                <label class="control-label col-sm-3"></label>
+            </div>
+            </div>
+            <div class="panel-footer">
+              <button class="btn btn-danger pull-left" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
+                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
