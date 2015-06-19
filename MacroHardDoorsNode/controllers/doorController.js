@@ -3,12 +3,14 @@
     console = process.console;
 
 var failedHeartbeats = 0;
+var open = false;
 
 exports.init = function () {
     request.post(node.env.serverAddress + "/api/doorcomms/handshake", {
         json: {
             name: node.env.name,
-            section: node.env.section
+            section: node.env.section,
+            open: false
         }
     }, function (err, response, body) {
         if (err) {

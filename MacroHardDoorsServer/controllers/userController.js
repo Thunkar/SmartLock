@@ -83,7 +83,13 @@ exports.revokeToken = function (req, res) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        return res.status(200).jsonp("Removed");
+        userModel.update({ alias: req.params.user }, { $pull: { tokens: req.params.token } }, function (err) {
+            if (err) {
+                console.file().time().err(err.message);
+                return res.status(500).send(err.message);
+            }
+            return res.status(200).jsonp("Removed");
+        });
     });
 };
 

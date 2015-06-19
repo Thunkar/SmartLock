@@ -6,7 +6,8 @@ var doorSchema = new Schema({
     section: { type: String, default: "" },
     ip: { type: String, default: "" },
     lastHeartbeat: { type: Date, default: Date.now },
-    open: {type: Boolean, default: false}
+    open: { type: Boolean, default: false },
+    active: {type: Boolean, default: false}
 });
 
 
