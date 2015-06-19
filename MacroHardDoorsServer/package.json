@@ -16,6 +16,7 @@
     "method-override": "^2.3.2",
     "moment": "^2.10.3",
     "mongoose": "^4.0.5",
+    "multer": "^0.1.8",
     "scribe-js": "^2.0.4"
   }
 }

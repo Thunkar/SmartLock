@@ -7,7 +7,8 @@ var userSchema = new Schema({
     password: {type: String, default: ""},
     name: { type: String, default: "" },
     token: {type: String, default: ""},
-    tokens: [mongoose.Schema.Types.ObjectId]
+    tokens: [mongoose.Schema.Types.ObjectId],
+    profilePic: { type: String, default: "" }
 });
 
 module.exports = mongoose.model('UserModel', userSchema);

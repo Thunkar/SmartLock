@@ -43,6 +43,7 @@ exports.createNewUser = function (req, res) {
         password: req.body.password,
         token: authController.generateToken(),
         name: req.body.name,
+        profilePic: req.files.profilePic.name,
         tokens: []
     });
     newUser.save(function (err) {
@@ -93,6 +94,19 @@ exports.revokeToken = function (req, res) {
     });
 };
 
+exports.getUserInfo = function (req, res) {
+    userModel.findOne({ alias: req.params.user }, function (err, user) {
+        tokenModel.find({ _id: { $in: user.tokens } }, function (err, tokens) {
+            var userToSend = {
+                alias: user.alias, 
+                name: user.name,
+                profilePic: app.env.serverAddress + "/files/" + user.profilePic,
+                tokens: tokens
+            };
+        });
+    });
+};
+
 exports.getUserTokens = function (req, res) {
     tokenModel.find({ user: req.params.user }, function (err, tokens) {
         if (err) {
@@ -104,11 +118,22 @@ exports.getUserTokens = function (req, res) {
 };
 
 exports.getUsers = function (req, res) {
-    userModel.find({}, function (err, users) {
+    var query = userModel.find({});
+    query.select('alias name profilePic')
+    query.exec(function (err, users) {
+        var result = [];
+        for (var i = 0; i < users.length; i++) {
+            var userToSend = {
+                alias: users[i].alias, 
+                name: users[i].name,
+                profilePic: app.env.serverAddress + "/files/" + users[i].profilePic,
+            };
+            result.push(userToSend);
+        }
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        return res.status(200).jsonp(users);
+        return res.status(200).jsonp(result);
     });
 };

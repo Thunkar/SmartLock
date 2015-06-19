@@ -71,6 +71,10 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/frontend/index.html');
 });
 
+app.get('/files/:file', function (req, res) {
+    res.sendFile(__dirname + '/uploads/' + req.params.file);
+});
+
 app.listen(env.port, function () {
     console.time().file().system('Main server listening on port: ' + env.port);
 });
