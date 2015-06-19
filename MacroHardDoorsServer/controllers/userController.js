@@ -58,6 +58,22 @@ exports.createNewUser = function (req, res) {
     });
 };
 
+exports.deleteUser = function (req, res) {
+    userModel.remove(req.params.user, function (err) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        tokenModel.remove({ user: req.params.user }, function (err) {
+            if (err) {
+                console.file().time().err(err.message);
+                return res.status(500).send(err.message);
+            }
+            return res.status(200).send("Success");
+        });
+    });
+};
+
 
 exports.addNewToken = function (req, res) {
     var newToken = new tokenModel({
