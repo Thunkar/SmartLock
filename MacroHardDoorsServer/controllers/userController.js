@@ -117,13 +117,18 @@ exports.revokeToken = function (req, res) {
 
 exports.getUserInfo = function (req, res) {
     userModel.findOne({ alias: req.params.user }, function (err, user) {
-        tokenModel.find({ _id: { $in: user.tokens } }, function (err, tokens) {
+        tokenModel.find({ id: { $in: user.tokens } }, function (err, tokens) {
             var userToSend = {
                 alias: user.alias, 
                 name: user.name,
                 profilePic: app.env.serverAddress + "/files/" + user.profilePic,
                 tokens: tokens
             };
+            if (err) {
+                console.file().time().err(err.message);
+                return res.status(500).send(err.message);
+            }
+            return res.status(200).jsonp(userToSend);
         });
     });
 };
