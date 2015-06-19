@@ -5,6 +5,7 @@
     doorModel = mongoose.model('DoorModel'),
     authController = require('./authController.js'),
     doorCommController = require('./doorCommController.js'),
+    stats = require('./statisticsController.js'),
     moment = require('moment'),
     console = process.console;
 
@@ -33,6 +34,7 @@ exports.open = function (req, res) {
         if (user.tokens.indexOf(req.body.token) == -1) return res.status(400).send("User doesn't own that token");
         ensureValidToken(req.body.door, user.alias, req.body.token, function (err) {
             if (err) {
+                stats.generateEvent(stats.eventType.userRejected, user.alias, null, req.body.token, null);
                 console.file().time().error(err.message);
                 return res.status(400).send(err.message);
             }
@@ -41,6 +43,7 @@ exports.open = function (req, res) {
                     console.file().time().error(err.message);
                     return res.status(500).send(err.message);
                 }
+                stats.generateEvent(stats.eventType.userEntry, user.alias, null, req.body.token, null);
                 return res.status(200).send("Opening door");
             });
         });

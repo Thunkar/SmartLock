@@ -4,6 +4,7 @@
     tokenModel = mongoose.model('TokenModel'),
     doorModel = mongoose.model('DoorModel'),
     authController = require('./authController.js'),
+    stats = require('./statisticsController.js'),
     moment = require('moment'),
     console = process.console;
 
@@ -17,11 +18,12 @@ exports.check = function () {
             if (!heartbeats[doors[i].id] && doors[i].active) {
                 deadCounter[doors[i].id] = isNaN(deadCounter[doors[i].id]) ? 0 : deadCounter[doors[i].id] += 1;
                 if (deadCounter[doors[i].id] == 3) {
-                    console.file().time().error("Node " + doors[i].id + " is dead!");
+                    console.file().time().error("Node " + doors[i].name + " with id " + doors[i].id + " is dead!");
                     delete deadCounter[doors[i].id];
-                    doorModel.findByIdAndUpdate(doors[i].id, { $set: {active: false} }, function (err) { if (err) console.file().time().error(err.message);});
+                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { active: false } }, function (err) { if (err) console.file().time().error(err.message); });
+                    stats.generateEvent(stats.eventType.nodeOffline, null, null, null, doors[i].name);
                 } else {
-                    console.file().time().warning("Node " + doors[i].id + " might be dead");
+                    console.file().time().warning("Node " + doors[i].name+ " with id " + doors[i].id + " might be dead");
                 }
             } else if(heartbeats[doors[i].id]) {
                 delete deadCounter[doors[i].id];
@@ -56,6 +58,7 @@ exports.handshake = function (req, res) {
                 console.file().time().error(err.message);
                 return res.status(500).send(err.message);
             }
+            stats.generateEvent(stats.eventType.nodeHandshake, null, null, null, newDoor.name);
             if (door.upserted) {
                 console.file().time().log("Door " + newDoor.name + " registered with id: " + door.upserted[0]._id + " and ip: " + req.ip);
                 return res.status(200).send(door.upserted[0]._id );

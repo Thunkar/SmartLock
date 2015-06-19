@@ -12,7 +12,9 @@
     userModel = require('./models/userModel.js')(app, mongoose),
     adminModel = require('./models/adminModel.js')(app, mongoose),
     tokenModel = require('./models/tokenModel.js')(app, mongoose),
-    doorCommController = require('./controllers/doorCommController.js');
+    statisticsModel = require('./models/statisticsModel.js')(app, mongoose),
+    doorCommController = require('./controllers/doorCommController.js'),
+    stats = require('./controllers/statisticsController.js');
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
@@ -52,6 +54,7 @@ mongoose.connect(env.dbAddress, function (err) {
                 process.exit(1);
             }
             doorCommController.check();
+            stats.generateEvent(stats.eventType.systemStarted, null, null, null, null);
             console.time().file().system("Ready to receive handshakes");
         });
     }
@@ -59,12 +62,14 @@ mongoose.connect(env.dbAddress, function (err) {
 
 
 var doors = require('./routes/doors.js'),
-    doorComms = require('./routes/doorComms.js')
-    users = require('./routes/users.js');
+    doorComms = require('./routes/doorComms.js'),
+    users = require('./routes/users.js'),
+    statistics = require('./routes/statistics.js');
 
 app.use("/api/doors", doors);
 app.use("/api/doorcomms", doorComms)
 app.use("/api/users", users);
+app.use("/api/statistics", statistics),
 app.use(express.static(__dirname + "/frontend"));
 
 app.get('/', function (req, res) {

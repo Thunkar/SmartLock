@@ -34,6 +34,7 @@
     <Compile Include="controllers\authController.js" />
     <Compile Include="controllers\doorCommController.js" />
     <Compile Include="controllers\doorController.js" />
+    <Compile Include="controllers\statisticsController.js" />
     <Compile Include="controllers\userController.js" />
     <Compile Include="frontend\lib\bootstrap\dist\js\bootstrap.js" />
     <Compile Include="frontend\lib\bootstrap\dist\js\bootstrap.min.js" />
@@ -291,11 +292,13 @@
     <Compile Include="frontend\lib\raphael\raphael-min.js" />
     <Compile Include="frontend\lib\raphael\raphael.js" />
     <Compile Include="models\adminModel.js" />
+    <Compile Include="models\statisticsModel.js" />
     <Compile Include="models\tokenModel.js" />
     <Compile Include="models\userModel.js" />
     <Compile Include="models\doorModel.js" />
     <Compile Include="routes\doorComms.js" />
     <Compile Include="routes\doors.js" />
+    <Compile Include="routes\statistics.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="server.js" />
     <Content Include="frontend\admin\index.html" />
