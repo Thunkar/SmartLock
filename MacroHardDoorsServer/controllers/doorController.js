@@ -23,7 +23,7 @@ function ensureValidToken(doorName, userAlias, tokenId, callback) {
             if (moment(token.validity.to).isBefore(moment(), 'second')) return callback(new Error("The token has expired"));
         }
         if (token.validity.uses != -1) token.validity.uses--;
-        token.save(function (err){
+        token.save(function (err) {
             return callback(err);
         })
     });
@@ -50,8 +50,16 @@ exports.open = function (req, res) {
     });
 };
 
-exports.getDoorsInfo = function (req, res) {
-    doorModel.find({}, function (err, doors) {
+
+exports.searchDoors = function (req, res) {
+    var query;
+    if (req.query.door) {
+        var regex = "^" + req.query.door + ".*";
+        query = doorModel.find({ name : { $regex : regex, $options: "-i" } });
+    } else {
+        query = doorModel.find({});
+    }
+    query.exec(function (err, doors) {
         if (err) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
