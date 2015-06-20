@@ -5,3 +5,26 @@
 .colPadding{
 	padding: 0px 10px;
 }
+.token-modal-window .modal-dialog{
+	width: 90%;
+}
+.leftSeparator {
+    border-left-width: 1px;
+    border-left-color: #ccc;
+    border-left-style: solid;
+}
+
+.bottomSeparator {
+    border-bottom-width: 1px;
+    border-bottom-color: #ccc;
+    border-bottom-style: solid;
+}
+.centerText{
+	text-align: center;
+}
+.bold{
+	font-weight: bold;
+}
+.datePicker{
+	display:inline-block; min-height:290px;
+}

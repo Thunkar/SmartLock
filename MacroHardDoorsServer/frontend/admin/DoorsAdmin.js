@@ -1,4 +1,4 @@
-var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute','ui.bootstrap']);
+var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute','ui.bootstrap','ui.bootstrap.datetimepicker',"angucomplete-alt"]);
 
 DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     $routeProvider.when("/stats", {

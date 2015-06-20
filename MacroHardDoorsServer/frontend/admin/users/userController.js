@@ -1,12 +1,15 @@
 DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,$log,$routeParams) {
 	var alias=$routeParams.userAlias;
+
 	var reloadUser=function(){
 	$http.get('/api/users/'+alias).success(function(data,status){
 		if(status==200){
 			$scope.user=data;
 		}
 	});}
+
 	reloadUser();
+
 	$scope.saveProfile=function(){
 		var formData = new FormData();
 		if($("#image")[0].files.length>0)
@@ -29,4 +32,38 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 		};
 		xhr.send(formData);
 	}
+
+	$scope.addToken=function(){
+		var modalInstance = $modal.open({
+			templateUrl: 'addToken.html',
+			controller: 'addTokenCtrl',
+			windowClass: 'token-modal-window',
+			resolve: {
+			}
+		});
+
+		modalInstance.result.then(function () {
+			reloadUser();
+		}, function () {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+	}
+
+
+});
+DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance) {
+	$scope.ok = function () {
+		
+
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+	 $scope.open = function($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    $scope.opened = true;
+  };
 });

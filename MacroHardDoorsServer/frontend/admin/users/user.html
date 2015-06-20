@@ -1,58 +1,127 @@
+ <script type="text/ng-template" id="addToken.html">
+ 	<div class="modal-header">
+ 		<h3 class="modal-title">Add Token</h3>
+ 	</div>
+ 	<div class="modal-body form-horizontal" style="overflow:hidden">
+ 		<h4 >Doors</h4>
+ 		<div class="btn-group" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
+ 			<button type="button" class="btn btn-primary" >{{door.name}}</button>
+ 			<button type="button" class="btn btn-primary" ng-click="deleteAddedDoor($index)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+ 		</div>
+ 		<div class="form-group" style="margin-bottom:10px">
+ 			<label class="control-label col-sm-3">Add door:</label>
+ 			<div class="col-sm-6">
+ 				<div angucomplete-alt id="doorInput"
+ 				placeholder="Search door"
+ 				pause="100"
+ 				selected-object="doorToAdd"
+ 				remote-url="/api/doors"
+ 				remote-url-request-formatter="doorFormatter"
+ 				remote-url-data-field="doors"
+ 				title-field="Name"
+ 				description-field="section"
+ 				minlength="1"
+ 				input-class="form-control"/>
+ 			</div>
+ 		</div>
+ 		
+ 		<h4>Schedule</h4>
+ 		<tabset justified="true" >
+ 			<tab heading="Interval">
+ 				<div class="row">
+ 					<div class="col-sm-6" style="text-align: center; ">
+ 						<div class="datePicker">
+ 							<datepicker ng-model="startDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 						</div>
+ 						<div class="row">
+ 							<p class="centerText bold">Start date: {{startDate}}</p>
+ 						</div>
+ 					</div>
+ 					<div class="col-sm-6" style="text-align: center; ">
+ 						<div style="display:inline-block; min-height:290px;">
+ 							<datepicker ng-model="endDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 						</div>
+ 						<div class="row">
+ 							<p class="centerText bold">End date: {{endDate}}</p>
+ 						</div>
+ 					</div>
+ 				</div>
+
+ 			</tab>
+ 			<tab heading="Daily">
+ 				<div class="row">
+ 					<div class="col-sm-6">
+
+ 					</div>
+ 					<div class="col-sm-6">
+
+ 					</div>
+ 				</div>
+ 			</tab>
+ 		</tabset>
+ 	</div>
+ </div>
+ <div class="modal-footer">
+ 	<button class="btn btn-primary" ng-click="ok()">OK</button>
+ 	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+ </div>
+</script>
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">{{user.alias}} - {{user.name}}</h1>
-    </div>
+	<div class="col-lg-12">
+		<h1 class="page-header">{{user.alias}} - {{user.name}}</h1>
+	</div>
 </div>
 <div class="row">
 	<div class="col-sm-5 ">
-      <img class="userImage img-responsive" ng-src="{{user.profilePic}}">
-    </div>
-    <div class="col-sm-7 ">
-     	<form class="form-horizontal">
-     		 <div class="form-group">
-          <div class="form-group" style="margin-bottom:10px">
-            <label class="control-label col-sm-3">Name:</label>
-            <div class="col-sm-6">
-                <input class="form-control" placeholder="Update user name" ng-model="editedUser.name">
-            </div>
-        </div>
-        <div class="form-group" style="margin-bottom:10px">
-            <label class="control-label col-sm-3">Password:</label>
-            <div class="col-sm-6">
-                <input class="form-control" type="password" placeholder="Update password" ng-model="editedUser.password">
-        </div>
-        </div>
-        <div class="form-group" style="margin-bottom:10px">
-        <label class="control-label col-sm-3"  for="image" class="rem">Image:</label>
-            <div class="col-sm-6">
-                <input  type="file" accept="image/*" id="image" name="image"/>
-            </div>
-        </div>
-     	</div>
-     	</form>
-     	<button class="btn btn-success pull-right" ng-click="saveProfile()">Save profile</button>
-    </div>
+		<img class="userImage img-responsive" ng-src="{{user.profilePic}}">
+	</div>
+	<div class="col-sm-7 ">
+		<form class="form-horizontal">
+			<div class="form-group">
+				<div class="form-group" style="margin-bottom:10px">
+					<label class="control-label col-sm-3">Name:</label>
+					<div class="col-sm-6">
+						<input class="form-control" placeholder="Update user name" ng-model="editedUser.name">
+					</div>
+				</div>
+				<div class="form-group" style="margin-bottom:10px">
+					<label class="control-label col-sm-3">Password:</label>
+					<div class="col-sm-6">
+						<input class="form-control" type="password" placeholder="Update password" ng-model="editedUser.password">
+					</div>
+				</div>
+				<div class="form-group" style="margin-bottom:10px">
+					<label class="control-label col-sm-3"  for="image" class="rem">Image:</label>
+					<div class="col-sm-6">
+						<input  type="file" accept="image/*" id="image" name="image"/>
+					</div>
+				</div>
+			</div>
+		</form>
+		<button class="btn btn-success pull-right" ng-click="saveProfile()">Save profile</button>
+	</div>
 </div>
 <div class="row">
-    <h2 >Tokens</h2>
+	<h2 >Tokens</h2>
 </div>
 <div class="row" ng-repeat="row in tokensRows">
-    <div class="col-sm-4" ng-repeat="token in row">
-        <div class="panel panel-primary " >
-            <div class="panel-heading">
-                {{token.name}}
-            </div>
-            <div class="panel-body">
-            <div class="row">
-                <label class="control-label col-sm-3"></label>
-                <label class="control-label col-sm-3"></label>
-            </div>
-            </div>
-            <div class="panel-footer">
-              <button class="btn btn-danger pull-left" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
-                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
+	<div class="col-sm-4" ng-repeat="token in row">
+		<div class="panel panel-primary " >
+			<div class="panel-heading">
+				{{token.name}}
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<label class="control-label col-sm-3"></label>
+					<label class="control-label col-sm-3"></label>
+				</div>
+			</div>
+			<div class="panel-footer">
+				<button class="btn btn-danger pull-left" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
+				<button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
 </div>
+<button class="btn btn-success pull-right" ng-click="addToken()">Add token</button>
