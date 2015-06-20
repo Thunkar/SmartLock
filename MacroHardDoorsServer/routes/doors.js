@@ -3,7 +3,7 @@
 
 var router = express.Router();
 
-router.route('/').get(doorController.getDoorsInfo);
+router.route('/').get(doorController.searchDoors);
 router.route('/open').post(doorController.open);
 
 

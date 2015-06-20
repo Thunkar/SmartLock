@@ -17,6 +17,7 @@ exports.doAdminLogin = function (req, res) {
             res.status(500).send(err.message);
             return console.time().file().error(err.message);
         }
+        if (!admin) return res.status(404).send("Not found");
         if (admin.password === req.body.password) {
             req.session.user = { token: admin.token, alias: admin.alias, isAdmin: true };
             res.status(200).send("Success");
@@ -149,6 +150,11 @@ exports.revokeToken = function (req, res) {
 
 exports.getUserInfo = function (req, res) {
     userModel.findOne({ alias: req.params.user }, function (err, user) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        if (!user) return res.status(404).send("User not found");
         tokenModel.find({ id: { $in: user.tokens } }, function (err, tokens) {
             var userToSend = {
                 alias: user.alias, 
@@ -179,6 +185,10 @@ exports.getUsers = function (req, res) {
     var query = userModel.find({});
     query.select('alias name profilePic')
     query.exec(function (err, users) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
         var result = [];
         for (var i = 0; i < users.length; i++) {
             var userToSend = {
@@ -187,10 +197,6 @@ exports.getUsers = function (req, res) {
                 profilePic: app.env.serverAddress + "/files/" + users[i].profilePic,
             };
             result.push(userToSend);
-        }
-        if (err) {
-            console.file().time().err(err.message);
-            return res.status(500).send(err.message);
         }
         return res.status(200).jsonp(result);
     });
