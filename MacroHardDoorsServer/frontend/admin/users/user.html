@@ -1,9 +1,30 @@
  <script type="text/ng-template" id="addToken.html">
  	<div class="modal-header">
- 		<h3 class="modal-title">Add Token</h3>
+ 		<h2 class="modal-title">Add Token</h2>
  	</div>
  	<div class="modal-body form-horizontal" style="overflow:hidden">
- 		<h4 >Doors</h4>
+ 		<h3 >Info</h3>
+ 		<div class="form-group" style="margin-bottom:10px">
+ 			<label class="control-label col-sm-3">Name:</label>
+ 			<div class="col-sm-6">
+ 				<input class="form-control" placeholder="Enter token name" ng-model="name">
+ 			</div>
+ 		</div>
+ 		<div class="form-group" style="margin-bottom:10px">
+ 			<label class="control-label col-sm-3">Uses:</label>
+ 			<div class="col-sm-6">
+ 				<div ng-show="!unlimitedUses" style="display:inline">
+ 					<span class="centerText bold" style="margin:0px 10px">{{uses}}</span>
+ 					<div class="btn-group">
+ 						<button type="button" class="btn btn-primary" ng-click="incrementUses()"><span class="glyphicon glyphicon-plus"></span></button>
+ 						<button type="button" class="btn btn-primary" ng-click="decrementUses()"><span class="glyphicon glyphicon-minus"></span></button>
+ 					</div>
+
+ 				</div>
+ 				<label class="checkbox-inline"><input ng-model="unlimitedUses" type="checkbox">Unlimited</label>
+ 			</div>
+ 		</div>
+ 		<h3 >Doors</h3>
  		<div class="btn-group" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
  			<button type="button" class="btn btn-primary" >{{door.name}}</button>
  			<button type="button" class="btn btn-primary" ng-click="deleteAddedDoor($index)"><span class="glyphicon glyphicon-remove-circle"></span></button>
@@ -25,46 +46,68 @@
  			</div>
  		</div>
  		
- 		<h4>Schedule</h4>
+ 		<h3>Schedule</h3>
  		<tabset justified="true" >
  			<tab heading="Interval">
  				<div class="row">
  					<div class="col-sm-6" style="text-align: center; ">
+ 						<h4>Start</h4>
  						<div class="datePicker">
- 							<datepicker ng-model="startDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 							<datepicker  ng-model="dates.startDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 						</div>
+ 						<div>
+ 							<timepicker style="display:inline-block" ng-model="dates.startTime" ng-change="updateDates()" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
  						</div>
  						<div class="row">
- 							<p class="centerText bold">Start date: {{startDate}}</p>
+ 							<p class="centerText bold">Start date: {{prettyDate(startDateTime)}}</p>
  						</div>
  					</div>
  					<div class="col-sm-6" style="text-align: center; ">
+ 						<h4>End</h4>
  						<div style="display:inline-block; min-height:290px;">
- 							<datepicker ng-model="endDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 							<datepicker ng-model="dates.endDate" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)"></datepicker>
+ 						</div>
+ 						<div>
+ 							<timepicker ng-change="updateDates()" style="display:inline-block" ng-model="dates.endTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
  						</div>
  						<div class="row">
- 							<p class="centerText bold">End date: {{endDate}}</p>
+ 							<p class="centerText bold">End date: {{prettyDate(endDateTime)}}</p>
  						</div>
  					</div>
  				</div>
 
  			</tab>
  			<tab heading="Daily">
- 				<div class="row">
+ 				<div class="row" style="text-align: center; ">
  					<div class="col-sm-6">
+ 						<h4>Start time</h4>
+ 						<timepicker style="display:inline-block" ng-model="dates.startDailyTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
 
  					</div>
  					<div class="col-sm-6">
+ 						<h4>End time</h4>
+ 						<timepicker style="display:inline-block" ng-model="dates.endDailyTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
 
  					</div>
  				</div>
- 			</tab>
- 		</tabset>
- 	</div>
+ 				<form style="text-align: center; " class="form-inline">
+ 					<label class="checkbox-inline"><input ng-model="days[0]" type="checkbox">Monday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[1]" type="checkbox">Tuesday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[2]" type="checkbox">Wednesday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[3]" type="checkbox">Thursday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[4]" type="checkbox">Friday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[5]" type="checkbox">Saturday</label>
+ 					<label class="checkbox-inline"><input ng-model="days[6]" type="checkbox">Sunday</label>
+ 				</div>
+ 			</form>
+ 		</tab>
+ 	</tabset>
  </div>
- <div class="modal-footer">
- 	<button class="btn btn-primary" ng-click="ok()">OK</button>
- 	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
- </div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" ng-click="ok()">OK</button>
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>
 </script>
 <div class="row">
 	<div class="col-lg-12">
