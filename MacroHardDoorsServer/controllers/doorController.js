@@ -64,6 +64,6 @@ exports.searchDoors = function (req, res) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
-        return res.status(200).jsonp(doors);
+        return res.status(200).jsonp({ doors: doors });
     });
 };

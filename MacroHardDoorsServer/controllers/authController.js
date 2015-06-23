@@ -18,30 +18,14 @@ generateSignature = function (date, token) {
     return SHA256(toSign);
 }
 
-generateAppSignature = function (date) {
-    var toSign = date + "_" + appSecret;
-    return SHA256(toSign);
-}
 
 exports.loginRequired = function (req, res, next) {
     if (!req.session.user) res.status(403).send("Not authorized");
     else next();
 }
 
-exports.authenticateAppAndContinue = function (req, res, next) {
-    var date = req.get("signDate");
-    var sentSignature = req.get("signature");
-    var signature = generateAppSignature(date);
-    if (signature == sentSignature) {
-        next()
-    }
-    else {
-        return res.status(403).send("Not authorized");
-    }
-};
 
-
-exports.authenticateAndContinue = function (req, res, next) {
+exports.authMobileUser = function (req, res, next) {
     User.findOne({ alias: req.get("alias") }, function (err, user) {
         if (err) {
             res.status(500).send(err.message);

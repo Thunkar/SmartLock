@@ -215,6 +215,7 @@
     <Compile Include="models\doorModel.js" />
     <Compile Include="routes\doorComms.js" />
     <Compile Include="routes\doors.js" />
+    <Compile Include="routes\mobile.js" />
     <Compile Include="routes\statistics.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="server.js" />
