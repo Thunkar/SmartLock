@@ -99,7 +99,9 @@ $scope.decrementUses=function(){
 	});
 	$scope.$watch('doorToAdd',function(newVal,oldVal){
 		if($scope.doorToAdd!==undefined){
-		$scope.addedDoors.push($scope.doorToAdd);
+			var door=$scope.doorToAdd.originalObject;
+			if($scope.addedDoors.findBy(door,'name')===-1)
+		$scope.addedDoors.push(door);
 		$scope.doorToAdd=undefined;
 	}
 	});

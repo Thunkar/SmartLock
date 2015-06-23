@@ -25,9 +25,11 @@
  			</div>
  		</div>
  		<h3 >Doors</h3>
- 		<div class="btn-group" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
+ 		<div class="row content-row">
+ 		<div class="col-sm-6 col-sm-offset-3 btn-group" style="text-align:center" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
  			<button type="button" class="btn btn-primary" >{{door.name}}</button>
  			<button type="button" class="btn btn-primary" ng-click="deleteAddedDoor($index)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+ 		</div>
  		</div>
  		<div class="form-group" style="margin-bottom:10px">
  			<label class="control-label col-sm-3">Add door:</label>
@@ -39,9 +41,10 @@
  				remote-url="/api/doors"
  				remote-url-request-formatter="doorFormatter"
  				remote-url-data-field="doors"
- 				title-field="Name"
+ 				title-field="name"
  				description-field="section"
  				minlength="1"
+ 				clear-selected="true"
  				input-class="form-control"/>
  			</div>
  		</div>
