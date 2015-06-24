@@ -39,6 +39,9 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 				controller: 'addTokenCtrl',
 				windowClass: 'token-modal-window',
 				resolve: {
+					user:function(){
+						return alias;
+					}
 				}
 			});
 
@@ -51,7 +54,7 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 
 
 	});
-DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance) {
+DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,user) {
 	$scope.uses=0;
 	$scope.dates={}
 	$scope.dates.startDate=new Date();
@@ -67,20 +70,20 @@ DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance) {
 		$scope.uses++;
 	}
 
-$scope.decrementUses=function(){
-	if($scope.uses>0)
-		$scope.uses--;
+	$scope.decrementUses=function(){
+		if($scope.uses>0)
+			$scope.uses--;
 	}
 
 	var updateDates=function(){
 		var startDate=$scope.dates.startDate;
 		var startTime=$scope.dates.startTime;
 		if(startDate&&startTime)
-		$scope.startDateTime=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate(),startTime.getHours(),startTime.getMinutes(),startTime.getSeconds(),startTime.getMilliseconds());
+			$scope.startDateTime=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate(),startTime.getHours(),startTime.getMinutes(),startTime.getSeconds(),startTime.getMilliseconds());
 		var endDate=$scope.dates.endDate;
 		var endTime=$scope.dates.endTime;
 		if(endDate&&endTime)
-		$scope.endDateTime=new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate(),endTime.getHours(),endTime.getMinutes(),endTime.getSeconds(),endTime.getMilliseconds());
+			$scope.endDateTime=new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate(),endTime.getHours(),endTime.getMinutes(),endTime.getSeconds(),endTime.getMilliseconds());
 		
 	}
 	$scope.updateDates=updateDates;
@@ -101,10 +104,14 @@ $scope.decrementUses=function(){
 		if($scope.doorToAdd!==undefined){
 			var door=$scope.doorToAdd.originalObject;
 			if($scope.addedDoors.findBy(door,'name')===-1)
-		$scope.addedDoors.push(door);
-		$scope.doorToAdd=undefined;
-	}
+				$scope.addedDoors.push(door);
+			$scope.doorToAdd=undefined;
+		}
 	});
+
+	$scope.deleteAddedDoor=function(index){
+		$scope.addedDoors.splice(index,1);
+	}
 
 	$scope.doorFormatter=function(query){
 		return {
@@ -117,8 +124,41 @@ $scope.decrementUses=function(){
 	}
 
 	$scope.ok = function () {
-		
+		var doors=[];
+		for(var i=0;i<$scope.addedDoors.length;i++){
+			doors.push($scope.addedDoors[i].name);
+		}
+		var days=[];
+		for(var i=0;i<$scope.days;i++){
+			if($scope.days[i])
+				days.push(i);
+		}
+		var from={};
+		var to={};
+		var uses=$scope.unlimitedUses? -1:$scope.uses;
 
+		if($scope.daily){
+			from=$scope.dates.startDailyTime;
+			to=$scope.dates.endDailyTime;
+		}else{
+			from=$scope.startDateTime;
+			to=$scope.endDateTime;
+			days=[];
+		}
+		var token={
+			name:$scope.name,
+			user:user,
+			doors:doors,
+			validity:{
+				from: from,
+				to: to,
+				repeat:days,
+				uses:uses
+			}
+		}
+		$http.post('/api/users/'+user+'/tokens',token).success(function(data,status){
+			$modalInstance.close();
+		});
 	};
 
 	$scope.cancel = function () {
