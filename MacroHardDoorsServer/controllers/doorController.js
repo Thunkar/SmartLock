@@ -12,13 +12,13 @@
 function ensureValidToken(userId, doorName, tokenId, callback) {
     userModel.findById(userId, function (err, user) {
         if (err) return callback(err);
+        if(!user) return callback(new Error("User does not exist"));
         var token = null;
-        for (var i = 0; i < user.tokens.lenght; i++) {
+        for (var i = 0; i < user.tokens.length; i++) {
             if (user.tokens[i]._id == tokenId) token = user.tokens[i];
         }
         if(!token) return callback(new Error("User does not own that token"));
         if (token.doors.indexOf(doorName) == -1) return callback(new Error("Token cannot open that door"));
-        if (token.user != userAlias) return callback(new Error("Token cannot open that door"));
         if (token.validity.uses == 0) return callback(new Error("Token is used up"));
         if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return callback(new Error("The token is not active yet"));
         if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return callback(new Error("The token has expired"));
