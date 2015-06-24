@@ -21,7 +21,8 @@ var userSchema = new Schema({
     token: {type: String, default: ""},
     tokens: [tokenSchema],
     profilePic: { type: String, default: "" },
-    active: {type: Boolean, default: false}
+    active: {type: Boolean, default: false},
+    email: {type: String, default: ""}
 });
 
 module.exports = mongoose.model('UserModel', userSchema);

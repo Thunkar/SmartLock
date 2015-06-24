@@ -50,7 +50,8 @@ exports.createNewUser = function (req, res) {
         name: req.body.name,
         profilePic: req.files.profilePic.name,
         tokens: [],
-        active: true
+        active: true,
+        email: req.body.email
     });
     newUser.save(function (err) {
         if (err) {
@@ -72,7 +73,8 @@ exports.editUser = function (req, res) {
         var updatedUser = {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
-            password: req.body.password || user.password
+            password: req.body.password || user.password,
+            email: req.body.email || user.email
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
@@ -144,7 +146,8 @@ exports.getUserInfo = function (req, res) {
             name: user.name,
             profilePic: app.env.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
-            active: user.active
+            active: user.active,
+            email: user.email
         };
         return res.status(200).jsonp(userToSend);
     });
@@ -164,7 +167,8 @@ exports.getUsers = function (req, res) {
                 alias: users[i].alias,
                 name: users[i].name,
                 profilePic: app.env.serverAddress + "/files/" + users[i].profilePic,
-                active: users[i].active
+                active: users[i].active,
+                email: users[i].email
             };
             result.push(userToSend);
         }
