@@ -115,17 +115,18 @@ exports.addNewToken = function (req, res) {
         validity: req.body.validity,
         user: req.body.user
     });
-    newToken.save(function (err, token) {
+    newToken.save(function (err) {
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        userModel.update({ alias: req.body.user }, { $push: { tokens: token.id } }, function (err) {
+        userModel.update({ alias: req.body.user }, { $push: { tokens: newToken._id } }, function (err) {
             if (err) {
                 console.file().time().err(err.message);
                 return res.status(500).send(err.message);
             }
-            stats.generateEvent(stats.eventType.newToken, req.body.user, null, token.id, req.body.doors);
+            console.file().time().log(newToken._id);
+            stats.generateEvent(stats.eventType.newToken, req.body.user, null, newToken._id, req.body.doors);
             return res.status(200).send("Success");
         });
     });
@@ -155,17 +156,17 @@ exports.getUserInfo = function (req, res) {
             return res.status(500).send(err.message);
         }
         if (!user) return res.status(404).send("User not found");
-        tokenModel.find({ id: { $in: user.tokens } }, function (err, tokens) {
-            var userToSend = {
-                alias: user.alias, 
-                name: user.name,
-                profilePic: app.env.serverAddress + "/files/" + user.profilePic,
-                tokens: tokens
-            };
+        tokenModel.find({ _id: { $in: user.tokens } }, function (err, tokens) {
             if (err) {
                 console.file().time().err(err.message);
                 return res.status(500).send(err.message);
             }
+            var userToSend = {
+                alias: user.alias,
+                name: user.name,
+                profilePic: app.env.serverAddress + "/files/" + user.profilePic,
+                tokens: tokens
+            };
             return res.status(200).jsonp(userToSend);
         });
     });
@@ -192,7 +193,7 @@ exports.getUsers = function (req, res) {
         var result = [];
         for (var i = 0; i < users.length; i++) {
             var userToSend = {
-                alias: users[i].alias, 
+                alias: users[i].alias,
                 name: users[i].name,
                 profilePic: app.env.serverAddress + "/files/" + users[i].profilePic,
             };

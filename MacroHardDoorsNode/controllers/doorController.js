@@ -1,9 +1,11 @@
 ﻿var node = require('../node.js'),
     request = require('request'),
+    GPIO = require('onoff').Gpio,
     console = process.console;
 
 var failedHeartbeats = 0;
 var open = false;
+var openPin = new GPIO(4, 'out');
 
 exports.init = function () {
     request.post(node.env.serverAddress + "/api/doorcomms/handshake", {
@@ -32,7 +34,9 @@ exports.init = function () {
 };
 
 function openDoor() {
-    console.file().time().warning("Opening door");
+    console.file().time().warning('Opening door');
+    openPin.writeSync(1);
+    setTimeout(function () { openPin.writeSync(0) }, 1000);
 };
 
 function doHeartbeat() {
