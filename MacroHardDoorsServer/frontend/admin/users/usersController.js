@@ -6,7 +6,7 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 			var length=data.length;
 			for(var i=0;i<length/USERS_COLUMNS;i++){
 				$scope.usersRows[i]=[];
-				for(var j=0;(i*USERS_COLUMNS+j)<length;j++){
+				for(var j=0;(j<USERS_COLUMNS)&&(i*USERS_COLUMNS+j)<length;j++){
 					$scope.usersRows[i][j]=data[i*USERS_COLUMNS+j];
 				}
 			}

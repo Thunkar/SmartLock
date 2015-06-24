@@ -1,59 +1,104 @@
 DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,$log,$routeParams) {
 	var alias=$routeParams.userAlias;
+	var TOKENS_COLUMNS = 4;
 
 	var reloadUser=function(){
 		$http.get('/api/users/'+alias).success(function(data,status){
 			if(status==200){
 				$scope.user=data;
+				$scope.tokensRows=[];
+				var tokens=data.tokens;
+			var length=tokens.length;
+			for(var i=0;i<length/TOKENS_COLUMNS;i++){
+				$scope.tokensRows[i]=[];
+				for(var j=0;(j<TOKENS_COLUMNS)&&(i*TOKENS_COLUMNS+j)<length;j++){
+					$scope.tokensRows[i][j]=tokens[i*TOKENS_COLUMNS+j];
+				}
 			}
-		});}
+			}
+		});
+	}
 
-		reloadUser();
+	reloadUser();
 
-		$scope.saveProfile=function(){
-			var formData = new FormData();
-			if($("#image")[0].files.length>0)
-				formData.append("profilePic", $("#image")[0].files[0]);
-			if($scope.editedUser.name!==undefined)
-				formData.append("name", $scope.editedUser.name);
-			if($scope.editedUser.password!==undefined)
-				formData.append("password", $scope.editedUser.password);
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', window.location.origin + '/api/users/'+alias);
-			xhr.onload = function () {
-				if (xhr.status === 200) {
-					$scope.editedUser=undefined;
-					reloadUser();
-					$scope.$apply();
-				} else {
-					console.log('Something went terribly wrong...');
-				}
-
-			};
-			xhr.send(formData);
-		}
-
-		$scope.addToken=function(){
-			var modalInstance = $modal.open({
-				templateUrl: 'addToken.html',
-				controller: 'addTokenCtrl',
-				windowClass: 'token-modal-window',
-				resolve: {
-					user:function(){
-						return alias;
-					}
-				}
-			});
-
-			modalInstance.result.then(function () {
+	$scope.saveProfile=function(){
+		var formData = new FormData();
+		if($("#image")[0].files.length>0)
+			formData.append("profilePic", $("#image")[0].files[0]);
+		if($scope.editedUser.name!==undefined)
+			formData.append("name", $scope.editedUser.name);
+		if($scope.editedUser.password!==undefined)
+			formData.append("password", $scope.editedUser.password);
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', window.location.origin + '/api/users/'+alias);
+		xhr.onload = function () {
+			if (xhr.status === 200) {
+				$scope.editedUser=undefined;
 				reloadUser();
-			}, function () {
-				$log.info('Modal dismissed at: ' + new Date());
-			});
+				$scope.$apply();
+			} else {
+				console.log('Something went terribly wrong...');
+			}
+
+		};
+		xhr.send(formData);
+	}
+
+	$scope.addToken=function(){
+		var modalInstance = $modal.open({
+			templateUrl: 'addToken.html',
+			controller: 'addTokenCtrl',
+			windowClass: 'token-modal-window',
+			resolve: {
+				user:function(){
+					return alias;
+				}
+			}
+		});
+
+		modalInstance.result.then(function () {
+			reloadUser();
+		}, function () {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+	}
+
+	$scope.getToString=function(token){
+		var date=moment(new Date(token.validity.to));
+		return token.validity.repeat.length>0? date.format('h:mm:ss a') : date.format('MMMM Do YYYY, h:mm:ss a');
+	}
+
+	$scope.getFromString=function(token){
+		var date=moment(new Date(token.validity.from));
+		return token.validity.repeat.length>0? date.format('h:mm:ss a') : date.format('MMMM Do YYYY, h:mm:ss a');
+	}
+	$scope.getDayString=function(integer){
+		switch(parseInt(integer)){
+			case 0:
+			return "Monday"
+			case 1:
+			return "Tuesday"
+			case 2:
+			return "Wednesday"
+			case 3:
+			return "Thursday"
+			case 4:
+			return "Friday"
+			case 5:
+			return "Saturday"
+			case 6:
+			return "Sunday"
 		}
+	}
 
+	$scope.deleteToken=function(parent,index){
+		var token=$scope.user.tokens[parent*TOKENS_COLUMNS+index];
+		$http.post('/api/users/'+alias+'/tokens/'+token._id+'/revoke').success(function(data,status){
+			reloadUser();
+		})
+	}
 
-	});
+});
 DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,user) {
 	$scope.uses=0;
 	$scope.dates={}
@@ -84,7 +129,7 @@ DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,us
 		var endTime=$scope.dates.endTime;
 		if(endDate&&endTime)
 			$scope.endDateTime=new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate(),endTime.getHours(),endTime.getMinutes(),endTime.getSeconds(),endTime.getMilliseconds());
-		
+
 	}
 	$scope.updateDates=updateDates;
 	updateDates();
@@ -123,13 +168,17 @@ DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,us
 		return moment(date).format('MMMM Do YYYY, h:mm:ss a')
 	}
 
+	$scope.setDaily=function(boolean){
+		$scope.daily=boolean;
+	}
+
 	$scope.ok = function () {
 		var doors=[];
 		for(var i=0;i<$scope.addedDoors.length;i++){
 			doors.push($scope.addedDoors[i].name);
 		}
 		var days=[];
-		for(var i=0;i<$scope.days;i++){
+		for(var i=0;i<$scope.days.length;i++){
 			if($scope.days[i])
 				days.push(i);
 		}
