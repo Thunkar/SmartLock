@@ -210,7 +210,6 @@
     <Compile Include="frontend\lib\raphael\raphael.js" />
     <Compile Include="models\adminModel.js" />
     <Compile Include="models\statisticsModel.js" />
-    <Compile Include="models\tokenModel.js" />
     <Compile Include="models\userModel.js" />
     <Compile Include="models\doorModel.js" />
     <Compile Include="routes\doorComms.js" />

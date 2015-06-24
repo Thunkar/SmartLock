@@ -1,7 +1,6 @@
 ﻿var app = require("../server.js"),
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
-    tokenModel = mongoose.model('TokenModel'),
     doorModel = mongoose.model('DoorModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),

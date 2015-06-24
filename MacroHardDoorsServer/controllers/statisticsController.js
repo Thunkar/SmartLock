@@ -2,7 +2,6 @@
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
-    tokenModel = mongoose.model('TokenModel'),
     statisticsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     console = process.console;

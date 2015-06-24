@@ -11,7 +11,6 @@
     doorModel = mongoose.model('DoorModel'),
     userModel = require('./models/userModel.js')(app, mongoose),
     adminModel = require('./models/adminModel.js')(app, mongoose),
-    tokenModel = require('./models/tokenModel.js')(app, mongoose),
     statisticsModel = require('./models/statisticsModel.js')(app, mongoose),
     doorCommController = require('./controllers/doorCommController.js'),
     stats = require('./controllers/statisticsController.js');
