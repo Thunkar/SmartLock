@@ -7,4 +7,4 @@ var providerSchema = new Schema({
     url: {type: String, default:""}
 });
 
-module.exports = mongoose.model('ProviderSchema', providerSchema);
+module.exports = mongoose.model('ProviderModel', providerSchema);

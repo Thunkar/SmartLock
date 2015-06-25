@@ -6,7 +6,8 @@ var adminSchema = new Schema( {
     password: { type: String, default: "" },
     name: { type: String, default: "" },
     token: { type: String, default: "" },
-    profilePic: {type: String, default: ""}
+    profilePic: { type: String, default: "" },
+    provider: {type: Schema.Types.ObjectId}
 });
 
 module.exports = mongoose.model('AdminModel', adminSchema);

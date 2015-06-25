@@ -35,16 +35,6 @@ mongoose.connect(env.dbAddress, function (err) {
     }
     else {
         console.time().file().system("Connected to DB");
-        console.time().file().system("Cleaning up...");
-        doorModel.remove({}, function (err) {
-            if (err) {
-                console.time().file().error(err.message);
-                process.exit(1);
-            }
-            doorCommController.check();
-            stats.generateEvent(stats.eventType.systemStarted, null, null, null, null);
-            console.time().file().system("Ready to receive handshakes");
-        });
     }
 });
 
@@ -52,6 +42,9 @@ var providers = require('./routes/providers.js');
 
 app.use("/api/providers", providers);
 
+app.get('/files/:file', function (req, res) {
+    res.sendFile(__dirname + '/uploads/' + req.params.file);
+});
 
 app.listen(env.port, function () {
     console.time().file().system('Main server listening on port: ' + env.port);

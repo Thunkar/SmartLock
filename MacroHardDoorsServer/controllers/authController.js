@@ -13,8 +13,8 @@ exports.generateToken = function () {
     return token;
 };
 
-generateSignature = function (date, token) {
-    var toSign = date + "_" + token + "_" + appSecret;
+exports.generateSignature = function (date, token) {
+    var toSign = date + "_" + token;
     return SHA256(toSign);
 }
 
@@ -37,7 +37,7 @@ exports.authMobileUser = function (req, res, next) {
         var token = user.token;
         var date = req.get("signDate");
         var sentSignature = req.get("signature");
-        var signature = generateSignature(date, token);
+        var signature = exports.generateSignature(date, token);
         if (signature == sentSignature) {
             next();
         }

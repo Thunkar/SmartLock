@@ -34,6 +34,7 @@
     <Compile Include="controllers\authController.js" />
     <Compile Include="controllers\doorCommController.js" />
     <Compile Include="controllers\doorController.js" />
+    <Compile Include="controllers\mobileController.js" />
     <Compile Include="controllers\statisticsController.js" />
     <Compile Include="controllers\userController.js" />
     <Compile Include="frontend\lib\bootstrap\dist\js\bootstrap.js" />

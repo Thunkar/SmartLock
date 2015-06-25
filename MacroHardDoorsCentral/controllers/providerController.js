@@ -8,21 +8,42 @@ var storagePath = './uploads/';
 
 exports.addProvider = function (req, res) {
     var provider = new providerModel({
-        alias: req.body.alias,
-        password: req.body.password,
-        token: authController.generateToken(),
         name: req.body.name,
-        profilePic: req.files.profilePic.name,
-        tokens: [],
-        active: true,
-        email: req.body.email
+        url: req.body.url,
+        profilePic: req.files.profilePic.name
     });
-    newUser.save(function (err) {
+    provider.save(function (err) {
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
-        return res.status(200).send(newUser._id);
+        return res.status(200).send(provider._id);
+    });
+};
+
+exports.removeProvider = function (req, res) {
+    providerModel.findByIdAndRemove(req.params.provider, function (err, provider) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        if (!provider) return res.status(404).send("Not found");
+        fs.unlink(storagePath + provider.profilePic, function(err) {if(err) console.file().time().error(err.message)})
+        return res.status(200).send("Success");
+    });
+};
+
+exports.getProviders = function (req, res) {
+    providerModel.find({}, function (err, providers) {
+        if (err) {
+            console.file().time().err(err.message);
+            return res.status(500).send(err.message);
+        }
+        var result = [];
+        for (var i = 0; i < providers.length; i++) {
+            var provider = providers[i];
+            provider.profilePic = app.env.serverAddress + "files/" + provider.profilePic;
+        }
+        return res.status(200).jsonp(providers);
     });
 };
