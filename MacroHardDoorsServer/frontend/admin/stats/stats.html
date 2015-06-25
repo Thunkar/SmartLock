@@ -154,19 +154,19 @@
                                 </p>
                             </div>
                             <div class="timeline-body">
-                                <p ng-switch-when="userEntry">User {{event.user.name}} used door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
-                                <p ng-switch-when="userRejected">User {{event.user.name}} failed to use door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
+                                <p ng-switch-when="userEntry">User {{event.user.name}} used door {{event.door}} with token {{findToken(event.user,event.token).name}}.</p>
+                                <p ng-switch-when="userRejected">User {{event.user.name}} failed to use door {{event.door}} with token {{findToken(event.user,event.token).name}}.</p>
                                 <p ng-switch-when="nodeHandshake">Door {{event.door}} is now connected to the server.</p>
                                 <p ng-switch-when="nodeOffline">Door {{event.door}} has crashed.</p>
                                 <p ng-switch-when="newUser">User {{event.user.name}} created in the database.</p>
                                 <p ng-switch-when="newAdmin">Admin {{event.user.name}} created in the database.</p>
-                                <p ng-switch-when="tokenRevoked">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been revoked</p>
-                                <p ng-switch-when="newToken">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been created</p>
+                                <p ng-switch-when="tokenRevoked">Token {{findToken(event.user,event.token).name}} of user {{event.user.name}} has been revoked</p>
+                                <p ng-switch-when="newToken">Token {{findToken(event.user,event.token).name}} of user {{event.user.name}} has been created</p>
                                 <p ng-switch-when="systemStarted">System startup completed</p>
                                     <p ng-switch-when="nodeActivated">Door {{event.door}} has been activated</p>
                                         <p ng-switch-when="nodeDeactivated">Door {{event.door}} has been deactivated.</p>
 
-                                        <p ng-switch-when="failedEntry">User {{event.user.name}} hasn't been able use door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
+                                        <p ng-switch-when="failedEntry">User {{event.user.name}} hasn't been able use door {{event.door}} with token {{findToken(event.user,event.token).name}}.</p>
                             </div>
                         </div>
 
