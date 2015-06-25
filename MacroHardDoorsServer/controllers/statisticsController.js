@@ -15,7 +15,7 @@ exports.eventType = {
     newUser: "newUser",
     newAdmin: "newAdmin",
     tokenRevoked: "tokenRevoked",
-    newToken: "tokenAdded",
+    newToken: "newToken",
     systemStarted: "systemStarted"
 };
 
