@@ -43,7 +43,7 @@
 </div>
 <div class="row" ng-repeat="row in usersRows">
     <div class="col-sm-4" ng-repeat="user in row">
-        <div class="panel panel-default " >
+        <div ng-class="user.active ? 'panel-default ' : 'panel-danger '" class="panel " >
             <div class="panel-heading">
                 {{user.alias}}
             </div>
@@ -54,8 +54,8 @@
             </div>
             </div>
             <div class="panel-footer">
-              <button class="btn btn-danger pull-left" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
-                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
+              <button class="btn btn-danger pull-right" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
+                <button class="btn btn-info pull-left" ng-click="viewUser($parent.$index,$index)">User info</button>
                 <div class="clearfix"></div>
             </div>
         </div>

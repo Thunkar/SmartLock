@@ -29,7 +29,7 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 	}
 	$scope.deleteUser=function(parent,index){
 		var user=$scope.usersRows[parent][index];
-		$http.post('/api/users/'+user.alias+'/delete',{}).success(function(data,status){
+		$http.post('/api/users/'+user._id+'/delete',{}).success(function(data,status){
 			if(status==200){
 				reloadUsers();
 			}
@@ -37,7 +37,7 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 	}
 		$scope.viewUser=function(parent,index){
 		var user=$scope.usersRows[parent][index];
-		$location.path('/users/'+user.alias);
+		$location.path('/users/'+user._id);
 	}
 });
 DoorsAdmin.controller('addUserCtrl', function ($http, $scope, $modalInstance) {
