@@ -101,7 +101,9 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 
 		});},1000);
 
-	
+	$scope.findToken=function(user,tokenId){
+		return user.tokens[user.tokens.findBy({_id:tokenId},'_id')];
+	}	
 
 });
 
