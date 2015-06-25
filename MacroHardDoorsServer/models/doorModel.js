@@ -7,7 +7,8 @@ var doorSchema = new Schema({
     ip: { type: String, default: "" },
     lastHeartbeat: { type: Date, default: Date.now },
     open: { type: Boolean, default: false },
-    active: {type: Boolean, default: false}
+    active: { type: Boolean, default: false },
+    online: {type: Boolean, default: false}
 });
 
 

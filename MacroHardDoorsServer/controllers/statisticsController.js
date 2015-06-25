@@ -16,7 +16,10 @@ exports.eventType = {
     newAdmin: "newAdmin",
     tokenRevoked: "tokenRevoked",
     newToken: "newToken",
-    systemStarted: "systemStarted"
+    systemStarted: "systemStarted",
+    nodeDeactivated: "nodeDeactivated",
+    nodeActivated: "nodeActivated",
+    failedEntry: "failedEntry"
 };
 
 exports.generateEvent = function (eventType, user, admin, token, door) {
@@ -24,10 +27,15 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
         event: eventType,
         date: new Date()
     });
-    if (door) newEvent.door = door;
-    if (user) newEvent.user = mongoose.Types.ObjectId(user);
-    if (token) newEvent.token = mongoose.Types.ObjectId(token);
-    if (admin) newEvent.admin = mongoose.Types.ObjectId(admin);
+    try {
+        if (door) newEvent.door = door;
+        if (user) newEvent.user = mongoose.Types.ObjectId(user);
+        if (token) newEvent.token = mongoose.Types.ObjectId(token);
+        if (admin) newEvent.admin = mongoose.Types.ObjectId(admin);
+    }
+    catch (err) {
+        if (err) console.file().time().error(err.message);
+    }
     newEvent.save(function (err) {
         if (err) console.file().time().error(err.message);
     });
@@ -40,7 +48,7 @@ exports.getLatest = function (req, res) {
     query.sort('-date');
     if (timeBounded)
         query.limit(10000);
-    else 
+    else
         query.limit(20);
     query.populate('user', '_id alias name profilePic tokens');
     query.populate('admin', '_id alias name profilePic');
@@ -51,9 +59,9 @@ exports.getLatest = function (req, res) {
         }
         var result = [];
         for (var i = 0; i < stats.length; i++) {
-            var stat = stats[i];
-            if (stat.user) stat.user.profilePic = app.env.serverAddress + "/files/" + stat.user.profilePic;
-            if (!timeBounded || (moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to)))) result.push(stat);
+            if (stats[i].user) 
+                stats[i].user.profilePic = app.env.serverAddress + "/files/" + stats[i].user.profilePic;
+            if (!timeBounded || (moment(stats[i].date).isAfter(moment(req.query.from)) && moment(stats[i].date).isBefore(moment(req.query.to)))) result.push(stats[i]);
         }
         return res.status(200).jsonp(result);
     });

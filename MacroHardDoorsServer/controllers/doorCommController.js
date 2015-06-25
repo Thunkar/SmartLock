@@ -14,19 +14,19 @@ exports.check = function () {
     doorModel.find({}, function (err, doors) {
         if (err) return console.file().time().error(err.message);
         for (var i = 0; i < doors.length; i++) {
-            if (!heartbeats[doors[i].id] && doors[i].active) {
+            if (!heartbeats[doors[i].id] && doors[i].online) {
                 deadCounter[doors[i].id] = isNaN(deadCounter[doors[i].id]) ? 0 : deadCounter[doors[i].id] += 1;
                 if (deadCounter[doors[i].id] == 3) {
                     console.file().time().error("Node " + doors[i].name + " with id " + doors[i].id + " is dead!");
                     delete deadCounter[doors[i].id];
-                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { active: false } }, function (err) { if (err) console.file().time().error(err.message); });
+                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: false } }, function (err) { if (err) console.file().time().error(err.message); });
                     stats.generateEvent(stats.eventType.nodeOffline, null, null, null, doors[i].name);
                 } else {
                     console.file().time().warning("Node " + doors[i].name+ " with id " + doors[i].id + " might be dead");
                 }
             } else if(heartbeats[doors[i].id]) {
                 delete deadCounter[doors[i].id];
-                doorModel.findByIdAndUpdate(doors[i].id, { $set: { active: true } }, function (err) { if (err) console.file().time().error(err.message); });
+                doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: true } }, function (err) { if (err) console.file().time().error(err.message); });
             }
         }
         setTimeout(exports.check, app.env.checkInterval);
@@ -50,6 +50,7 @@ exports.handshake = function (req, res) {
             ip: req.ip,
             lastHeartbeat: new Date(), 
             active: true,
+            online: true,
             open: req.body.open
         }
         doorModel.update({ name: newDoor.name }, newDoor, { upsert: true }, function (err, door) {
@@ -102,6 +103,7 @@ exports.openDoor = function (doorName, retries, callback) {
     doorModel.findOne({ name: doorName }, function (err, door) {
         if (err) return callback(err);
         if (!door) return callback(new Error("Door does not exist"));
+        if (!door.active) return callback(new Error("Door is not active"));
         if (!heartbeats[door.id]) {
             setTimeout(function () {
                 exports.openDoor(door, ++retries, callback);

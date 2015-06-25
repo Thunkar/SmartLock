@@ -37,21 +37,35 @@ function ensureValidToken(userId, doorName, tokenId, callback) {
 exports.open = function (req, res) {
     ensureValidToken(req.body.user, req.body.door, req.body.token, function (err) {
         if (err) {
-            stats.generateEvent(stats.eventType.userRejected, req.body.user, null, req.body.token, null);
+            stats.generateEvent(stats.eventType.userRejected, req.body.user, null, req.body.token, req.body.door);
             console.file().time().error(err.message);
             return res.status(400).send(err.message);
         }
         doorCommController.openDoor(req.body.door, 0, function (err, result) {
             if (err) {
+                stats.generateEvent(stats.eventType.failedEntry, req.body.user, null, req.body.token, req.body.door);
                 console.file().time().error(err.message);
                 return res.status(500).send(err.message);
             }
-            stats.generateEvent(stats.eventType.userEntry, req.body.user, null, req.body.token, null);
+            stats.generateEvent(stats.eventType.userEntry, req.body.user, null, req.body.token, req.body.door);
             return res.status(200).send("Opening door");
         });
     });
 };
 
+exports.toggleDoor = function (req, res) {
+    doorModel.update({ name: req.params.door },{ $set: { active: req.body.active }}, function (err) {
+        if (err) {
+            console.file().time().error(err.message);
+            return res.status(500).send(err.message);
+        }
+        if(req.body.active)
+            stats.generateEvent(stats.eventType.nodeActivated, null, null, null, req.params.door);
+        else
+            stats.generateEvent(stats.eventType.nodeDeactivated, null, null, null, req.params.door);
+        return res.status(200).send("Success");
+    });
+}
 
 exports.searchDoors = function (req, res) {
     var query;
