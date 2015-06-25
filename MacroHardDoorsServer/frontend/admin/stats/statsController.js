@@ -106,9 +106,10 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 });
 
 DoorsAdmin.controller('timelineController', function ($scope,$location,$http) {
+	setInterval(function(){
 	$http.get('/api/statistics').success(function(data,status){
 		$scope.timeline=data;
-	});
+	});},1000);
 
 	$scope.formatDate=function(date){
 		return " "+moment(new Date(date)).fromNow();
