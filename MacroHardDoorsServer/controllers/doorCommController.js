@@ -19,12 +19,12 @@ exports.check = function () {
                 if (deadCounter[doors[i].id] == 3) {
                     console.file().time().error("Node " + doors[i].name + " with id " + doors[i].id + " is dead!");
                     delete deadCounter[doors[i].id];
-                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: false } }, function (err) { if (err) console.file().time().error(err.message); });
+                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: false, active : false }}, function (err) { if (err) console.file().time().error(err.message); });
                     stats.generateEvent(stats.eventType.nodeOffline, null, null, null, doors[i].name);
                 } else {
-                    console.file().time().warning("Node " + doors[i].name+ " with id " + doors[i].id + " might be dead");
+                    console.file().time().warning("Node " + doors[i].name + " with id " + doors[i].id + " might be dead");
                 }
-            } else if(heartbeats[doors[i].id]) {
+            } else if (heartbeats[doors[i].id]) {
                 delete deadCounter[doors[i].id];
                 doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: true } }, function (err) { if (err) console.file().time().error(err.message); });
             }
@@ -48,8 +48,8 @@ exports.handshake = function (req, res) {
             name: req.body.name,
             section: req.body.section,
             ip: req.ip,
-            lastHeartbeat: new Date(), 
-            active: true,
+            lastHeartbeat: new Date(),
+            active: app.env.activeDoorsDefault,
             online: true,
             open: req.body.open
         }
@@ -61,7 +61,7 @@ exports.handshake = function (req, res) {
             stats.generateEvent(stats.eventType.nodeHandshake, null, null, null, newDoor.name);
             if (door.upserted) {
                 console.file().time().log("Door " + newDoor.name + " registered with id: " + door.upserted[0]._id + " and ip: " + req.ip);
-                return res.status(200).send(door.upserted[0]._id );
+                return res.status(200).send(door.upserted[0]._id);
             }
             doorModel.findOne({ name: newDoor.name }, function (err, door) {
                 console.file().time().log("Door " + door.name + " re-registered with id: " + door.id + " and ip: " + req.ip);
@@ -86,7 +86,7 @@ exports.heartbeat = function (req, res) {
         }
         if (!door) return res.status(404).send("Door does not exist");
         var timeoutId = setTimeout(function () {
-            answerHeartbeat(door)
+            answerHeartbeat(door);
         }, app.env.pingInterval);
         heartbeats[door.id] = { res: res, timeoutId: timeoutId, name: door.name };
         door.lastHeartbeat = new Date();

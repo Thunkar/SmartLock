@@ -1,4 +1,4 @@
-﻿var node = require('../node.js'),
+﻿var node = require('../door.js'),
     request = require('request'),
     GPIO = require('onoff').Gpio,
     console = process.console;

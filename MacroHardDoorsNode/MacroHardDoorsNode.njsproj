@@ -12,7 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e5d9c12d-f691-48cf-9624-d4c33824af3e</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>node.js</StartupFile>
+    <StartupFile>door.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="controllers\doorController.js" />
-    <Compile Include="node.js" />
+    <Compile Include="door.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

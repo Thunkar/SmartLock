@@ -18,5 +18,9 @@ var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
 exports.env = env;
 console.file().time().system("Configuration loaded");
 
-var controller = require('./controllers/doorController.js');
-setTimeout(controller.init, 2000);
+if(env.dummy)
+    var controller = require('./controllers/doorControllerDummy.js');
+else
+    var controller = require('./controllers/doorController.js');
+
+controller.init();
