@@ -31,6 +31,9 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
         templateUrl: "users/user.html"
     }).otherwise({redirectTo: '/stats'});
 });
+DoorsAdmin.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.timeout = 5000;
+}]);
 /*
 DoorsAdmin.controller('sidebarController', function ($scope,$location) {
   var url =   $location.path();
