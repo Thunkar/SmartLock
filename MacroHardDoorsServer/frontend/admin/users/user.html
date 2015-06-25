@@ -26,10 +26,10 @@
  		</div>
  		<h3 >Doors</h3>
  		<div class="row content-row">
- 		<div class="col-sm-6 col-sm-offset-3 btn-group" style="text-align:center" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
- 			<button type="button" class="btn btn-primary" >{{door.name}}</button>
- 			<button type="button" class="btn btn-primary" ng-click="deleteAddedDoor($index)"><span class="glyphicon glyphicon-remove-circle"></span></button>
- 		</div>
+ 			<div class="col-sm-6 col-sm-offset-3 btn-group" style="text-align:center" ng-repeat="door  in addedDoors" style="padding:0px 5px;">
+ 				<button type="button" class="btn btn-primary" >{{door.name}}</button>
+ 				<button type="button" class="btn btn-primary" ng-click="deleteAddedDoor($index)"><span class="glyphicon glyphicon-remove-circle"></span></button>
+ 			</div>
  		</div>
  		<div class="form-group" style="margin-bottom:10px">
  			<label class="control-label col-sm-3">Add door:</label>
@@ -148,9 +148,11 @@
 	</div>
 </div>
 <div class="row">
-	<h2 >Tokens</h2>
+	<div class="col-lg-12">
+		<h2 >Tokens</h2>
+	</div>
 </div>
-<div class="row" ng-repeat="row in tokensRows">
+<div class="row" ng-repeat="row in tokensRows"><div class="col-lg-12">
 	<div class="col-sm-3" ng-repeat="token in row">
 		<div class="panel panel-default " >
 			<div class="panel-heading">
@@ -159,13 +161,13 @@
 			<div class="panel-body">
 				<p>Doors: <span ng-repeat="door in token.doors">{{door}}, </span></p> 
 				<p>Validity: from {{getFromString(token)}} to {{getToString(token)}} <span ng-show="token.validity.repeat.length>0">on <span ng-repeat="day in token.validity.repeat">{{getDayString(day)}}, </span></span></p>
-				<p ng-show="token.validity.uses>0">{{token.validity.uses}} uses left</p>
+				<p ><span ng-show="token.validity.uses>0">{{token.validity.uses}} uses left</span></p>
 			</div>
 			<div class="panel-footer">
-				<button class="btn btn-danger pull-left" ng-click="deleteToken($parent.$index,$index)">Delete token</button>
+				<button class="btn btn-danger pull-left" ng-click="deleteToken($parent.$index,$index)">Revoke token</button>
 				<div class="clearfix"></div>
 			</div>
 		</div>
-	</div>
+	</div></div>
 </div>
 <button class="btn btn-success pull-right" ng-click="addToken()">Add token</button>

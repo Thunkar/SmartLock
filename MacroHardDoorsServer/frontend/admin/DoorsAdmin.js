@@ -1,4 +1,12 @@
 var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute','ui.bootstrap','ui.bootstrap.datetimepicker',"angucomplete-alt"]);
+Array.prototype.filterBy=function(attr,validation){
+    var findings=[];
+    for(var i=0;i<this.length;i++){
+        if(validation(this[i][attr]))
+            findings.push(this[i]);
+    }
+    return findings;
+}
 Array.prototype.findBy=function(item,attr){
     if(attr===undefined)
         return this.indexOf(item);
@@ -10,6 +18,7 @@ Array.prototype.findBy=function(item,attr){
 }
 DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     $routeProvider.when("/stats", {
+        controller:"statsController",
         templateUrl: "stats/stats.html"
     }).when("/doors", {
         controller: "doorsController",
@@ -17,7 +26,7 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     }).when("/users",{
     	controller: "usersController",
     	templateUrl: "users/users.html"
-    }).when("/users/:userAlias", {
+    }).when("/users/:userId", {
         controller: "userController",
         templateUrl: "users/user.html"
     }).otherwise({redirectTo: '/stats'});

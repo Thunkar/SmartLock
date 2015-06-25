@@ -1,9 +1,9 @@
 DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,$log,$routeParams) {
-	var alias=$routeParams.userAlias;
+	var userId=$routeParams.userId;
 	var TOKENS_COLUMNS = 4;
 
 	var reloadUser=function(){
-		$http.get('/api/users/'+alias).success(function(data,status){
+		$http.get('/api/users/'+userId).success(function(data,status){
 			if(status==200){
 				$scope.user=data;
 				$scope.tokensRows=[];
@@ -51,7 +51,7 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 			windowClass: 'token-modal-window',
 			resolve: {
 				user:function(){
-					return alias;
+					return userId;
 				}
 			}
 		});
@@ -93,7 +93,7 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 
 	$scope.deleteToken=function(parent,index){
 		var token=$scope.user.tokens[parent*TOKENS_COLUMNS+index];
-		$http.post('/api/users/'+alias+'/tokens/'+token._id+'/revoke').success(function(data,status){
+		$http.post('/api/users/'+userId+'/tokens/revoke',{token:token._id}).success(function(data,status){
 			reloadUser();
 		})
 	}

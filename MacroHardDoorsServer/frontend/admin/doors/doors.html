@@ -1,0 +1,33 @@
+<div class="row">
+	<div class="col-lg-12">
+		<h1 class="page-header">Doors</h1>
+	</div>
+</div>
+
+<div class="row" ng-repeat="row in doorsRows">
+    <div class="col-sm-4" ng-repeat="door in row">
+        <div ng-class="!door.active ?  'panel-danger ' : 'panel-green'" class="panel " >
+            <div class="panel-heading">
+                {{door.name}}
+            </div>
+            <div class="panel-body" style="text-align:center">
+              <div class="row">
+              <div class="col-sm-6">
+              <i ng-class="door.open? 'fa-unlock' : 'fa-lock'" class="fa" style="font-size:6em"> </i>
+              </div>
+               <div  class="col-sm-6">
+            <p>Section {{door.section}}</p>
+            <p ng-show="door.open">Open</p>
+            <p ng-show="!door.open">Closed</p>
+            <p ng-show="door.active">Active</p>
+            <p ng-show="!door.active">Deactivated</p>
+            </div>
+            </div>
+            </div>
+            <div class="panel-footer">
+              <button class="btn btn-danger pull-right" ng-click="deactivateDoor($parent.$index,$index)">Deactivate door</button>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
