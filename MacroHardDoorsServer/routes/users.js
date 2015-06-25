@@ -12,7 +12,6 @@ router.route('/newuser').post([multer({ dest: './uploads/' })], userController.c
 router.route('/newadmin').post([multer({ dest: './uploads/' })], userController.createNewAdmin);
 router.route('/:user').get(userController.getUserInfo).post([multer({ dest: './uploads/' })], userController.editUser);
 router.route('/:user/delete').post(userController.deleteUser);
-router.route('/:user/activate').post(userController.activateUser);
 router.route('/:user/tokens').post(userController.addNewToken);
 router.route('/:user/tokens/revoke').post(userController.revokeToken);
 

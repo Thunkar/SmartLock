@@ -137,7 +137,8 @@ exports.editUser = function (req, res) {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
             password: req.body.password || user.password,
-            email: req.body.email || user.email
+            email: req.body.email || user.email,
+            active: req.body.active || user.active
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
@@ -146,6 +147,8 @@ exports.editUser = function (req, res) {
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
         user.password = updatedUser.password;
+        user.email = updatedUser.email;
+        user.active = updatedUser.active;
         user.save(function (err) {
             if (err) {
                 console.file().time().err(err.message);
@@ -235,15 +238,5 @@ exports.getUsers = function (req, res) {
             result.push(userToSend);
         }
         return res.status(200).jsonp(result);
-    });
-};
-
-exports.activateUser = function (req, res) {
-    userModel.findByIdAndUpdate(req.params.user, { $set: { active: true } }, function (err, user) {
-        if(err) {
-            console.file().time().error(err.message);
-            return res.status(500).send(err.message);
-        }
-        return res.status(200).send("Activated");
     });
 };
