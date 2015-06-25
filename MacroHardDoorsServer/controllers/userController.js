@@ -58,7 +58,7 @@ exports.createNewUser = function (req, res) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        stats.generateEvent(stats.eventType.newUser, newUser.alias, null, null, null);
+        stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
         return res.status(200).send(newUser._id);
     });
 };
@@ -117,8 +117,7 @@ exports.addNewToken = function (req, res) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        console.file().time().log(newToken._id);
-        stats.generateEvent(stats.eventType.newToken, req.body.user, null, newToken._id, req.body.doors);
+        stats.generateEvent(stats.eventType.newToken, req.params.user, null, newToken._id, req.body.doors);
         return res.status(200).send(newToken._id);
     });
 };
@@ -129,7 +128,7 @@ exports.revokeToken = function (req, res) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.params.token, null);
+        stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.body.token, null);
         return res.status(200).jsonp("Removed");
     });
 };

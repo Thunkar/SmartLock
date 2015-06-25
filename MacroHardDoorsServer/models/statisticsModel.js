@@ -2,10 +2,10 @@
     Schema = mongoose.Schema;
 
 var statisticsSchema = new Schema({
-    user: { type: String, default: ""},
-    door: { type: String, default: "" },
-    token: { type: String, default: "" },
-    admin: { type: String, default: "" },
+    user: { type: Schema.Types.ObjectId, ref: 'UserModel'},
+    door: { type: String },
+    token: { type: Schema.Types.ObjectId, ref: 'TokenModel'},
+    admin: { type: Schema.Types.ObjectId, ref: 'AdminModel'},
     event: { type: String, default: "" },
     date: {type: Date, default: Date.now}
 });
