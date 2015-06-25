@@ -35,6 +35,14 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 			}
 		});
 	}
+		$scope.setUserActive=function(parent,index,value){
+		var user=$scope.usersRows[parent][index];
+		$http.post('/api/users/'+user._id+'/activate',{active:value}).success(function(data,status){
+			if(status==200){
+				reloadUsers();
+			}
+		});
+	}
 		$scope.viewUser=function(parent,index){
 		var user=$scope.usersRows[parent][index];
 		$location.path('/users/'+user._id);

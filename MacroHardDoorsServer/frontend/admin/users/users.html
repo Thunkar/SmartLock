@@ -52,6 +52,25 @@
         <div ng-class="user.active ? 'panel-default ' : 'panel-danger '" class="panel " >
             <div class="panel-heading">
                 {{user.alias}}
+                <div class="pull-right">
+                <div class="btn-group">
+              <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        
+                                        <li><a ng-show="user.active" href="javascript:void(0)" ng-click="setUserActive($parent.$index,$index,false)">Deactivate</a>
+                                        </li>
+                                       <li><a ng-show="!user.active" href="javascript:void(0)" ng-click="setUserActive($parent.$index,$index,true)">Activate</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="javascript:void(0)"  ng-click="deleteUser($parent.$index,$index)">Delete</a>
+                                        </li>
+                                        
+                                    </ul>
+                                    </div>
+                                    </div>
             </div>
             <div class="panel-body">
             <div class="row">
@@ -60,8 +79,7 @@
             </div>
             </div>
             <div class="panel-footer">
-              <button class="btn btn-danger pull-right" ng-click="deleteUser($parent.$index,$index)">Delete user</button>
-                <button class="btn btn-info pull-left" ng-click="viewUser($parent.$index,$index)">User info</button>
+                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
                 <div class="clearfix"></div>
             </div>
         </div>
