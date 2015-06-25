@@ -24,10 +24,10 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
         event: eventType,
         date: new Date()
     });
-    if(door) newEvent.door = door;
-    if(user) newEvent.user = mongoose.Types.ObjectId(user);
-    if(token) newEvent.token = mongoose.Types.ObjectId(token);
-    if(admin) newEvent.admin = mongoose.Types.ObjectId(admin);
+    if (door) newEvent.door = door;
+    if (user) newEvent.user = mongoose.Types.ObjectId(user);
+    if (token) newEvent.token = mongoose.Types.ObjectId(token);
+    if (admin) newEvent.admin = mongoose.Types.ObjectId(admin);
     newEvent.save(function (err) {
         if (err) console.file().time().error(err.message);
     });
@@ -35,9 +35,13 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
 
 
 exports.getLatest = function (req, res) {
+    var timeBounded = req.query.to && req.query.from;
     var query = statisticsModel.find({});
     query.sort('-date');
-    query.limit(10000);
+    if (timeBounded)
+        query.limit(10000);
+    else 
+        query.limit(20);
     query.populate('user', '_id alias name profilePic tokens');
     query.populate('admin', '_id alias name profilePic');
     query.exec(function (err, stats) {
@@ -46,10 +50,10 @@ exports.getLatest = function (req, res) {
             return res.status(500).send(err.message);
         }
         var result = [];
-        for(var i = 0; i < stats.length; i++) {
+        for (var i = 0; i < stats.length; i++) {
             var stat = stats[i];
-            if(stat.user) stat.user.profilePic = app.env.serverAddress + "/files/" + stat.user.profilePic;
-            if(moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to))) result.push(stat);
+            if (stat.user) stat.user.profilePic = app.env.serverAddress + "/files/" + stat.user.profilePic;
+            if (!timeBounded || (moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to)))) result.push(stat);
         }
         return res.status(200).jsonp(result);
     });

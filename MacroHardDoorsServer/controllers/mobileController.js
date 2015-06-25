@@ -10,14 +10,14 @@ var storagePath = './uploads/';
 
 
 exports.login = function (req, res) {
-    userModel.findById(req.body.user, function (err, user) {
+    userModel.findOne({alias: req.body.user}, function (err, user) {
         if (err) {
             res.status(500).send(err.message);
             return console.time().file().error(err.message);
         }
         if (!user) return res.status(404).send("Not found");
         if (user.password === req.body.password) {
-            return res.status(200).send(user.get('token'));
+            return res.status(200).jsonp(user);
         }
         return res.status(401).send("Not authorized");
     });
