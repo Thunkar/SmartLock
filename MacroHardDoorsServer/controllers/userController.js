@@ -12,13 +12,12 @@
 var storagePath = './uploads/';
 
 exports.register = function (req, res) {
-    adminModel.findById(req.body.admin, function (err, admin) {
+    adminModel.find({}, function (err, admins) {
         if (err) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
-        if (!admin) return res.status(404).send("Not found");
-        if (admin.provider) return res.status(400).send("Already registered");
+        if (admins[0].provider) return res.status(400).send("Already registered");
         var formData = {
             name: req.body.name,
             url: req.body.url,
@@ -33,26 +32,24 @@ exports.register = function (req, res) {
             }
             fs.unlink(storagePath + req.files.profilePic.name);
             if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
-            admin.provider = mongoose.Types.ObjectId(body.replace(/"/g, ''));
-            admin.save(function (err) {
-                if (err) {
-                    console.file().time().error(err.message);
-                    return res.status(500).send(err.message);
-                }
-                return res.status(200).send("Success");
-            });
+            for (var i = 0; i < admins.length; i++) {
+                var admin = admins[i];
+                admin.provider = mongoose.Types.ObjectId(body.replace(/"/g, ''));
+                admin.save(function (err) {
+                    if (err) console.file().time().error(err.message);
+                });
+            }
+            return res.status(200).send("Success");
         });
     });
 };
 
 exports.unRegister = function (req, res) {
-    adminModel.findById(req.body.admin, function (err, admin) {
+    adminModel.find({}, function (err, admins) {
         if (err) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
-        if (!admin) return res.status(404).send("Not found");
-        if (!admin.provider) return res.status(400).send("You need a provider to delete");
         var date = moment().format("DD/MM/YYYY_hh:mm:ss");
         var signature = authController.generateSignature(date, app.env.mainServerSecret);
         request.post({ url: app.env.mainServerAddress + "/api/providers/" + admin.provider + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
@@ -61,14 +58,14 @@ exports.unRegister = function (req, res) {
                 return res.status(500).send(err.message);
             }
             if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
-            admin.provider = undefined;
-            admin.save(function (err) {
-                if (err) {
-                    console.file().time().error(err.message);
-                    return res.status(500).send(err.message);
-                }
-                return res.status(200).send("Success");
-            });
+            for (var i = 0; i < admins.length; i++) {
+                var admin = admins[i];
+                admin.provider = undefined;
+                admin.save(function (err) {
+                    if (err) console.file().time().error(err.message);
+                });
+            }
+            return res.status(200).send("Success");
         });
     });
 };
