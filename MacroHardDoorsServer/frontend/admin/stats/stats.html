@@ -111,52 +111,65 @@
             <div class="panel-body">
                 <ul class="timeline">
                     <li ng-repeat="event in timeline" ng-switch="event.event" ng-class="$index%2 ? 'timeline-inverted':''"> 
-                    
+
                         <div  ng-switch-when="userEntry" class="timeline-badge success"><i class="fa fa-unlock"></i>
                         </div>
                         <div ng-switch-when="userRejected" class="timeline-badge warning"><i class="fa fa-ban"></i>
                         </div>  
-                         <div  ng-switch-when="nodeHandshake" class="timeline-badge success"><i class="fa fa-comments-o"></i>
+                        <div  ng-switch-when="nodeHandshake" class="timeline-badge success"><i class="fa fa-comments-o"></i>
                         </div>
-                        <div ng-switch-when="nodeOffline" class="timeline-badge danger"><i class="fa fa-power-off"></i>
+                        <div ng-switch-when="nodeOffline" class="timeline-badge danger"><i class="fa fa-chain-broken"></i>
                         </div>       
                         <div  ng-switch-when="newUser" class="timeline-badge info"><i class="fa fa-user"></i>
                         </div>
                         <div ng-switch-when="newAdmin" class="timeline-badge warning"><i class="fa fa-server"></i>
                         </div>  
-                         <div  ng-switch-when="tokenRevoked" class="timeline-badge warning"><i class="fa fa-times"></i>
+                        <div  ng-switch-when="tokenRevoked" class="timeline-badge warning"><i class="fa fa-times"></i>
                         </div>
                         <div ng-switch-when="newToken" class="timeline-badge"><i class="fa fa-key"></i>
                         </div>     
-                       <div ng-switch-when="systemStarted" class="timeline-badge info"><i class="fa fa-bolt "></i>
-                        </div>                  
+                        <div ng-switch-when="systemStarted" class="timeline-badge info"><i class="fa fa-bolt "></i>
+                        </div>           
+                        <div ng-switch-when="nodeActivated" class="timeline-badge warning"><i class="fa fa-bolt"></i>
+                        </div>     
+                        <div ng-switch-when="nodeDeactivated" class="timeline-badge success"><i class="fa fa-power-off"></i>
+                        </div>      
+                        <div ng-switch-when="failedEntry" class="timeline-badge success"><i class="fa fa-ban"></i>
+                        </div>     
                         <div  class="timeline-panel">
                             <div class="timeline-heading">
-                            <h4 class="timeline-title"  ng-switch-when="userEntry">Door open</h4>
-                            <h4 class="timeline-title"  ng-switch-when="userRejected">User rejected</h4>
-                            <h4 class="timeline-title"  ng-switch-when="nodeHandshake">Door connected</h4>
-                            <h4 class="timeline-title"  ng-switch-when="nodeOffline">Door deactivated</h4>
-                            <h4 class="timeline-title"  ng-switch-when="newUser">New user</h4>
-                            <h4 class="timeline-title"  ng-switch-when="newAdmin">New admin</h4>
-                            <h4 class="timeline-title"  ng-switch-when="tokenRevoked">Token revoked</h4>
-                            <h4 class="timeline-title"  ng-switch-when="newToken">New token</h4>
-                            <h4 class="timeline-title"  ng-switch-when="systemStarted">System started</h4>
+                                <h4 class="timeline-title"  ng-switch-when="userEntry">Door open</h4>
+                                <h4 class="timeline-title"  ng-switch-when="userRejected">User rejected</h4>
+                                <h4 class="timeline-title"  ng-switch-when="nodeHandshake">Door connected</h4>
+                                <h4 class="timeline-title"  ng-switch-when="nodeOffline">Door offline</h4>
+                                <h4 class="timeline-title"  ng-switch-when="newUser">New user</h4>
+                                <h4 class="timeline-title"  ng-switch-when="newAdmin">New admin</h4>
+                                <h4 class="timeline-title"  ng-switch-when="tokenRevoked">Token revoked</h4>
+                                <h4 class="timeline-title"  ng-switch-when="newToken">New token</h4>
+                                <h4 class="timeline-title"  ng-switch-when="systemStarted">System started</h4>
+                                <h4 class="timeline-title"  ng-switch-when="nodeActivated">Door activated</h4>
+                                <h4 class="timeline-title"  ng-switch-when="nodeDeactivated">Door deactivated</h4>
+                                <h4 class="timeline-title"  ng-switch-when="failedEntry">Entry failed</h4>
                                 <p><small class="text-muted"><i class="fa fa-clock-o"></i>{{formatDate(event.date)}}</small>
                                 </p>
                             </div>
                             <div class="timeline-body">
                                 <p ng-switch-when="userEntry">User {{event.user.name}} used door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
-                                 <p ng-switch-when="userRejected">User {{event.user.name}} failed to use door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
-                                  <p ng-switch-when="nodeHandshake">Door {{event.door}} is now connected to the server.</p>
-                                   <p ng-switch-when="nodeOffline">Door {{event.door}} has been deactivated.</p>
-                                    <p ng-switch-when="newUser">User {{event.user.name}} created in the database.</p>
-                                     <p ng-switch-when="newAdmin">Admin {{event.user.name}} created in the database.</p>
-                                      <p ng-switch-when="tokenRevoked">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been revoked</p>
-                                       <p ng-switch-when="newToken">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been created</p>
-                                        <p ng-switch-when="systemStarted">System startup completed</p>
+                                <p ng-switch-when="userRejected">User {{event.user.name}} failed to use door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
+                                <p ng-switch-when="nodeHandshake">Door {{event.door}} is now connected to the server.</p>
+                                <p ng-switch-when="nodeOffline">Door {{event.door}} has crashed.</p>
+                                <p ng-switch-when="newUser">User {{event.user.name}} created in the database.</p>
+                                <p ng-switch-when="newAdmin">Admin {{event.user.name}} created in the database.</p>
+                                <p ng-switch-when="tokenRevoked">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been revoked</p>
+                                <p ng-switch-when="newToken">Token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}} of user {{event.user.name}} has been created</p>
+                                <p ng-switch-when="systemStarted">System startup completed</p>
+                                    <p ng-switch-when="nodeActivated">Door {{event.door}} has been activated</p>
+                                        <p ng-switch-when="nodeDeactivated">Door {{event.door}} has been deactivated.</p>
+
+                                        <p ng-switch-when="failedEntry">User {{event.user.name}} hasn't been able use door {{event.door}} with token {{event.user.tokens[event.user.tokens.findBy('_id',event.token)].name}}.</p>
                             </div>
                         </div>
-                  
+
                     </li>
                 </ul>
             </div>
@@ -166,7 +179,7 @@
     </div>
     <!-- /.col-lg-8 -->
     <div class="col-lg-4">
-      
+
         <!-- /.panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -178,7 +191,7 @@
             </div>
             <!-- /.panel-body -->
         </div>
-                <div class="panel panel-default">
+        <div class="panel panel-default">
             <div class="panel-heading">
                 <i class="fa fa-bar-chart-o fa-fw"></i> Doors
             </div>
@@ -188,7 +201,7 @@
             </div>
             <!-- /.panel-body -->
         </div>
-</div>
-                <!-- /.col-lg-4 -->
     </div>
+    <!-- /.col-lg-4 -->
+</div>
             <!-- /.row -->

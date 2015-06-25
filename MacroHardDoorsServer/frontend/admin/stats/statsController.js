@@ -48,11 +48,11 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 				lastDonutUserData=newDonutData;
 			}
 		});},1000);
-
+	setInterval(function(){
 	$http.get('/api/statistics').success(function(data,status){
 		$scope.stats=data;
 		$scope.userRejections=data.filterBy('event',function(val){return val==='userRejected';});
-	});
+	});},1000);
 
 	var formatRelativeDays=function(diff){
 		switch(diff){
@@ -64,7 +64,7 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 		}
 		return (-diff )+" days ago";
 	}
-	var doorsArea=		Morris.Area({
+	var doorsChart=		Morris.Line({
 		element: 'doors-area-chart',
 		data: [],
 		xkey: 'period',
@@ -97,7 +97,7 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 					nodesOffline:dailyStats[i].filterBy("event",function(val){return val==='nodeOffline';}).length
 				});
 			}
-			doorsArea.setData(dailyData);
+			doorsChart.setData(dailyData);
 
 		});},1000);
 

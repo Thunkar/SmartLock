@@ -14,4 +14,17 @@ DoorsAdmin.controller('doorsController', function ($scope,$location,$http) {
 		});
 	}
 	reloadDoors();
+
+	$scope.deactivateDoor=function(parent,index){
+		var door=$scope.doorsRows[parent][index];
+		$http.post('/api/doors/'+door.name+'/active',{active:false}).success(function(data,status){
+			reloadDoors();
+		});
+	}
+	$scope.activateDoor=function(parent,index){
+		var door=$scope.doorsRows[parent][index];
+				$http.post('/api/doors/'+door.name+'/active',{active:true}).success(function(data,status){
+			reloadDoors();
+		});
+	}
 });

@@ -1,6 +1,10 @@
 DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,$log,$routeParams) {
 	var userId=$routeParams.userId;
 	var TOKENS_COLUMNS = 4;
+	$scope.editedUser={};
+	$scope.$watch('user',function(){
+		$scope.editedUser=$.extend(true,{},$scope.user);
+	});
 
 	var reloadUser=function(){
 		$http.get('/api/users/'+userId).success(function(data,status){
@@ -29,11 +33,15 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 			formData.append("name", $scope.editedUser.name);
 		if($scope.editedUser.password!==undefined)
 			formData.append("password", $scope.editedUser.password);
+		if($scope.editedUser.email!==undefined)
+			formData.append("email",$scope.editedUser.email);
+		if($scope.editedUser.active!==undefined)
+			formData.append("active",$scope.editedUser.active);
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', window.location.origin + '/api/users/'+alias);
+		xhr.open('POST', window.location.origin + '/api/users/'+userId);
 		xhr.onload = function () {
 			if (xhr.status === 200) {
-				$scope.editedUser=undefined;
+				$scope.editedUser={};
 				reloadUser();
 				$scope.$apply();
 			} else {

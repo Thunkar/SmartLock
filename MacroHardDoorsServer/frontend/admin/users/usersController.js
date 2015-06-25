@@ -47,6 +47,7 @@ DoorsAdmin.controller('addUserCtrl', function ($http, $scope, $modalInstance) {
 		formData.append("name", $scope.name);
 		formData.append("alias", $scope.alias);
 		formData.append("password", $scope.password);
+		formData.append("email",$scope.mail);
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', window.location.origin + '/api/users/newuser');
 		xhr.onload = function () {
