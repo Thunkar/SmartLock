@@ -10,14 +10,20 @@ var storagePath = './uploads/';
 
 
 exports.login = function (req, res) {
-    userModel.findOne({alias: req.body.user}, function (err, user) {
+    userModel.findOne({ alias: req.body.alias }, function (err, user) {
         if (err) {
             res.status(500).send(err.message);
             return console.time().file().error(err.message);
         }
         if (!user) return res.status(404).send("Not found");
+        if (!user.active) return res.status(400).send("Not active");
         if (user.password === req.body.password) {
-            return res.status(200).jsonp(user);
+            var userToSend = {
+                _id: user._id,
+                token: user.token,
+                active: user.active
+            };
+            return res.status(200).jsonp(userToSend);
         }
         return res.status(401).send("Not authorized");
     });
@@ -104,10 +110,12 @@ exports.getUserInfo = function (req, res) {
         }
         if (!user) return res.status(404).send("User not found");
         var userToSend = {
+            _id: user._id,
             alias: user.alias,
             name: user.name,
             profilePic: app.env.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
+            email: user.email,
             active: user.active
         };
         return res.status(200).jsonp(userToSend);

@@ -1,6 +1,6 @@
 ﻿var express = require('express'),
     mobileController = require('../controllers/mobileController.js'),
-    doorController = require('../controllers/doordoorController.js'),
+    doorController = require('../controllers/doorController.js'),
     multer = require('multer');
 
 var router = express.Router();

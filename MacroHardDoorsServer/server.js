@@ -63,11 +63,13 @@ mongoose.connect(env.dbAddress, function (err) {
 var doors = require('./routes/doors.js'),
     doorComms = require('./routes/doorComms.js'),
     users = require('./routes/users.js'),
+    mobile = require('./routes/mobile.js'),
     statistics = require('./routes/statistics.js');
 
 app.use("/api/doors", doors);
 app.use("/api/doorcomms", doorComms)
 app.use("/api/users", users);
+app.use("/api/mobile", mobile);
 app.use("/api/statistics", statistics),
 app.use(express.static(__dirname + "/frontend"));
 
