@@ -1,6 +1,7 @@
 var app = require("../server.js"),
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
+    statsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
     fs = require('fs'),
@@ -19,7 +20,8 @@ exports.login = function (req, res) {
         if (!user.active) return res.status(400).send("Not active");
         if (user.password === req.body.password) {
             var userToSend = {
-                _id: user._id,
+                _id: user._id.toString(),
+                alias: user.alias,
                 token: user.token,
                 active: user.active
             };
@@ -121,3 +123,16 @@ exports.getUserInfo = function (req, res) {
         return res.status(200).jsonp(userToSend);
     });
 };
+
+exports.getUserStats = function (req, res) {
+    var query = statsModel.find({user: req.params.user});
+    query.sort('-date');
+    query.limit(20);
+    query.exec(function(err, stats){
+        if(err) {
+            console.file().time().error(err.message);
+            return res.status(200).send(err.message);
+        }
+        return res.status(200).jsonp(stats);
+    });
+}
