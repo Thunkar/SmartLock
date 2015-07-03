@@ -2,5 +2,5 @@
 	"serverAddress": "http://localhost:5000",
 	"name":"Test",
 	"section":"A",
-	"dummy":"true"
+	"dummy":true
 }

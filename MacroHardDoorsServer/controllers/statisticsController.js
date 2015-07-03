@@ -19,7 +19,9 @@ exports.eventType = {
     systemStarted: "systemStarted",
     nodeDeactivated: "nodeDeactivated",
     nodeActivated: "nodeActivated",
-    failedEntry: "failedEntry"
+    failedEntry: "failedEntry",
+    doorOpened: "doorOpened",
+    doorClosed: "doorClosed"
 };
 
 exports.generateEvent = function (eventType, user, admin, token, door) {

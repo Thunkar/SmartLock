@@ -129,6 +129,8 @@ exports.setDoorStatus = function (req, res) {
         }
         if (!door) return res.status(404).send("Door not found");
         door.open = req.body.open;
+        if(door.open) stats.generateEvent(stats.eventType.doorOpened, null, null, null, door.name);
+        else stats.generateEvent(stats.eventType.doorClosed, null, null, null, door.name);
         door.save(function (err) {
             if (err) {
                 console.file().time().error(err.message);
