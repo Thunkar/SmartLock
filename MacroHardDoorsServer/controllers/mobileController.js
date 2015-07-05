@@ -17,7 +17,6 @@ exports.login = function (req, res) {
             return console.time().file().error(err.message);
         }
         if (!user) return res.status(404).send("Not found");
-        if (!user.active) return res.status(400).send("Not active");
         if (user.password === req.body.password) {
             var userToSend = {
                 _id: user._id.toString(),
@@ -38,6 +37,7 @@ exports.createNewUser = function (req, res) {
         password: req.body.password,
         token: authController.generateToken(),
         name: req.body.name,
+        email: req.body.email,
         profilePic: req.files.profilePic.name,
         tokens: [],
         active: false
@@ -47,8 +47,14 @@ exports.createNewUser = function (req, res) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
         }
-        stats.generateEvent(stats.eventType.newUser, newUser.alias, null, null, null);
-        return res.status(200).send(newUser.token);
+        stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
+        var userToSend = {
+            _id: newUser._id.toString(),
+            alias: newUser.alias,
+            token: newUser.token,
+            active: newUser.active
+        };
+        return res.status(200).jsonp(userToSend);
     });
 };
 
@@ -125,11 +131,11 @@ exports.getUserInfo = function (req, res) {
 };
 
 exports.getUserStats = function (req, res) {
-    var query = statsModel.find({user: req.params.user});
+    var query = statsModel.find({ user: req.params.user });
     query.sort('-date');
     query.limit(20);
-    query.exec(function(err, stats){
-        if(err) {
+    query.exec(function (err, stats) {
+        if (err) {
             console.file().time().error(err.message);
             return res.status(200).send(err.message);
         }
