@@ -59,7 +59,7 @@ exports.createNewUser = function (req, res) {
 };
 
 exports.editUser = function (req, res) {
-    userModel.findById(req.body.user, function (err, user) {
+    userModel.findById(req.params.user, function (err, user) {
         if (err) {
             console.file().time().err(err.message);
             return res.status(500).send(err.message);
@@ -68,7 +68,8 @@ exports.editUser = function (req, res) {
         var updatedUser = {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
-            password: req.body.password || user.password
+            password: req.body.password || user.password,
+            email: req.body.email || user.email
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
@@ -77,6 +78,7 @@ exports.editUser = function (req, res) {
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
         user.password = updatedUser.password;
+        user.email = updatedUser.email;
         user.save(function (err) {
             if (err) {
                 console.file().time().err(err.message);
