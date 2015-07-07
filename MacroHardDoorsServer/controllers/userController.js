@@ -26,6 +26,7 @@ exports.register = function () {
         }
         if(httpResponse.statusCode != 200) console.file().time().error("Server responded: " + httpResponse.statusCode)
         app.env.providerId = body.replace(/"/g, '');
+        return console.time().file().log("Registered with central server");
     });
 };
 
