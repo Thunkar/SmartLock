@@ -135,6 +135,8 @@
                         <div ng-switch-when="nodeDeactivated" class="timeline-badge warning"><i class="fa fa-power-off"></i>
                         </div>      
                         <div ng-switch-when="failedEntry" class="timeline-badge danger"><i class="fa fa-ban"></i>
+                         <div ng-switch-when="doorOpened" class="timeline-badge info"><i class="fa fa-unlock"></i>
+                            <div ng-switch-when="doorClosed" class="timeline-badge info"><i class="fa fa-lock"></i>
                         </div>     
                         <div  class="timeline-panel">
                             <div class="timeline-heading">
@@ -150,6 +152,8 @@
                                 <h4 class="timeline-title"  ng-switch-when="nodeActivated">Door activated</h4>
                                 <h4 class="timeline-title"  ng-switch-when="nodeDeactivated">Door deactivated</h4>
                                 <h4 class="timeline-title"  ng-switch-when="failedEntry">Entry failed</h4>
+                                 <h4 class="timeline-title"  ng-switch-when="doorOpened">Door opened</h4>
+                                <h4 class="timeline-title"  ng-switch-when="doorClosed">Door closed</h4>
                                 <p><small class="text-muted"><i class="fa fa-clock-o"></i>{{formatDate(event.date)}}</small>
                                 </p>
                             </div>
@@ -167,6 +171,9 @@
                                         <p ng-switch-when="nodeDeactivated">Door {{event.door}} has been deactivated.</p>
 
                                         <p ng-switch-when="failedEntry">User {{event.user.name}} hasn't been able use door {{event.door}} with token {{findToken(event.user,event.token).name}}.</p>
+                                         <p ng-switch-when="doorOpened">Door {{event.door}} has been opened.</p>
+
+                                        <p ng-switch-when="doorClosed">Door {{event.door}} has been closed.</p>
                             </div>
                         </div>
 
