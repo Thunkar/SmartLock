@@ -5,7 +5,8 @@
     bodyParser = require('body-parser'),
     methodOverride = require("method-override"),
     mongoose = require('mongoose'),
-    providerModel = require('./models/providerModel.js')(app, mongoose);
+    providerModel = require('./models/providerModel.js')(app, mongoose),
+    providerController = require('./controllers/providerController.js');
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
@@ -35,6 +36,7 @@ mongoose.connect(env.dbAddress, function (err) {
     }
     else {
         console.time().file().system("Connected to DB");
+        providerController.removeProviders();
     }
 });
 

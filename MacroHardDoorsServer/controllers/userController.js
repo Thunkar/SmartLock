@@ -4,6 +4,7 @@
     adminModel = mongoose.model('AdminModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
+    scheduler = require('node-schedule'),
     fs = require('fs'),
     request = require('request'),
     moment = require('moment'),
@@ -11,62 +12,41 @@
 
 var storagePath = './uploads/';
 
-exports.register = function (req, res) {
-    adminModel.find({}, function (err, admins) {
+exports.register = function () {
+    var formData = {
+        name: app.env.providerName,
+        url: app.env.serverAddress,
+        profilePic: fs.createReadStream(app.env.providerImg)
+    };
+    var date = moment().format("DD/MM/YYYY_hh:mm:ss");
+    var signature = authController.generateSignature(date, app.env.mainServerSecret);
+    request.post({ url: app.env.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
             console.file().time().error(err.message);
-            return res.status(500).send(err.message);
         }
-        if (admins[0].provider) return res.status(400).send("Already registered");
-        var formData = {
-            name: req.body.name,
-            url: req.body.url,
-            profilePic: fs.createReadStream(storagePath + req.files.profilePic.name)
-        };
-        var date = moment().format("DD/MM/YYYY_hh:mm:ss");
-        var signature = authController.generateSignature(date, app.env.mainServerSecret);
-        request.post({ url: app.env.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
-            if (err) {
-                console.file().time().error(err.message);
-                return res.status(500).send(err.message);
-            }
-            fs.unlink(storagePath + req.files.profilePic.name);
-            if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
-            for (var i = 0; i < admins.length; i++) {
-                var admin = admins[i];
-                admin.provider = mongoose.Types.ObjectId(body.replace(/"/g, ''));
-                admin.save(function (err) {
-                    if (err) console.file().time().error(err.message);
-                });
-            }
-            return res.status(200).send("Success");
-        });
+        if(httpResponse.statusCode != 200) console.file().time().error("Server responded: " + httpResponse.statusCode)
+        app.env.providerId = body.replace(/"/g, '');
     });
 };
 
+var registerRule = new scheduler.RecurrenceRule();
+
+registerRule.hour = 5;
+registerRule.minute = 3;
+
+scheduler.scheduleJob(registerRule, exports.register);
+
 exports.unRegister = function (req, res) {
-    adminModel.find({}, function (err, admins) {
+    if(!app.env.providerId) return res.status(400).send("No id");
+    var date = moment().format("DD/MM/YYYY_hh:mm:ss");
+    var signature = authController.generateSignature(date, app.env.mainServerSecret);
+    request.post({ url: app.env.mainServerAddress + "/api/providers/" + app.env.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
             console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
-        var date = moment().format("DD/MM/YYYY_hh:mm:ss");
-        var signature = authController.generateSignature(date, app.env.mainServerSecret);
-        request.post({ url: app.env.mainServerAddress + "/api/providers/" + admin.provider + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
-            if (err) {
-                console.file().time().error(err.message);
-                return res.status(500).send(err.message);
-            }
-            if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
-            for (var i = 0; i < admins.length; i++) {
-                var admin = admins[i];
-                admin.provider = undefined;
-                admin.save(function (err) {
-                    if (err) console.file().time().error(err.message);
-                });
-            }
-            return res.status(200).send("Success");
-        });
+        if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
+        return res.status(200).send("Success");
     });
 };
 

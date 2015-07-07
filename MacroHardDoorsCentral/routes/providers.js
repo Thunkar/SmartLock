@@ -6,6 +6,5 @@
 var router = express.Router();
 
 router.route('/').get(providerController.getProviders).post(authController.authAndContinue, [multer({ dest: './uploads/' })], providerController.addProvider);
-router.route('/:provider/delete').post(authController.authAndContinue, providerController.removeProvider);
 
 module.exports = router;

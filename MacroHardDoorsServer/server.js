@@ -13,6 +13,7 @@
     adminModel = require('./models/adminModel.js')(app, mongoose),
     statisticsModel = require('./models/statisticsModel.js')(app, mongoose),
     doorCommController = require('./controllers/doorCommController.js'),
+    userController = require('./controllers/userController.js'),
     stats = require('./controllers/statisticsController.js');
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -54,6 +55,7 @@ mongoose.connect(env.dbAddress, function (err) {
             }
             doorCommController.check();
             stats.generateEvent(stats.eventType.systemStarted, null, null, null, null);
+            userController.register();
             console.time().file().system("Ready to receive handshakes");
         });
     }

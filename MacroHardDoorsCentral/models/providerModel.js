@@ -2,7 +2,7 @@
     Schema = mongoose.Schema;
 
 var providerSchema = new Schema({
-    name: { type: String, default: "" },
+    name: { type: String, default: "", unique: true, dropDups: true },
     profilePic: { type: String, default: "" },
     url: {type: String, default:""}
 });
