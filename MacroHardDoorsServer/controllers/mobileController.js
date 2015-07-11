@@ -44,7 +44,7 @@ exports.createNewUser = function (req, res) {
     });
     newUser.save(function (err) {
         if (err) {
-            console.file().time().err(err.message);
+            console.file().time().error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
