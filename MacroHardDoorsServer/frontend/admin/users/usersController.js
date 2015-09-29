@@ -54,7 +54,7 @@ DoorsAdmin.controller('addUserCtrl', function ($http, $scope, $modalInstance) {
 		formData.append("profilePic", $("#image")[0].files[0]);
 		formData.append("name", $scope.name);
 		formData.append("alias", $scope.alias);
-		formData.append("password", $scope.password);
+		formData.append("password", CryptoJS.SHA256($scope.password).toString().toUpperCase());
 		formData.append("email",$scope.mail);
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', window.location.origin + '/api/users/newuser');

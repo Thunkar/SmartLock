@@ -32,7 +32,7 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 		if($scope.editedUser.name!==undefined)
 			formData.append("name", $scope.editedUser.name);
 		if($scope.editedUser.password!==undefined)
-			formData.append("password", $scope.editedUser.password);
+			formData.append("password", CryptoJS.SHA256($scope.editedUser.password).toString().toUpperCase());
 		if($scope.editedUser.email!==undefined)
 			formData.append("email",$scope.editedUser.email);
 		if($scope.editedUser.active!==undefined)
