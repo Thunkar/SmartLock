@@ -2,7 +2,9 @@
     app = require('../server.js'),
     mongoose = require('mongoose'),
     user = mongoose.model('UserModel'),
-    console = process.console;
+    winston = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 exports.generateToken = function () {
     var pickFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+#%&";
@@ -28,8 +30,8 @@ exports.loginRequired = function (req, res, next) {
 exports.authMobileUser = function (req, res, next) {
     User.findOne({ alias: req.get("alias") }, function (err, user) {
         if (err) {
-            res.status(500).send(err.message);
-            return console.time().file().error(err.message);
+            systemLogger.error(err.message);
+            return res.status(500).send(err.message);
         }
         if (!user) {
             return res.status(404).send("User does not exist");

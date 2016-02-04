@@ -1,41 +1,29 @@
-﻿var scribe = require('scribe-js')(),
-    express = require('express'),
+﻿var express = require('express'),
     app = express(),
     fs = require('fs'),
     bodyParser = require('body-parser'),
-    methodOverride = require("method-override"),
     mongoose = require('mongoose'),
     providerModel = require('./models/providerModel.js')(app, mongoose),
-    providerController = require('./controllers/providerController.js');
+    providerController = require('./controllers/providerController.js'),
+    winston = require('winston');
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
-app.use(scribe.express.logger());
 app.enable('trust proxy');
 
-var console = process.console;
+var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
+exports.config = config;
 
-console.addLogger('system', null, {
-    alwaysTime: true,
-    alwaysLocation: true,
-    alwaysTags: true,
-    timeColors : 'grey',
-    tagsColors: 'lightblue',
-    fileColors: 'red',
-    defaultTags: ['System']
-});
+require('./utils/logger.js');
 
-console.file().time().system("Reading config file");
-var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
-exports.env = env;
-console.file().time().system("Configuration loaded");
+var systemLogger = winston.loggers.get('system');
 
-mongoose.connect(env.dbAddress, function (err) {
+mongoose.connect(config.dbAddress, function (err) {
     if (err) {
-        console.error("could not connect to DB: " + err);
+       systemLogger.error("could not connect to DB: " + err);
     }
     else {
-        console.time().file().system("Connected to DB");
+        systemLogger.info("Connected to DB");
         providerController.removeProviders();
     }
 });
@@ -48,6 +36,6 @@ app.get('/files/:file', function (req, res) {
     res.sendFile(__dirname + '/uploads/' + req.params.file);
 });
 
-app.listen(env.port, function () {
-    console.time().file().system('Main server listening on port: ' + env.port);
+app.listen(config.port, function () {
+    systemLogger.info('Main server listening on port: ' + config.port);
 });

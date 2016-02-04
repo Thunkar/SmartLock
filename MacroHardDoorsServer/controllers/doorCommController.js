@@ -5,28 +5,30 @@
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
     moment = require('moment'),
-    console = process.console;
+    winstono = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 var heartbeats = {};
 var deadCounter = {};
 
 exports.check = function () {
     doorModel.find({}, function (err, doors) {
-        if (err) return console.file().time().error(err.message);
+        if (err) return systemLogger.error(err.message);
         for (var i = 0; i < doors.length; i++) {
             if (!heartbeats[doors[i].id] && doors[i].online) {
                 deadCounter[doors[i].id] = isNaN(deadCounter[doors[i].id]) ? 0 : deadCounter[doors[i].id] += 1;
                 if (deadCounter[doors[i].id] == 3) {
-                    console.file().time().error("Node " + doors[i].name + " with id " + doors[i].id + " is dead!");
+                    systemLogger.error("Node " + doors[i].name + " with id " + doors[i].id + " is dead!");
                     delete deadCounter[doors[i].id];
-                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: false, active : false }}, function (err) { if (err) console.file().time().error(err.message); });
+                    doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: false, active : false }}, function (err) { if (err) systemLogger.error(err.message); });
                     stats.generateEvent(stats.eventType.nodeOffline, null, null, null, doors[i].name);
                 } else {
-                    console.file().time().warning("Node " + doors[i].name + " with id " + doors[i].id + " might be dead");
+                    systemLogger.warn("Node " + doors[i].name + " with id " + doors[i].id + " might be dead");
                 }
             } else if (heartbeats[doors[i].id]) {
                 delete deadCounter[doors[i].id];
-                doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: true } }, function (err) { if (err) console.file().time().error(err.message); });
+                doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: true } }, function (err) { if (err) systemLogger.error(err.message); });
             }
         }
         setTimeout(exports.check, app.env.checkInterval);
@@ -37,11 +39,11 @@ exports.check = function () {
 exports.handshake = function (req, res) {
     doorModel.findOne({ name: req.body.name }, function (err, door) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (door && heartbeats[door.id]) {
-            console.file().time().warning("Duplicated door name trying to register in the system from ip: " + req.ip);
+            systemLogger.warn("Duplicated door name trying to register in the system from ip: " + req.ip);
             return res.status(400).send("Duplicated name");
         }
         var newDoor = {
@@ -55,16 +57,16 @@ exports.handshake = function (req, res) {
         }
         doorModel.update({ name: newDoor.name }, newDoor, { upsert: true }, function (err, door) {
             if (err) {
-                console.file().time().error(err.message);
+                systemLogger.error(err.message);
                 return res.status(500).send(err.message);
             }
             stats.generateEvent(stats.eventType.nodeHandshake, null, null, null, newDoor.name);
             if (door.upserted) {
-                console.file().time().log("Door " + newDoor.name + " registered with id: " + door.upserted[0]._id + " and ip: " + req.ip);
+                systemLogger.info("Door " + newDoor.name + " registered with id: " + door.upserted[0]._id + " and ip: " + req.ip);
                 return res.status(200).send(door.upserted[0]._id);
             }
             doorModel.findOne({ name: newDoor.name }, function (err, door) {
-                console.file().time().log("Door " + door.name + " re-registered with id: " + door.id + " and ip: " + req.ip);
+                systemLogger.info("Door " + door.name + " re-registered with id: " + door.id + " and ip: " + req.ip);
                 return res.status(200).send(door.id);
             });
         });
@@ -81,7 +83,7 @@ function answerHeartbeat(door) {
 exports.heartbeat = function (req, res) {
     doorModel.findById(req.body.id, function (err, door) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!door) return res.status(404).send("Door does not exist");
@@ -92,7 +94,7 @@ exports.heartbeat = function (req, res) {
         door.lastHeartbeat = new Date();
         door.save(function (err) {
             if (err) {
-                console.file().time().err(err.message);
+                systemLogger.error(err.message);
             }
         });
     });
@@ -113,7 +115,7 @@ exports.openDoor = function (doorName, retries, callback) {
             clearTimeout(heartbeats[door.id].timeoutId);
             heartbeats[door.id].res.status(200).send("OPEN");
             delete heartbeats[door.id];
-            console.file().time().system("Sent OPEN to door: " + door.name + " with id: " + door.id);
+            systemLogger.info("Sent OPEN to door: " + door.name + " with id: " + door.id);
             result = { door: door };
             callback(err, result);
         }
@@ -124,7 +126,7 @@ exports.openDoor = function (doorName, retries, callback) {
 exports.setDoorStatus = function (req, res) {
     doorModel.findById(req.body.id, function (err, door) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!door) return res.status(404).send("Door not found");
@@ -133,7 +135,7 @@ exports.setDoorStatus = function (req, res) {
         else stats.generateEvent(stats.eventType.doorClosed, null, null, null, door.name);
         door.save(function (err) {
             if (err) {
-                console.file().time().error(err.message);
+                systemLogger.error(err.message);
                 return res.status(500).send(err.message);
             }
             return res.status(200).send("Updated");

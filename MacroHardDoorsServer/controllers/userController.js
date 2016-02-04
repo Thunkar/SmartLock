@@ -8,9 +8,13 @@
     fs = require('fs'),
     request = require('request'),
     moment = require('moment'),
-    console = process.console;
+    winston = require('winston');
+
+
+var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
+
 
 exports.register = function () {
     var formData = {
@@ -22,11 +26,11 @@ exports.register = function () {
     var signature = authController.generateSignature(date, app.env.mainServerSecret);
     request.post({ url: app.env.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
         }
-        if(httpResponse.statusCode != 200) console.file().time().error("Server responded: " + httpResponse.statusCode)
+        if(httpResponse.statusCode != 200) systemLogger.error("Server responded: " + httpResponse.statusCode)
         app.env.providerId = body.replace(/"/g, '');
-        return console.time().file().log("Registered with central server");
+        return systemLogger.info("Registered with central server");
     });
 };
 
@@ -43,7 +47,7 @@ exports.unRegister = function (req, res) {
     var signature = authController.generateSignature(date, app.env.mainServerSecret);
     request.post({ url: app.env.mainServerAddress + "/api/providers/" + app.env.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
@@ -55,7 +59,7 @@ exports.doAdminLogin = function (req, res) {
     adminModel.findById(req.body.admin, function (err, admin) {
         if (err) {
             res.status(500).send(err.message);
-            return console.time().file().error(err.message);
+            return systemLogger.error(err.message);
         }
         if (!admin) return res.status(404).send("Not found");
         if (admin.password === req.body.password) {
@@ -75,7 +79,7 @@ exports.createNewAdmin = function (req, res) {
     });
     newAdmin.save(function (err) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.newAdmin, null, newAdmin.name, null, null);
@@ -96,7 +100,7 @@ exports.createNewUser = function (req, res) {
     });
     newUser.save(function (err) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
@@ -107,7 +111,7 @@ exports.createNewUser = function (req, res) {
 exports.editUser = function (req, res) {
     userModel.findById(req.params.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!user) return res.status(404).send("User not found");
@@ -120,7 +124,7 @@ exports.editUser = function (req, res) {
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            fs.unlink(storagePath + user.profilePic, function (err) { if (err) console.file().time().error(err.message) });
+            fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
         }
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
@@ -129,7 +133,7 @@ exports.editUser = function (req, res) {
         user.active = updatedUser.active;
         user.save(function (err) {
             if (err) {
-                console.file().time().err(err.message);
+                systemLogger.error(err.message);
                 return res.status(500).send(err.message);
             }
             return res.status(200).send("Success");
@@ -140,7 +144,7 @@ exports.editUser = function (req, res) {
 exports.activateUser = function (req, res) {
     userModel.findByIdAndUpdate(req.params.user, { $set: { active: req.body.active } }, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         return res.status(200).send("Success");
@@ -150,10 +154,10 @@ exports.activateUser = function (req, res) {
 exports.deleteUser = function (req, res) {
     userModel.findByIdAndRemove(req.params.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
-        fs.unlink(storagePath + user.profilePic, function (err) { if (err) console.file().time().error(err.message) });
+        fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
         return res.status(200).send("Success");
     });
 };
@@ -168,7 +172,7 @@ exports.addNewToken = function (req, res) {
     };
     userModel.findByIdAndUpdate(req.params.user, { $push: { tokens: newToken } }, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.newToken, req.params.user, null, newToken._id, req.body.doors);
@@ -179,7 +183,7 @@ exports.addNewToken = function (req, res) {
 exports.revokeToken = function (req, res) {
     userModel.findByIdAndUpdate(req.params.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }, function (err) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.body.token, null);
@@ -190,7 +194,7 @@ exports.revokeToken = function (req, res) {
 exports.getUserInfo = function (req, res) {
     userModel.findById(req.params.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!user) return res.status(404).send("User not found");
@@ -210,7 +214,7 @@ exports.getUserInfo = function (req, res) {
 exports.getUsers = function (req, res) {
     userModel.find({}, function (err, users) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         var result = [];

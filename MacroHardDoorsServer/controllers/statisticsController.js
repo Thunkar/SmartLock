@@ -5,7 +5,9 @@
     statisticsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     moment = require('moment'),
-    console = process.console;
+    winston = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 exports.eventType = {
     userEntry: "userEntry",
@@ -36,10 +38,10 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
         if (admin) newEvent.admin = mongoose.Types.ObjectId(admin);
     }
     catch (err) {
-        if (err) console.file().time().error(err.message);
+        if (err) systemLogger.error(err.message);
     }
     newEvent.save(function (err) {
-        if (err) console.file().time().error(err.message);
+        if (err) systemLogger.error(err.message);
     });
 };
 
@@ -56,7 +58,7 @@ exports.getLatest = function (req, res) {
     query.populate('admin', '_id alias name profilePic');
     query.exec(function (err, stats) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         var result = [];
