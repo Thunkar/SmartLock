@@ -10,7 +10,6 @@
     moment = require('moment'),
     winston = require('winston');
 
-
 var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
