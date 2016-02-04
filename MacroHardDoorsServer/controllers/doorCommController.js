@@ -5,7 +5,7 @@
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
     moment = require('moment'),
-    winstono = require('winston');
+    winston = require('winston');
 
 var systemLogger = winston.loggers.get('system');
 

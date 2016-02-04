@@ -1,30 +1,21 @@
-﻿var scribe = require('scribe-js')(),
-    fs = require('fs');
+﻿var fs = require('fs');
 
-var console = process.console;
+var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
+exports.config = config;
 
-console.addLogger('system', null, {
-    alwaysTime: true,
-    alwaysLocation: true,
-    alwaysTags: true,
-    timeColors : 'grey',
-    tagsColors: 'lightblue',
-    fileColors: 'red',
-    defaultTags: ['System']
-});
+require('./utils/logger.js');
 
-console.file().time().system("Reading config file");
-var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
-exports.env = env;
-console.file().time().system("Configuration loaded");
+var winston = require('winston');
 
-if(env.dummy) {
+var systemLogger = winston.loggers.get('system');
+
+if(config.dummy) {
     var controller = require('./controllers/doorControllerDummy.js');
-    console.file().time().system("Using dummy controller");
+    systemLogger.info("Using dummy controller");
 }
 else {
     var controller = require('./controllers/doorController.js');
-    console.file().time().system("Using real controller");
+    systemLogger.info("Using real controller");
 }
 
 controller.init();

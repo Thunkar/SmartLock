@@ -5,10 +5,8 @@ exports.config = config;
 
 require('./utils/logger.js');
 
-
 var express = require('express'),
     app = express(),
-    fs = require('fs'),
     bodyParser = require('body-parser'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session),
@@ -20,12 +18,12 @@ var express = require('express'),
     statisticsModel = require('./models/statisticsModel.js')(app, mongoose),
     doorCommController = require('./controllers/doorCommController.js'),
     userController = require('./controllers/userController.js'),
-    stats = require('./controllers/statisticsController.js');
+    stats = require('./controllers/statisticsController.js'),
+    winston = require('winston');
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
-app.use(cookieParser('macroharddoors'));
 var sessionStore = new fileStore({ retries: 10, maxTimeout: 300 });
 app.use(session({ store: sessionStore, secret: config.secret, resave: false, saveUninitialized: false, proxy: true, name: "hsasim", cookie: { secure: false, maxAge: null } }));
 app.enable('trust proxy');
