@@ -1,4 +1,4 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     doorModel = mongoose.model('DoorModel'),

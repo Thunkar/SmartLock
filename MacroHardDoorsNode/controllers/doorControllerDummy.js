@@ -38,7 +38,7 @@ function openDoor() {
 };
 
 function doHeartbeat() {
-    console.time().file().log("Pinging the server...")
+    systemLogger.info("Pinging the server...")
     if (!config.id) {
         systemLogger.error("No id, killing myself...");
         process.exit(1);
@@ -62,7 +62,7 @@ function doHeartbeat() {
             }
         }
         else {
-            console.file().time().log("Server responded: " + body);
+            systemLogger.info("Server responded: " + body);
             if (body === "OPEN") openDoor();
         }
         doHeartbeat();

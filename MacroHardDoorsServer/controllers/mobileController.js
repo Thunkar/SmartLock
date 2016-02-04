@@ -1,4 +1,4 @@
-var app = require("../server.js"),
+var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     statsModel = mongoose.model('StatisticsModel'),
@@ -124,7 +124,7 @@ exports.getUserInfo = function (req, res) {
             _id: user._id,
             alias: user.alias,
             name: user.name,
-            profilePic: app.env.serverAddress + "/files/" + user.profilePic,
+            profilePic: config.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
             email: user.email,
             active: user.active

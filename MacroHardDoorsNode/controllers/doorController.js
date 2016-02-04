@@ -43,7 +43,7 @@ function openDoor() {
 };
 
 function doHeartbeat() {
-    console.time().file().log("Pinging the server...")
+    systemLogger.info("Pinging the server...")
     if (!config.id) {
         systemLogger.error("No id, killing myself...");
         process.exit(1);
@@ -67,7 +67,7 @@ function doHeartbeat() {
                 }
             }
             else {
-                console.file().time().log("Server responded: " + body);
+                systemLogger.info("Server responded: " + body);
                 if (body === "OPEN" && !open) openDoor();
             }
             doHeartbeat();
@@ -79,9 +79,9 @@ checkPin.watch(function (err, value) {
     if(open && value == 0 || !open && value == 1) return;
     open = value == 0;
     if (open) {
-        console.file().time().log("Door opened");
+        systemLogger.info("Door opened");
     } else {
-        console.file().time().log("Door closed");
+        systemLogger.info("Door closed");
     }
     request.post(config.serverAddress + "/api/doorcomms/status", {
         json: {
@@ -94,7 +94,7 @@ checkPin.watch(function (err, value) {
                 systemLogger.error("Server, responded with an error D:");
             }
             else {
-                console.file().time().log("Server responded: " + body);
+                systemLogger.info("Server responded: " + body);
             }
         });
 });

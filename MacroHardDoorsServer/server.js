@@ -25,7 +25,7 @@ var express = require('express'),
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
 var sessionStore = new fileStore({ retries: 10, maxTimeout: 300 });
-app.use(session({ store: sessionStore, secret: config.secret, resave: false, saveUninitialized: false, proxy: true, name: "hsasim", cookie: { secure: false, maxAge: null } }));
+app.use(session({ store: sessionStore, secret: config.secret, resave: false, saveUninitialized: false, proxy: true, name: "macroharddoors", cookie: { secure: false, maxAge: null } }));
 app.enable('trust proxy');
 
 var systemLogger = winston.loggers.get('system');

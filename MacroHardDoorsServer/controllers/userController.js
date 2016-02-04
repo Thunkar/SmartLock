@@ -1,4 +1,4 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
@@ -17,18 +17,18 @@ var storagePath = './uploads/';
 
 exports.register = function () {
     var formData = {
-        name: app.env.providerName,
-        url: app.env.serverAddress,
-        profilePic: fs.createReadStream(app.env.providerImg)
+        name: config.providerName,
+        url: config.serverAddress,
+        profilePic: fs.createReadStream(config.providerImg)
     };
     var date = moment().format("DD/MM/YYYY_hh:mm:ss");
-    var signature = authController.generateSignature(date, app.env.mainServerSecret);
-    request.post({ url: app.env.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
+    var signature = authController.generateSignature(date, config.mainServerSecret);
+    request.post({ url: config.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
             systemLogger.error(err.message);
         }
         if(httpResponse.statusCode != 200) systemLogger.error("Server responded: " + httpResponse.statusCode)
-        app.env.providerId = body.replace(/"/g, '');
+        config.providerId = body.replace(/"/g, '');
         return systemLogger.info("Registered with central server");
     });
 };
@@ -41,10 +41,10 @@ registerRule.minute = 3;
 scheduler.scheduleJob(registerRule, exports.register);
 
 exports.unRegister = function (req, res) {
-    if(!app.env.providerId) return res.status(400).send("No id");
+    if(!config.providerId) return res.status(400).send("No id");
     var date = moment().format("DD/MM/YYYY_hh:mm:ss");
-    var signature = authController.generateSignature(date, app.env.mainServerSecret);
-    request.post({ url: app.env.mainServerAddress + "/api/providers/" + app.env.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
+    var signature = authController.generateSignature(date, config.mainServerSecret);
+    request.post({ url: config.mainServerAddress + "/api/providers/" + config.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
             systemLogger.error(err.message);
             return res.status(500).send(err.message);
@@ -200,7 +200,7 @@ exports.getUserInfo = function (req, res) {
         var userToSend = {
             alias: user.alias,
             name: user.name,
-            profilePic: app.env.serverAddress + "/files/" + user.profilePic,
+            profilePic: config.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
             active: user.active,
             email: user.email
@@ -222,7 +222,7 @@ exports.getUsers = function (req, res) {
                 _id: users[i]._id,
                 alias: users[i].alias,
                 name: users[i].name,
-                profilePic: app.env.serverAddress + "/files/" + users[i].profilePic,
+                profilePic: config.serverAddress + "/files/" + users[i].profilePic,
                 active: users[i].active,
                 email: users[i].email
             };

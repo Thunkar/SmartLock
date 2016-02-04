@@ -1,5 +1,5 @@
 ﻿var SHA256 = require("crypto-js/sha256"),
-    app = require('../server.js'),
+    config = require('../server.js').config,
     mongoose = require('mongoose'),
     user = mongoose.model('UserModel'),
     winston = require('winston');

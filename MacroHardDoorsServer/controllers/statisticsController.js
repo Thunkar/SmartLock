@@ -1,4 +1,4 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
@@ -64,7 +64,7 @@ exports.getLatest = function (req, res) {
         var result = [];
         for (var i = 0; i < stats.length; i++) {
             if (stats[i].user) 
-                stats[i].user.profilePic = app.env.serverAddress + "/files/" + stats[i].user.profilePic;
+                stats[i].user.profilePic = config.serverAddress + "/files/" + stats[i].user.profilePic;
             if (!timeBounded || (moment(stats[i].date).isAfter(moment(req.query.from)) && moment(stats[i].date).isBefore(moment(req.query.to)))) result.push(stats[i]);
         }
         return res.status(200).jsonp(result);

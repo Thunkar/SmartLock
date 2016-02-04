@@ -1,4 +1,4 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     doorModel = mongoose.model('DoorModel'),
@@ -31,7 +31,7 @@ exports.check = function () {
                 doorModel.findByIdAndUpdate(doors[i].id, { $set: { online: true } }, function (err) { if (err) systemLogger.error(err.message); });
             }
         }
-        setTimeout(exports.check, app.env.checkInterval);
+        setTimeout(exports.check, config.checkInterval);
     });
 };
 
@@ -51,7 +51,7 @@ exports.handshake = function (req, res) {
             section: req.body.section,
             ip: req.ip,
             lastHeartbeat: new Date(),
-            active: app.env.activeDoorsDefault,
+            active: config.activeDoorsDefault,
             online: true,
             open: req.body.open
         }
@@ -89,7 +89,7 @@ exports.heartbeat = function (req, res) {
         if (!door) return res.status(404).send("Door does not exist");
         var timeoutId = setTimeout(function () {
             answerHeartbeat(door);
-        }, app.env.pingInterval);
+        }, config.pingInterval);
         heartbeats[door.id] = { res: res, timeoutId: timeoutId, name: door.name };
         door.lastHeartbeat = new Date();
         door.save(function (err) {
@@ -109,7 +109,7 @@ exports.openDoor = function (doorName, retries, callback) {
         if (!heartbeats[door.id]) {
             setTimeout(function () {
                 exports.openDoor(door, ++retries, callback);
-            }, app.env.openRetryTimeout);
+            }, config.openRetryTimeout);
         }
         else {
             clearTimeout(heartbeats[door.id].timeoutId);
