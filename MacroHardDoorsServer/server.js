@@ -1,4 +1,12 @@
-﻿var express = require('express'),
+﻿var fs = require('fs');
+
+var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
+exports.config = config;
+
+require('./utils/logger.js');
+
+
+var express = require('express'),
     app = express(),
     fs = require('fs'),
     bodyParser = require('body-parser'),
@@ -14,10 +22,6 @@
     userController = require('./controllers/userController.js'),
     stats = require('./controllers/statisticsController.js');
 
-var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
-exports.config = config;
-
-require('./utils/logger.js');
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
