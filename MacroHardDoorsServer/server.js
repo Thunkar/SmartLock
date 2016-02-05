@@ -7,9 +7,9 @@ require('./utils/logger.js');
 
 var express = require('express'),
     app = express(),
-    server = require('http').createServer(app);
-io = require('socket.io')(server);
-bodyParser = require('body-parser'),
+    server = require('http').createServer(app),
+    io = require('socket.io')(server),
+    bodyParser = require('body-parser'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session),
     mongoose = require('mongoose'),
