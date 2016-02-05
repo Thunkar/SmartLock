@@ -1,4 +1,5 @@
 ﻿var config = require("../server.js").config,
+    eventsChannel = require('../server.js').eventsChannel,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
@@ -42,6 +43,7 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
     }
     newEvent.save(function (err) {
         if (err) systemLogger.error(err.message);
+        updatesChannel.emit(eventType);
     });
 };
 

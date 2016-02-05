@@ -7,7 +7,9 @@ require('./utils/logger.js');
 
 var express = require('express'),
     app = express(),
-    bodyParser = require('body-parser'),
+    server = require('http').createServer(app);
+io = require('socket.io')(server);
+bodyParser = require('body-parser'),
     session = require('express-session'),
     fileStore = require('session-file-store')(session),
     mongoose = require('mongoose'),
@@ -76,3 +78,15 @@ app.get('/files/:file', function (req, res) {
 app.listen(config.port, function () {
     systemLogger.info('Main server listening on port: ' + config.port);
 });
+
+var eventsChannel = io.of('/api/events');
+
+eventsChannel.on('connection', function (socket) {
+    systemLogger.info('New client connected to events channel');
+    
+    socket.on('disconnect', function () {
+        systemLogger.info('Client disconnected to events channel');
+    });
+});
+
+exports.updatesChannel = updatesChannel;
