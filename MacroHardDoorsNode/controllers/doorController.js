@@ -48,6 +48,7 @@ socket.on('disconnect', function () {
 
 checkPin.watch(function (err, value) {
     if (err) return systemLogger.error(err.message);
+    if (!config.id) return;
     if(open && value == 0 || !open && value == 1) return;
     open = value == 0;
     if (open) {
