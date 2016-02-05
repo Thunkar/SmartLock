@@ -1,11 +1,13 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
     statisticsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     moment = require('moment'),
-    console = process.console;
+    winston = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 exports.eventType = {
     userEntry: "userEntry",
@@ -36,10 +38,10 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
         if (admin) newEvent.admin = mongoose.Types.ObjectId(admin);
     }
     catch (err) {
-        if (err) console.file().time().error(err.message);
+        if (err) systemLogger.error(err.message);
     }
     newEvent.save(function (err) {
-        if (err) console.file().time().error(err.message);
+        if (err) systemLogger.error(err.message);
     });
 };
 
@@ -56,13 +58,13 @@ exports.getLatest = function (req, res) {
     query.populate('admin', '_id alias name profilePic');
     query.exec(function (err, stats) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         var result = [];
         for (var i = 0; i < stats.length; i++) {
             if (stats[i].user) 
-                stats[i].user.profilePic = app.env.serverAddress + "/files/" + stats[i].user.profilePic;
+                stats[i].user.profilePic = config.serverAddress + "/files/" + stats[i].user.profilePic;
             if (!timeBounded || (moment(stats[i].date).isAfter(moment(req.query.from)) && moment(stats[i].date).isBefore(moment(req.query.to)))) result.push(stats[i]);
         }
         return res.status(200).jsonp(result);

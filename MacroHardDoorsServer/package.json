@@ -9,16 +9,16 @@
   },
   "dependencies": {
     "body-parser": "^1.12.3",
-    "cookie-parser": "^1.3.4",
+    "colors": "^1.1.2",
     "crypto-js": "^3.1.5",
     "express": "^4.12.3",
     "express-session": "^1.11.1",
-    "method-override": "^2.3.2",
     "moment": "^2.10.3",
     "mongoose": "^4.0.6",
     "multer": "^0.1.8",
+    "node-schedule": "^0.2.9",
     "request": "^2.58.0",
-    "scribe-js": "^2.0.4",
-    "node-schedule":"^0.2.9"
+    "session-file-store": "0.0.24",
+    "winston": "^2.1.1"
   }
 }

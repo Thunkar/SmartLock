@@ -1,10 +1,9 @@
 ﻿var SHA256 = require("crypto-js/sha256"),
-    app = require('../server.js'),
-    console = process.console;
+    config = require('../server.js').config;
 
 
 generateSignature = function (date) {
-    var toSign = date + "_" + app.env.mainServerSecret;
+    var toSign = date + "_" + config.mainServerSecret;
     return SHA256(toSign);
 }
 

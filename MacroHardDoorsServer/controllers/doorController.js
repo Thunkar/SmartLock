@@ -1,4 +1,4 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     doorModel = mongoose.model('DoorModel'),
@@ -6,8 +6,9 @@
     doorCommController = require('./doorCommController.js'),
     stats = require('./statisticsController.js'),
     moment = require('moment'),
-    console = process.console;
+    winston = require('winston'); 
 
+var systemLogger = winston.loggers.get('system');
 
 function ensureValidToken(userId, doorName, tokenId, callback) {
     userModel.findById(userId, function (err, user) {
@@ -38,13 +39,13 @@ exports.open = function (req, res) {
     ensureValidToken(req.body.user, req.body.door, req.body.token, function (err) {
         if (err) {
             stats.generateEvent(stats.eventType.userRejected, req.body.user, null, req.body.token, req.body.door);
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(400).send(err.message);
         }
         doorCommController.openDoor(req.body.door, 0, function (err, result) {
             if (err) {
                 stats.generateEvent(stats.eventType.failedEntry, req.body.user, null, req.body.token, req.body.door);
-                console.file().time().error(err.message);
+                systemLogger.error(err.message);
                 return res.status(500).send(err.message);
             }
             stats.generateEvent(stats.eventType.userEntry, req.body.user, null, req.body.token, req.body.door);
@@ -56,7 +57,7 @@ exports.open = function (req, res) {
 exports.toggleDoor = function (req, res) {
     doorModel.update({ name: req.params.door },{ $set: { active: req.body.active }}, function (err) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if(req.body.active)
@@ -77,7 +78,7 @@ exports.searchDoors = function (req, res) {
     }
     query.exec(function (err, doors) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         return res.status(200).jsonp({ doors: doors });

@@ -1,11 +1,15 @@
-﻿var scribe = require('scribe-js')(),
-    express = require('express'),
+﻿var fs = require('fs');
+
+var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
+exports.config = config;
+
+require('./utils/logger.js');
+
+var express = require('express'),
     app = express(),
-    fs = require('fs'),
     bodyParser = require('body-parser'),
-    methodOverride = require("method-override"),
     session = require('express-session'),
-    cookieParser = require('cookie-parser'),
+    fileStore = require('session-file-store')(session),
     mongoose = require('mongoose'),
     doorModel = require('./models/doorModel.js')(app, mongoose),
     doorModel = mongoose.model('DoorModel'),
@@ -14,49 +18,34 @@
     statisticsModel = require('./models/statisticsModel.js')(app, mongoose),
     doorCommController = require('./controllers/doorCommController.js'),
     userController = require('./controllers/userController.js'),
-    stats = require('./controllers/statisticsController.js');
+    stats = require('./controllers/statisticsController.js'),
+    winston = require('winston');
+
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
-app.use(methodOverride());
-app.use(cookieParser('macroharddoors'));
-app.use(session());
-app.use(scribe.express.logger());
+var sessionStore = new fileStore({ retries: 10, maxTimeout: 300 });
+app.use(session({ store: sessionStore, secret: config.secret, resave: false, saveUninitialized: false, proxy: true, name: "macroharddoors", cookie: { secure: false, maxAge: null } }));
 app.enable('trust proxy');
 
-var console = process.console;
+var systemLogger = winston.loggers.get('system');
 
-console.addLogger('system', null, {
-    alwaysTime: true,
-    alwaysLocation: true,
-    alwaysTags: true,
-    timeColors : 'grey',
-    tagsColors: 'lightblue',
-    fileColors: 'red',
-    defaultTags: ['System']
-});
-
-console.file().time().system("Reading config file");
-var env = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
-exports.env = env;
-console.file().time().system("Configuration loaded");
-
-mongoose.connect(env.dbAddress, function (err) {
+mongoose.connect(config.dbAddress, function (err) {
     if (err) {
-        console.error("could not connect to DB: " + err);
+        systemLogger.error("could not connect to DB: " + err);
     }
     else {
-        console.time().file().system("Connected to DB");
-        console.time().file().system("Cleaning up...");
+        systemLogger.info("Connected to DB");
+        systemLogger.info("Cleaning up...");
         doorModel.remove({}, function (err) {
             if (err) {
-                console.time().file().error(err.message);
+                systemLogger.error(err.message);
                 process.exit(1);
             }
             doorCommController.check();
             stats.generateEvent(stats.eventType.systemStarted, null, null, null, null);
             userController.register();
-            console.time().file().system("Ready to receive handshakes");
+            systemLogger.info("Ready to receive handshakes");
         });
     }
 });
@@ -84,6 +73,6 @@ app.get('/files/:file', function (req, res) {
 });
 
 
-app.listen(env.port, function () {
-    console.time().file().system('Main server listening on port: ' + env.port);
+app.listen(config.port, function () {
+    systemLogger.info('Main server listening on port: ' + config.port);
 });

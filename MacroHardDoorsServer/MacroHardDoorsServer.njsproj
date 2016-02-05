@@ -219,6 +219,7 @@
     <Compile Include="routes\statistics.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="server.js" />
+    <Compile Include="utils\logger.js" />
     <Content Include="frontend\admin\index.html" />
     <Content Include="frontend\css\sb-admin-2.css" />
     <Content Include="frontend\css\timeline.css" />
@@ -698,7 +699,6 @@
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="config\nodes\" />
     <Folder Include="frontend\css\" />
     <Folder Include="frontend\lib\" />
     <Folder Include="frontend\lib\bootstrap-social\" />
@@ -823,7 +823,7 @@
     <Folder Include="models\" />
     <Folder Include="frontend\" />
     <Folder Include="controllers\" />
-    <Folder Include="config\" />
+    <Folder Include="utils\" />
     <Folder Include="routes\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->

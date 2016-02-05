@@ -1,10 +1,12 @@
-﻿var app = require("../server.js"),
+﻿var config = require("../server.js").config,
     mongoose = require('mongoose'),
     providerModel = mongoose.model('ProviderModel'),
     fs = require('fs'),
     scheduler = require('node-schedule'),
     mkdirp = require('mkdirp'),
-    console = process.console;
+    winston = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
 
@@ -61,7 +63,7 @@ ensureExists = function (path, cb) {
 exports.addProvider = function (req, res) {
     providerModel.update({ name: req.body.name }, { $set: { name: req.body.name, url: req.body.url, profilePic: req.files.profilePic.name } }, { upsert: true }, function (err, provider) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         return res.status(200).send(provider._id);
@@ -69,18 +71,18 @@ exports.addProvider = function (req, res) {
 };
 
 exports.removeProviders = function () {
-    console.file().time().log("Cleaning up...");
+    systemLogger.info("Cleaning up...");
     providerModel.remove({}, function (err) {
         if (err) {
-            return console.file().time().err(err.message);
+            return systemLogger.error(err.message);
         }
         rmdirAsync(storagePath, function (err) {
-            if (err) console.time().file().error(err.message);
+            if (err) systemLogger.error(err.message);
             ensureExists(storagePath, function(err){
-                if (err) console.time().file().error(err.message);
+                if (err) systemLogger.error(err.message);
             })
         });
-        return console.file().time().log("Ready");
+        return systemLogger.info("Ready");
     });
 };
 
@@ -94,13 +96,13 @@ scheduler.scheduleJob(cleaningRule, exports.removeProviders);
 exports.getProviders = function (req, res) {
     providerModel.find({}, function (err, providers) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         var result = [];
         for (var i = 0; i < providers.length; i++) {
             var provider = providers[i];
-            provider.profilePic = app.env.serverAddress + "files/" + provider.profilePic;
+            provider.profilePic = config.serverAddress + "files/" + provider.profilePic;
         }
         return res.status(200).jsonp(providers);
     });

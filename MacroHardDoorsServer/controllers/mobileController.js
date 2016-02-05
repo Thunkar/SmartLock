@@ -1,20 +1,21 @@
-var app = require("../server.js"),
+var config = require("../server.js").config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     statsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
     fs = require('fs'),
-    console = process.console;
+    winston = require('winston');
+
+var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
-
 
 exports.login = function (req, res) {
     userModel.findOne({ alias: req.body.alias }, function (err, user) {
         if (err) {
             res.status(500).send(err.message);
-            return console.time().file().error(err.message);
+            return systemLogger.error(err.message);
         }
         if (!user) return res.status(404).send("Not found");
         if (user.password === req.body.password) {
@@ -44,7 +45,7 @@ exports.createNewUser = function (req, res) {
     });
     newUser.save(function (err) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
@@ -61,7 +62,7 @@ exports.createNewUser = function (req, res) {
 exports.editUser = function (req, res) {
     userModel.findById(req.params.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!user) return res.status(404).send("User not found");
@@ -73,7 +74,7 @@ exports.editUser = function (req, res) {
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            fs.unlink(storagePath + user.profilePic, function (err) { if (err) console.file().time().error(err.message) });
+            fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
         }
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
@@ -81,7 +82,7 @@ exports.editUser = function (req, res) {
         user.email = updatedUser.email;
         user.save(function (err) {
             if (err) {
-                console.file().time().err(err.message);
+                systemLogger.error(err.message);
                 return res.status(500).send(err.message);
             }
             return res.status(200).send("Success");
@@ -92,10 +93,10 @@ exports.editUser = function (req, res) {
 exports.deleteUser = function (req, res) {
     userModel.findByIdAndRemove(req.body.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
-        fs.unlink(storagePath + user.profilePic, function (err) { if (err) console.file().time().error(err.message) });
+        fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
         return res.status(200).send("Success");
     });
 };
@@ -104,7 +105,7 @@ exports.deleteUser = function (req, res) {
 exports.revokeToken = function (req, res) {
     userModel.findByIdAndUpdate(req.body.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }, function (err) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.params.token, null);
@@ -115,7 +116,7 @@ exports.revokeToken = function (req, res) {
 exports.getUserInfo = function (req, res) {
     userModel.findById(req.params.user, function (err, user) {
         if (err) {
-            console.file().time().err(err.message);
+            systemLogger.error(err.message);
             return res.status(500).send(err.message);
         }
         if (!user) return res.status(404).send("User not found");
@@ -123,7 +124,7 @@ exports.getUserInfo = function (req, res) {
             _id: user._id,
             alias: user.alias,
             name: user.name,
-            profilePic: app.env.serverAddress + "/files/" + user.profilePic,
+            profilePic: config.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
             email: user.email,
             active: user.active
@@ -138,7 +139,7 @@ exports.getUserStats = function (req, res) {
     query.limit(20);
     query.exec(function (err, stats) {
         if (err) {
-            console.file().time().error(err.message);
+            systemLogger.error(err.message);
             return res.status(200).send(err.message);
         }
         return res.status(200).jsonp(stats);
