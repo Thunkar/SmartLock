@@ -1,4 +1,4 @@
-﻿var config = require("../server.js").config,
+﻿var config = require('../server.js').config,
     eventsChannel = require('../server.js').eventsChannel,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
@@ -27,6 +27,14 @@ exports.eventType = {
     doorClosed: "doorClosed"
 };
 
+eventsChannel.on('connection', function (socket) {
+    systemLogger.info('New client connected to events channel');
+    
+    socket.on('disconnect', function () {
+        systemLogger.info('Client disconnected to events channel');
+    });
+});
+
 exports.generateEvent = function (eventType, user, admin, token, door) {
     var newEvent = new statisticsModel({
         event: eventType,
@@ -43,7 +51,7 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
     }
     newEvent.save(function (err) {
         if (err) systemLogger.error(err.message);
-        updatesChannel.emit(eventType);
+        eventsChannel.emit(eventType);
     });
 };
 

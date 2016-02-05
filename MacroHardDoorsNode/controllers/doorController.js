@@ -1,78 +1,50 @@
 ﻿var config = require('../door.js').config,
-    request = require('request'),
     GPIO = require('onoff').Gpio,
+    socket = require('socket.io-client')(config.serverAddress + '/doorcomms'),
     winston = require('winston');
 
 var systemLogger = winston.loggers.get('system');
 
-var failedHeartbeats = 0;
 var openPin = new GPIO(4, 'out');
 var checkPin = new GPIO(14, 'in', 'both');
 var open = checkPin.readSync() == 0;
 
-exports.init = function () {
-    request.post(config.serverAddress + "/api/doorcomms/handshake", {
-        json: {
-            name: config.name,
-            section: config.section,
-            open: open
-        }
-    }, function (err, response, body) {
-            if (err) {
-                systemLogger.error("Handshake failed!: " + err.message);
-                systemLogger.error("No id, killing myself...");
-                process.exit(1);
-
-            } else {
-                systemLogger.info("Handshake returned: " + response.statusCode + ", id is: " + body);
-                if (response.statusCode != 200) {
-                    systemLogger.error("Handshake failed!: " + body);
-                    systemLogger.error("No id, killing myself...");
-                    process.exit(1);
-                }
-                config.id = body;
-                doHeartbeat();
-            }
-        });
-};
-
-function openDoor() {
+var openDoor = function() {
     systemLogger.warn('Opening door');
     openPin.writeSync(1);
     setTimeout(function () { openPin.writeSync(0) }, 1000);
 };
 
-function doHeartbeat() {
-    systemLogger.info("Pinging the server...")
-    if (!config.id) {
-        systemLogger.error("No id, killing myself...");
-        process.exit(1);
-    }
-    request.post(config.serverAddress + "/api/doorcomms/heartbeat", {
-        json: {
-            id: config.id
+socket.on('connect', function () {
+    socket.emit('handshake', {
+        name: config.name,
+        section: config.section,
+        open: false
+    }, function (data) {
+        if (data) {
+            config.id = data.id;
+            systemLogger.info("Handshake completed, id: " + data.id);
         }
-    }, function (err, response, body) {
-            if (err) {
-                systemLogger.error(err.message);
-                if (++failedHeartbeats > 10) {
-                    systemLogger.error("No response from server, killing myself...");
-                    process.exit(1);
-                }
-            }
-            else if (response.statusCode != 200) {
-                if (++failedHeartbeats > 10) {
-                    systemLogger.error("No response from server, killing myself...");
-                    process.exit(1);
-                }
-            }
-            else {
-                systemLogger.info("Server responded: " + body);
-                if (body === "OPEN" && !open) openDoor();
-            }
-            doHeartbeat();
-        });
-};
+        else {
+            systemLogger.error("Handshake failed!: " + body);
+            systemLogger.error("No id, killing myself...");
+            process.exit(1);
+        }
+    });
+});
+
+socket.on('open', openDoor);
+
+socket.on('error', function (err) {
+    systemLogger.error("Socket error: " + err.message);
+    process.exit(-1);
+});
+
+socket.on('disconnect', function () {
+    systemLogger.error("Socket disconnected");
+    process.exit(-1);
+});
+
 
 checkPin.watch(function (err, value) {
     if (err) return systemLogger.error(err.message);
@@ -83,18 +55,7 @@ checkPin.watch(function (err, value) {
     } else {
         systemLogger.info("Door closed");
     }
-    request.post(config.serverAddress + "/api/doorcomms/status", {
-        json: {
-            id: config.id,
-            open: open
-        }
-    }, function (err, response, body) {
-            if (err) return systemLogger.error(err.message);
-            else if (response.statusCode != 200) {
-                systemLogger.error("Server, responded with an error D:");
-            }
-            else {
-                systemLogger.info("Server responded: " + body);
-            }
-        });
+    if (socket) {
+        socket.emit('status', { id: config.id, open: open });
+    }
 });

@@ -17,5 +17,3 @@ else {
     var controller = require('./controllers/doorController.js');
     systemLogger.info("Using real controller");
 }
-
-controller.init();
