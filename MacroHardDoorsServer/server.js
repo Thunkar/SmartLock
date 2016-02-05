@@ -89,4 +89,4 @@ eventsChannel.on('connection', function (socket) {
     });
 });
 
-exports.updatesChannel = updatesChannel;
+exports.eventsChannel = eventsChannel;
