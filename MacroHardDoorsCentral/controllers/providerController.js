@@ -90,6 +90,7 @@ var cleaningRule = new scheduler.RecurrenceRule();
 
 cleaningRule.hour = 5;
 cleaningRule.minute = 0;
+cleaningRule.second = 30;
 
 scheduler.scheduleJob(cleaningRule, exports.removeProviders);
 
