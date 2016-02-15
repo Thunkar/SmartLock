@@ -51,7 +51,7 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
     }
     newEvent.save(function (err) {
         if (err) systemLogger.error(err.message);
-        eventsChannel.emit(eventType);
+        eventsChannel.emit("event", { type: eventType });
     });
 };
 
@@ -73,7 +73,7 @@ exports.getLatest = function (req, res) {
         }
         var result = [];
         for (var i = 0; i < stats.length; i++) {
-            if (stats[i].user) 
+            if (stats[i].user)
                 stats[i].user.profilePic = config.serverAddress + "/files/" + stats[i].user.profilePic;
             if (!timeBounded || (moment(stats[i].date).isAfter(moment(req.query.from)) && moment(stats[i].date).isBefore(moment(req.query.to)))) result.push(stats[i]);
         }
