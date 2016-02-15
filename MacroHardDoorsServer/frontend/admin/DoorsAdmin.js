@@ -1,4 +1,27 @@
 var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute','ui.bootstrap','ui.bootstrap.datetimepicker',"angucomplete-alt"]);
+
+DoorsAdmin.run(['$rootScope', function($rootScope) {
+    var socket = io('/events');
+
+    socket.connect();
+
+    socket.on('connect',function() {
+        console.log('Client has connected to the server!');
+    });
+    // Add a connect listener
+    socket.on('event',function(data) {
+        console.log('Received a message from the server!',data);
+        if(data.type==='nodeHandshake'||data.type==='nodeOffline'||data.type==='nodeActivated'||data.type==='nodeDeactivated')
+            $rootScope.$broadcast('doorEvent', data);
+        $rootScope.$broadcast('event', data);
+    });
+    // Add a disconnect listener
+    socket.on('disconnect',function() {
+        console.log('The client has disconnected!');
+    });
+
+}]);
+
 Array.prototype.filterBy=function(attr,validation){
     var findings=[];
     for(var i=0;i<this.length;i++){

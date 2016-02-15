@@ -14,7 +14,11 @@ DoorsAdmin.controller('doorsController', function ($scope,$location,$http) {
 		});
 	}
 	reloadDoors();
-	setInterval(reloadDoors,1000)
+	$scope.$on('doorEvent',function(){
+		console.log("Door event, reloading");
+		reloadDoors();
+	});
+	//setInterval(reloadDoors,1000)
 	$scope.deactivateDoor=function(parent,index){
 		var door=$scope.doorsRows[parent][index];
 		$http.post('/api/doors/'+door.name+'/active',{active:false}).success(function(data,status){

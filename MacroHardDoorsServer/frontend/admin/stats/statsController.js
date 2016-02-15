@@ -6,7 +6,7 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 		resize: true
 	});
 	var lastDonutDoorData={};
-	setInterval(function(){
+	var reloadStats=function(){
 		$http.get('/api/doors').success(function(data,status){
 			$scope.doors=data.doors;
 			$scope.deactivatedDoors=data.doors.filterBy('active',function(val){return val===false;});
@@ -24,7 +24,13 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 				lastDonutDoorData=newDonutData;
 			}
 		});
-	},1000);
+	}
+	$scope.$on('event',function(){
+		console.log("Event, reloading stats");
+		reloadStats();
+	});
+	//setInterval(reloadStats,1000);
+	reloadStats();
 	var usersDonut=Morris.Donut({
 		element: 'users-donut-chart',
 		data: [{"value":"","label":""}],
