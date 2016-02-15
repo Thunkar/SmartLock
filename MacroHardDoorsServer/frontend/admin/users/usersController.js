@@ -2,14 +2,7 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 	var USERS_COLUMNS=3;
 	var reloadUsers=function(){
 		$http.get('/api/users').success(function(data,status){
-			$scope.usersRows=[];
-			var length=data.length;
-			for(var i=0;i<length/USERS_COLUMNS;i++){
-				$scope.usersRows[i]=[];
-				for(var j=0;(j<USERS_COLUMNS)&&(i*USERS_COLUMNS+j)<length;j++){
-					$scope.usersRows[i][j]=data[i*USERS_COLUMNS+j];
-				}
-			}
+			$scope.users=data;
 		});
 	}
 	reloadUsers();
@@ -27,24 +20,21 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 			$log.info('Modal dismissed at: ' + new Date());
 		});
 	}
-	$scope.deleteUser=function(parent,index){
-		var user=$scope.usersRows[parent][index];
+	$scope.deleteUser=function(user){
 		$http.post('/api/users/'+user._id+'/delete',{}).success(function(data,status){
 			if(status==200){
 				reloadUsers();
 			}
 		});
 	}
-		$scope.setUserActive=function(parent,index,value){
-		var user=$scope.usersRows[parent][index];
+	$scope.setUserActive=function(user,value){
 		$http.post('/api/users/'+user._id+'/activate',{active:value}).success(function(data,status){
 			if(status==200){
 				reloadUsers();
 			}
 		});
 	}
-		$scope.viewUser=function(parent,index){
-		var user=$scope.usersRows[parent][index];
+	$scope.viewUser=function(user){
 		$location.path('/users/'+user._id);
 	}
 });

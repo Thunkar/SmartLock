@@ -47,8 +47,7 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
-<div class="row" ng-repeat="row in usersRows">
-    <div class="col-sm-4" ng-repeat="user in row">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="user in users">
         <div ng-class="user.active ? 'panel-default ' : 'panel-danger '" class="panel " >
             <div class="panel-heading">
                 {{user.alias}}
@@ -60,12 +59,12 @@
                                     </button>
                                     <ul class="dropdown-menu pull-right" role="menu">
                                         
-                                        <li><a ng-show="user.active" href="javascript:void(0)" ng-click="setUserActive($parent.$index,$index,false)">Deactivate</a>
+                                        <li><a ng-show="user.active" href="javascript:void(0)" ng-click="setUserActive(user,false)">Deactivate</a>
                                         </li>
-                                       <li><a ng-show="!user.active" href="javascript:void(0)" ng-click="setUserActive($parent.$index,$index,true)">Activate</a>
+                                       <li><a ng-show="!user.active" href="javascript:void(0)" ng-click="setUserActive(user,true)">Activate</a>
                                         </li>
                                         <li class="divider"></li>
-                                        <li><a href="javascript:void(0)"  ng-click="deleteUser($parent.$index,$index)">Delete</a>
+                                        <li><a href="javascript:void(0)"  ng-click="deleteUser(user,$index)">Delete</a>
                                         </li>
                                         
                                     </ul>
@@ -79,10 +78,10 @@
             </div>
             </div>
             <div class="panel-footer">
-                <button class="btn btn-info pull-right" ng-click="viewUser($parent.$index,$index)">User info</button>
+                <button class="btn btn-info pull-right" ng-click="viewUser(user)">User info</button>
                 <div class="clearfix"></div>
             </div>
         </div>
-    </div>
 </div>
 <button class="btn btn-success pull-right" ng-click="addUser()">Add user</button>
+ <div class="clearfix"></div>

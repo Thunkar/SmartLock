@@ -4,33 +4,31 @@
 	</div>
 </div>
 
-<div class="row" ng-repeat="row in doorsRows">
-    <div class="col-sm-4" ng-repeat="door in row">
-        <div ng-class="!door.online ?  'panel-danger ' : !door.active? 'panel-warning': 'panel-green'" class="panel " >
-            <div class="panel-heading">
-                {{door.name}}
+  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="door in doors">
+      <div ng-class="!door.online ?  'panel-danger ' : !door.active? 'panel-warning': 'panel-green'" class="panel " >
+          <div class="panel-heading">
+              {{door.name}}
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div class="row">
+            <div class="col-sm-6">
+            <i ng-class="door.open? 'fa-unlock' : 'fa-lock'" class="fa" style="font-size:6em"> </i>
             </div>
-            <div class="panel-body" style="text-align:center">
-              <div class="row">
-              <div class="col-sm-6">
-              <i ng-class="door.open? 'fa-unlock' : 'fa-lock'" class="fa" style="font-size:6em"> </i>
-              </div>
-               <div  class="col-sm-6">
-            <p>Section {{door.section}}</p>
-            <p ng-show="door.open">Open</p>
-            <p ng-show="!door.open">Closed</p>
-            <p ng-show="door.active">Active</p>
-            <p ng-show="!door.active">Deactivated</p>
-            <p ng-show="!door.online">Offline</p>
-            <p ng-show="door.online">Online</p>
-            </div>
-            </div>
-            </div>
-            <div class="panel-footer" >
-              <button ng-show="door.active" ng-disabled="!door.online" class="btn btn-danger pull-right" ng-click="deactivateDoor($parent.$index,$index)">Deactivate door</button>
-               <button ng-show="!door.active" ng-disabled="!door.online" class="btn btn-info pull-right" ng-click="activateDoor($parent.$index,$index)">Activate door</button>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
+             <div  class="col-sm-6">
+          <p>Section {{door.section}}</p>
+          <p ng-show="door.open">Open</p>
+          <p ng-show="!door.open">Closed</p>
+          <p ng-show="door.active">Active</p>
+          <p ng-show="!door.active">Deactivated</p>
+          <p ng-show="!door.online">Offline</p>
+          <p ng-show="door.online">Online</p>
+          </div>
+          </div>
+          </div>
+          <div class="panel-footer" >
+            <button ng-show="door.active" ng-disabled="!door.online" class="btn btn-danger pull-right" ng-click="deactivateDoor(door)">Deactivate door</button>
+             <button ng-show="!door.active" ng-disabled="!door.online" class="btn btn-info pull-right" ng-click="activateDoor(door)">Activate door</button>
+              <div class="clearfix"></div>
+          </div>
+      </div>
 </div>
