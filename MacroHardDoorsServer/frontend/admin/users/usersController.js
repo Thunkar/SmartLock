@@ -1,4 +1,4 @@
-DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal,$log) {
+DoorsAdmin.controller('usersController', ['$scope','$location','$http','$modal','$log' , function ($scope,$location,$http,$modal,$log) {
 	var USERS_COLUMNS=3;
 	var reloadUsers=function(){
 		$http.get('/api/users').success(function(data,status){
@@ -37,8 +37,8 @@ DoorsAdmin.controller('usersController', function ($scope,$location,$http,$modal
 	$scope.viewUser=function(user){
 		$location.path('/users/'+user._id);
 	}
-});
-DoorsAdmin.controller('addUserCtrl', function ($http, $scope, $modalInstance) {
+}]);
+DoorsAdmin.controller('addUserCtrl',  ['$http', '$scope','$modalInstance', function ($http, $scope, $modalInstance) {
 	$scope.ok = function () {
 		var formData = new FormData();
 		formData.append("profilePic", $("#image")[0].files[0]);
@@ -64,4 +64,4 @@ DoorsAdmin.controller('addUserCtrl', function ($http, $scope, $modalInstance) {
 	$scope.cancel = function () {
 		$modalInstance.dismiss('cancel');
 	};
-});
+}]);

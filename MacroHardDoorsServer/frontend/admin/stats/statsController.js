@@ -1,4 +1,4 @@
-DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
+DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,function ($scope,$location,$http) {
 	var doorsDonut=Morris.Donut({
 		element: 'doors-donut-chart',
 		data: [{"value":"","label":""}],
@@ -111,9 +111,9 @@ DoorsAdmin.controller('statsController', function ($scope,$location,$http) {
 		return user.tokens[user.tokens.findBy({_id:tokenId},'_id')];
 	}	
 
-});
+}]);
 
-DoorsAdmin.controller('timelineController', function ($scope,$location,$http) {
+DoorsAdmin.controller('timelineController', [ '$scope','$location','$http' ,function ($scope,$location,$http) {
 	setInterval(function(){
 	$http.get('/api/statistics').success(function(data,status){
 		$scope.timeline=data;
@@ -123,4 +123,4 @@ DoorsAdmin.controller('timelineController', function ($scope,$location,$http) {
 		return " "+moment(new Date(date)).fromNow();
 	}
 
-});
+}]);
