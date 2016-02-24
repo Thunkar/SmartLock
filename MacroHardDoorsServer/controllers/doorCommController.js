@@ -104,7 +104,7 @@ exports.openDoor = function (doorName, callback) {
         else {
             systemLogger.info("Sent OPEN to door: " + door.name + " with id: " + door.id);
             doors[door.id].socket.emit('open')
-            callback(err, result);
+            callback(err);
         }
     });
 };

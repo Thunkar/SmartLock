@@ -42,7 +42,7 @@ exports.open = function (req, res) {
             systemLogger.error(err.message);
             return res.status(400).send(err.message);
         }
-        doorCommController.openDoor(req.body.door, function (err, result) {
+        doorCommController.openDoor(req.body.door, function (err) {
             if (err) {
                 stats.generateEvent(stats.eventType.failedEntry, req.body.user, null, req.body.token, req.body.door);
                 systemLogger.error(err.message);
