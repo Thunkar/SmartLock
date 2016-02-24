@@ -74,10 +74,7 @@ doorsChannel.on('connection', function (socket) {
             return socket.disconnect();
         }
         doorModel.findById(registeredDoor.id, function (err, door) {
-            if (err) {
-                systemLogger.error(err.message);
-                return res.status(500).send(err.message);
-            }
+            if (err) return systemLogger.error(err.info)
             if (!door) {
                 systemLogger.error("No door found");
                 return socket.disconnect();
@@ -86,11 +83,7 @@ doorsChannel.on('connection', function (socket) {
             if (door.open) stats.generateEvent(stats.eventType.doorOpened, null, null, null, door.name);
             else stats.generateEvent(stats.eventType.doorClosed, null, null, null, door.name);
             door.save(function (err) {
-                if (err) {
-                    systemLogger.error(err.message);
-                    return res.status(500).send(err.message);
-                }
-                return res.status(200).send("Updated");
+                if (err) return systemLogger.error(err.message);
             });
         });
     })
