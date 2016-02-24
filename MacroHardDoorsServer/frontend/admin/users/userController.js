@@ -1,4 +1,4 @@
-DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,$log,$routeParams) {
+DoorsAdmin.controller('userController', [ '$scope','$location','$http' ,'$modal','$log','$routeParams', function ($scope,$location,$http,$modal,$log,$routeParams) {
 	var userId=$routeParams.userId;
 	var TOKENS_COLUMNS = 4;
 	$scope.editedUser={};
@@ -106,8 +106,8 @@ DoorsAdmin.controller('userController', function ($scope,$location,$http,$modal,
 		})
 	}
 
-});
-DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,user) {
+}]);
+DoorsAdmin.controller('addTokenCtrl', ['$http', '$scope','$modalInstance','user' , function ($http, $scope, $modalInstance,user) {
 	$scope.uses=0;
 	$scope.dates={}
 	$scope.dates.startDate=new Date();
@@ -227,4 +227,4 @@ DoorsAdmin.controller('addTokenCtrl', function ($http, $scope, $modalInstance,us
 
 		$scope.opened = true;
 	};
-});
+}]);

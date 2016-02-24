@@ -1,4 +1,4 @@
-DoorsAdmin.controller('doorsController', function ($scope,$location,$http) {
+DoorsAdmin.controller('doorsController', [ '$scope','$location','$http' ,function ($scope,$location,$http) {
 	var reloadDoors=function(){
 		$http.get('/api/doors').success(function(data,status){
 			$scope.doors=data.doors;
@@ -20,4 +20,4 @@ DoorsAdmin.controller('doorsController', function ($scope,$location,$http) {
 			reloadDoors();
 		});
 	}
-});
+}]);
