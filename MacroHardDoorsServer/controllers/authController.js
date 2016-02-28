@@ -28,7 +28,7 @@ exports.loginRequired = function (req, res, next) {
 
 
 exports.authMobileUser = function (req, res, next) {
-    User.findOne({ alias: req.get("alias") }, function (err, user) {
+    user.findOne({ alias: req.get("alias") }, function (err, user) {
         if (err) {
             systemLogger.error(err.message);
             return res.status(500).send(err.message);

@@ -27,7 +27,7 @@ exports.register = function () {
         if (err) {
             systemLogger.error(err.message);
         }
-        if(httpResponse.statusCode != 200) systemLogger.error("Server responded: " + httpResponse.statusCode)
+        if (httpResponse.statusCode != 200) systemLogger.error("Server responded: " + httpResponse.statusCode)
         config.providerId = body.replace(/"/g, '');
         return systemLogger.info("Registered with central server");
     });
@@ -35,12 +35,12 @@ exports.register = function () {
 
 var registerRule = new scheduler.RecurrenceRule();
 
-registerRule.second = 00;
+registerRule.second = 0;
 
 scheduler.scheduleJob(registerRule, exports.register);
 
 exports.unRegister = function (req, res) {
-    if(!config.providerId) return res.status(400).send("No id");
+    if (!config.providerId) return res.status(400).send("No id");
     var date = moment().format("DD/MM/YYYY_hh:mm:ss");
     var signature = authController.generateSignature(date, config.mainServerSecret);
     request.post({ url: config.mainServerAddress + "/api/providers/" + config.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
@@ -54,7 +54,7 @@ exports.unRegister = function (req, res) {
 };
 
 exports.doAdminLogin = function (req, res) {
-    adminModel.findById(req.body.admin, function (err, admin) {
+    adminModel.find({ alias: req.body.alias }, function (err, admin) {
         if (err) {
             res.status(500).send(err.message);
             return systemLogger.error(err.message);
@@ -62,9 +62,9 @@ exports.doAdminLogin = function (req, res) {
         if (!admin) return res.status(404).send("Not found");
         if (admin.password === req.body.password) {
             req.session.user = { token: admin.token, alias: admin.alias, isAdmin: true };
-            res.status(200).send("Success");
+            return res.status(200).send("Success");
         }
-        else res.status(401).send("Not authorized");
+        else return res.status(401).send("Not authorized");
     });
 };
 
