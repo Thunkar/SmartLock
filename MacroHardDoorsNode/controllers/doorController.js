@@ -10,6 +10,10 @@ var checkPin = new GPIO(14, 'in', 'both');
 var open = checkPin.readSync() == 0;
 
 var openDoor = function() {
+    if(open) {
+        systemLogger.warn('Door already opened');
+        return;
+    }
     systemLogger.warn('Opening door');
     openPin.writeSync(1);
     setTimeout(function () { openPin.writeSync(0) }, 1000);
