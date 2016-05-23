@@ -1,4 +1,5 @@
-﻿var fs = require('fs');
+﻿process.chdir(__dirname);
+var fs = require('fs');
 
 var config = JSON.parse(fs.readFileSync('./config.cnf', 'utf8').toString());
 exports.config = config;

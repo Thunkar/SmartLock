@@ -25,7 +25,7 @@ exports.register = function () {
     var signature = authController.generateSignature(date, config.mainServerSecret);
     request.post({ url: config.mainServerAddress + "/api/providers", formData: formData, headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
         if (err) {
-            systemLogger.error(err.message);
+            return systemLogger.error(err.message);
         }
         if (httpResponse.statusCode != 200) systemLogger.error("Server responded: " + httpResponse.statusCode)
         config.providerId = body.replace(/"/g, '');
