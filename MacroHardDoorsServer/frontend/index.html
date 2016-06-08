@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Smartlock</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="./lib/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="./lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Custom Css -->
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+<body ng-app="SmartLock">
+    <div class="container">
+        <div ng-show="!appUser" ng-controller="LoginController" class="col-md-8 col-md-offset-2" style="padding-top: 100px">
+            <div class="jumbotron">
+                <div class="loginFormContainer">
+                    <h1>Login</h1>
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2"  for="login">Login:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="login" name="login" ng-model="alias" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px">
+                            <label class="control-label col-sm-2" for="password">Password:</label>
+                            <div class="col-sm-10">
+                                <input class="form-control"  type="password" id="password" name="password" ng-model="password" />
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <input class="btn btn-lg btn-primary pull-right" ng-click="login()" value="Login"/>
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="appUser" ng-controller="DoorsController" style="margin-top: 20px" >
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">SmartLock</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="javascript:void(0)">Home</a></li>
+
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="javascript:void(0)" ng-click="logout()">Logout</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
+        </nav>
+            <h1>{{user.alias}} - {{user.name}}</h1>
+            <div class="row" >
+                <div class="col-md-4 col-sm-6" ng-repeat="token in user.tokens">
+                <div class="panel" ng-class="{'panel-default': isValid(token),'panel-warning': !isValid(token)}">
+                    <div class="panel-heading">
+                        {{token.name}}
+                    </div>
+                    <div class="panel-body">
+                        <div ng-show="!isValid(token)">
+                            <p>Token is not valid a this time</p>
+                        </div>
+                        <div ng-show="isValid(token)">
+                            <div class="btn-group-vertical" role="group" style="width: 100%">
+                                <button type="button" class="btn btn-default" ng-repeat="door in token.doors" ng-click="openDoor(token,door);">Open {{door}}</button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer" ng-show="token.validity.uses!=-1">
+                        <span>{{token.validity.uses}} uses left</span>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="./lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="./lib/angular/angular.js"></script>
+
+    <script src="./lib/angular-animate/angular-animate.js"></script>
+
+    <script src="./lib/angular-route/angular-route.js"></script>
+
+    <script src="./lib/angular-bootstrap/bootstrap.js"></script>
+
+    <script src="./lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+    <script src="./lib/sha256.js"></script>
+
+    <script type="text/javascript" src="./lib/moment.js"></script>
+
+    <script type="text/javascript" src="./lib/angucomplete-alt.min.js"></script>
+
+    <script src="SmartLock.js"></script>
+</body>
+</html>

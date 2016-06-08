@@ -47,7 +47,6 @@ DoorsAdmin.controller('userController', [ '$scope','$location','$http' ,'$modal'
 			} else {
 				console.log('Something went terribly wrong...');
 			}
-
 		};
 		xhr.send(formData);
 	}
