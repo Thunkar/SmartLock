@@ -18,7 +18,7 @@
 </head>
 <body ng-app="SmartLock">
     <div class="container">
-        <div ng-show="!appUser" ng-controller="LoginController" class="col-md-8 col-md-offset-2" style="padding-top: 100px">
+        <div ng-if="!appUser" ng-controller="LoginController" class="col-md-8 col-md-offset-2" style="padding-top: 100px">
             <div class="jumbotron">
                 <div class="loginFormContainer">
                     <h1>Login</h1>
@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <div ng-show="appUser" ng-controller="DoorsController" style="margin-top: 20px" >
+        <div ng-if="appUser" ng-controller="DoorsController" style="margin-top: 20px" >
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
