@@ -26,7 +26,7 @@ exports.init = function () {
             resave: false,
             saveUninitialized: false,
             proxy: true,
-            name: "test",
+            name: "MacroHardDoors",
             cookie: {
                 secure: false,
                 maxAge: null

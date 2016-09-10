@@ -22,7 +22,7 @@ function SHA256(data) {
     return new Promise((resolve, reject) => {
         let computeHashAsync = async.asyncify(computeSHA256Hash);
         computeHashAsync(data, (err, hash) => {
-            if(err) return reject(err);
+            if (err) return reject(err);
             return resolve(hash);
         });
     });
@@ -42,10 +42,6 @@ function generateToken() {
         token += pickFrom.charAt(Math.random() * 59);
     }
     return token;
-};
-
-function generateAccessToken() {
-    return { value: generateToken(), expiration: new Date().addDays(config.tokenExpiration) };
 };
 
 function generateSaltedPassword(password, iterations) {
@@ -69,44 +65,20 @@ function validateSaltedPassword(password, salt, hash, iterations) {
     });
 };
 
-function auth(type, req, res, next) {
-    if (type == "user")
-        var query = userModel.findOne({ alias: req.session.user.alias });
-    else if (type == "admin")
-        var query = adminModel.findOne({ alias: req.session.user.alias });
-    query.exec().then((user) => {
-        if (!user) {
-            return next(new CodedError("User does not exist", 404));
-        }
-        req.user = user;
-        const sentToken = req.get("accessToken");
-        if (sentToken == user.accessToken.value && moment(user.accessToken.expiration).isAfter(moment())) {
-            next();
-        }
-        else {
-            return next(new CodedError("Not authorized", 403));
-        }
-    }, (err) => {
-        return next(err);
-    });
+exports.auth = function(req, res, next){
+    if (req.session.user)
+        return next();
+    else
+        return next(new CodedError("Not authorized", 403));
 };
 
-exports.authenticateUserAndContinue = function (req, res, next) {
-    return auth("user", req, res, next);
-};
-
-exports.authenticateAdminAndContinue = function (req, res, next) {
-    return auth("admin", req, res, next);
-};
-
-exports.generateSignature = function (date, token) { 
-    var toSign = date + "_" + token; 
-    return computeSHA256Hash(toSign); 
-} 
+exports.generateSignature = function (date, token) {
+    var toSign = date + "_" + token;
+    return computeSHA256Hash(toSign);
+}
 
 exports.SHA256 = SHA256;
 exports.generateSaltedPassword = generateSaltedPassword;
 exports.generateRandomPassword = generateRandomPassword;
 exports.generateToken = generateToken;
-exports.generateAccessToken = generateAccessToken;
 exports.validateSaltedPassword = validateSaltedPassword;

@@ -53,13 +53,21 @@ exports.unRegister = function (req, res, next) {
 };
 
 exports.doAdminLogin = function (req, res, next) {
-    adminModel.find({ alias: req.body.alias }).exec().then((admin) => {
+    var admin;
+    adminModel.find({ alias: req.body.alias }).exec().then((storedAdmin) => {
+        admin = storedAdmin;
         if (!admin) return next(new CodedError("Not found", 404));
-        if (admin.password === req.body.password) {
-            req.session.user = { token: admin.token, alias: admin.alias, isAdmin: true };
+        return authController.validateSaltedPassword(req.body.password, admin.pwd.salt, admin.pwd.hash, admin.pwd.iterations);
+    }).then((valid) => {
+        if (valid) {
+            var userToSend = {
+                _id: admin._id.toString(),
+                alias: admin.alias,
+                isAdmin: true
+            }
+            req.session.user = userToSend;
             return res.status(200).send("Success");
-        }
-        else return next(new CodedError("Not authorized", 401));
+        } else return next(new CodedError("Not authorized", 401));
     }, (err) => {
         return next(err);
     });
@@ -70,7 +78,6 @@ exports.createNewAdmin = function (req, res, next) {
         var newAdmin = new adminModel({
             alias: req.body.alias,
             pwd: saltedPassword,
-            accessToken: authController.generateAccessToken(),
             name: req.body.name,
         });
         return newAdmin.save();
@@ -87,7 +94,6 @@ exports.createNewUser = function (req, res, next) {
         var newUser = new userModel({
             alias: req.body.alias,
             password: saltedPassword,
-            accessToken: authController.generateAccessToken(),
             name: req.body.name,
             profilePic: req.files.profilePic.name,
             tokens: [],

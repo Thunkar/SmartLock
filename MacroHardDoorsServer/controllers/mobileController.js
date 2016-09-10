@@ -21,38 +21,16 @@ exports.login = function (req, res, next) {
         return authController.validateSaltedPassword(req.body.password, user.pwd.salt, user.pwd.hash, config.pwdIterations);
     }).then((valid) => {
         if (valid) {
-            if (user.accessToken && moment(user.accessToken.expiration).isAfter(moment()))
-                user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
-            else
-                user.accessToken = authController.generateAccessToken();
             var userToSend = {
                 _id: user._id.toString(),
                 alias: user.alias,
-                accessToken: user.accessToken,
                 active: user.active
             };
+            req.session.user = userToSend;
             return res.status(200).jsonp(userToSend);
         } else {
             return next(new CodedError("Not authorized", 401));
         }
-    }, (err) => {
-        return next(err);
-    });
-};
-
-exports.renewAccessToken = function (req, res, next) {
-    userModel.findById(req.params.user).exec().then((user) => {
-        if (!user) return next(new CodedError("Not found", 404));
-        user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
-        var userToSend = {
-            _id: user._id.toString(),
-            alias: user.alias,
-            accessToken: user.accessToken,
-            active: user.active
-        };
-        return user.save();
-    }).then(() => {
-        return res.status(200).jsonp(user.accessToken);
     }, (err) => {
         return next(err);
     });
@@ -63,7 +41,6 @@ exports.createNewUser = function (req, res, next) {
         var newUser = new userModel({
             alias: req.body.alias,
             pwd: req.body.password,
-            accessToken: authController.generateAccessToken(),
             name: req.body.name,
             email: req.body.email,
             profilePic: req.files.profilePic.name,
