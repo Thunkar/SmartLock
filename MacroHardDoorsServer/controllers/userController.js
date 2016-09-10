@@ -66,13 +66,15 @@ exports.doAdminLogin = function (req, res, next) {
 };
 
 exports.createNewAdmin = function (req, res, next) {
-    var newAdmin = new adminModel({
-        alias: req.body.alias,
-        password: req.body.password,
-        token: authController.generateToken(),
-        name: req.body.name,
-    });
-    newAdmin.save().then(() => {
+    authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
+        var newAdmin = new adminModel({
+            alias: req.body.alias,
+            pwd: saltedPassword,
+            accessToken: authController.generateAccessToken(),
+            name: req.body.name,
+        });
+        return newAdmin.save();
+    }).then(() => {
         stats.generateEvent(stats.eventType.newAdmin, null, newAdmin.name, null, null);
         return res.status(200).send(newAdmin._id);
     }, (err) => {
@@ -81,17 +83,19 @@ exports.createNewAdmin = function (req, res, next) {
 };
 
 exports.createNewUser = function (req, res, next) {
-    var newUser = new userModel({
-        alias: req.body.alias,
-        password: req.body.password,
-        token: authController.generateToken(),
-        name: req.body.name,
-        profilePic: req.files.profilePic.name,
-        tokens: [],
-        active: true,
-        email: req.body.email
-    });
-    newUser.save(() => {
+    authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
+        var newUser = new userModel({
+            alias: req.body.alias,
+            password: saltedPassword,
+            accessToken: authController.generateAccessToken(),
+            name: req.body.name,
+            profilePic: req.files.profilePic.name,
+            tokens: [],
+            active: true,
+            email: req.body.email
+        });
+        return newUser.save();
+    }).then(() => {
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
         return res.status(200).send(newUser._id);
     }, (err) => {
@@ -111,13 +115,18 @@ exports.editUser = function (req, res, next) {
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            fs.unlink(storagePath + user.profilePic, (err) => { if (err) systemLogger.error(err.message) });
+            services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
         }
+        var tasks = [];
+        if (req.body.password)
+            tasks.push(authController.generateSaltedPassword(req.body.password, config.pwdIterations));
+        return Promise.all(tasks);
+    }).then((results) => {
+        if (results[0])
+            user.pwd = results[0]
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
-        user.password = updatedUser.password;
         user.email = updatedUser.email;
-        user.active = updatedUser.active;
         return user.save();
     }).then(() => {
         return res.status(200).send("Success");
@@ -129,14 +138,14 @@ exports.editUser = function (req, res, next) {
 exports.activateUser = function (req, res, next) {
     userModel.findByIdAndUpdate(req.params.user, { $set: { active: req.body.active } }).exec().then((user) => {
         return res.status(200).send("Success");
-    },(err) => {
+    }, (err) => {
         return next(err);
     });
 };
 
 exports.deleteUser = function (req, res, next) {
     userModel.findByIdAndRemove(req.params.user).exec().then((user) => {
-        fs.unlink(storagePath + user.profilePic, (err) => { if (err) systemLogger.error(err.message) });
+        services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
         return res.status(200).send("Success");
     }, (err) => {
         return next(err);

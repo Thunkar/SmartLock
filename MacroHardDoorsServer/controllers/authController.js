@@ -2,7 +2,8 @@
     async = require('async'),
     config = require('../utils/services.js').config,
     mongoose = require('mongoose'),
-    User = mongoose.model('UserModel'),
+    userModel = mongoose.model('UserModel'),
+    adminModel = mongoose.model('AdminModel'),
     moment = require('moment'),
     CodedError = require('../utils/CodedError.js'),
     Promise = require('bluebird'),
@@ -70,13 +71,14 @@ function validateSaltedPassword(password, salt, hash, iterations) {
 
 function auth(type, req, res, next) {
     if (type == "user")
-        var query = User.findOne({ alias: req.session.user.alias });
+        var query = userModel.findOne({ alias: req.session.user.alias });
     else if (type == "admin")
+        var query = adminModel.findOne({ alias: req.session.user.alias });
     query.exec().then((user) => {
         if (!user) {
             return next(new CodedError("User does not exist", 404));
         }
-        req[type] = user;
+        req.user = user;
         const sentToken = req.get("accessToken");
         if (sentToken == user.accessToken.value && moment(user.accessToken.expiration).isAfter(moment())) {
             next();

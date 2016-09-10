@@ -21,16 +21,16 @@ exports.login = function (req, res, next) {
         return authController.validateSaltedPassword(req.body.password, user.pwd.salt, user.pwd.hash, config.pwdIterations);
     }).then((valid) => {
         if (valid) {
+            if (user.accessToken && moment(user.accessToken.expiration).isAfter(moment()))
+                user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
+            else
+                user.accessToken = authController.generateAccessToken();
             var userToSend = {
                 _id: user._id.toString(),
                 alias: user.alias,
                 accessToken: user.accessToken,
                 active: user.active
             };
-            if (user.accessToken && moment(user.accessToken.expiration).isAfter(moment()))
-                user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
-            else
-                user.accessToken = authController.generateAccessToken();
             return res.status(200).jsonp(userToSend);
         } else {
             return next(new CodedError("Not authorized", 401));
@@ -44,6 +44,12 @@ exports.renewAccessToken = function (req, res, next) {
     userModel.findById(req.params.user).exec().then((user) => {
         if (!user) return next(new CodedError("Not found", 404));
         user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
+        var userToSend = {
+            _id: user._id.toString(),
+            alias: user.alias,
+            accessToken: user.accessToken,
+            active: user.active
+        };
         return user.save();
     }).then(() => {
         return res.status(200).jsonp(user.accessToken);
