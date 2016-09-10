@@ -5,7 +5,6 @@
 
 var router = express.Router();
 
-router.route('/renewtoken').post(mobileController.renewAccessToken);
 router.route('/userlogin').post(mobileController.login);
 router.route('/newuser').post([multer({ dest: './uploads/' })], mobileController.createNewUser);
 router.route('/info/:user').get(mobileController.getUserInfo).post([multer({ dest: './uploads/' })], mobileController.editUser);
