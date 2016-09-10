@@ -6,11 +6,11 @@ var systemLogger = winston.loggers.get('system');
 
 var open = false;
 
-var openDoor = function () {
+function openDoor() {
     systemLogger.warn('Opening door');
 };
 
-socket.on('connect', function () {
+socket.on('connect', () => {
     socket.emit('handshake', {
         name: config.name,
         section: config.section,
@@ -30,12 +30,12 @@ socket.on('connect', function () {
 
 socket.on('open', openDoor);
 
-socket.on('error', function (err) {
+socket.on('error', (err) => {
     systemLogger.error("Socket error: " + err.message);
     process.exit(-1);
 });
 
-socket.on('disconnect', function () {
+socket.on('disconnect', () => {
     systemLogger.error("Socket disconnected");
     process.exit(-1);
 });

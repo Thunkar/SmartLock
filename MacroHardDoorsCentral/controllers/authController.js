@@ -2,7 +2,7 @@
     config = require('../server.js').config;
 
 
-generateSignature = function (date) {
+function generateSignature(date) {
     var toSign = date + "_" + config.mainServerSecret;
     return SHA256(toSign);
 }

@@ -1,4 +1,5 @@
-﻿var config = require('../server.js').config,
+﻿var services = require('../utils/services.js'),
+    config = services.config,
     eventsChannel = require('../server.js').eventsChannel,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
@@ -29,7 +30,7 @@ exports.eventType = {
 
 eventsChannel.on('connection', function (socket) {
     systemLogger.info('New client connected to events channel');
-    
+
     socket.on('disconnect', function () {
         systemLogger.info('Client disconnected to events channel');
     });
@@ -49,14 +50,15 @@ exports.generateEvent = function (eventType, user, admin, token, door) {
     catch (err) {
         if (err) systemLogger.error(err.message);
     }
-    newEvent.save(function (err) {
-        if (err) systemLogger.error(err.message);
+    newEvent.save().then(() => {
         eventsChannel.emit("event", { type: eventType });
+    }, (err) => {
+        return systemLogger.error(err.message);
     });
 };
 
 
-exports.getLatest = function (req, res) {
+exports.getLatest = function (req, res, next) {
     var timeBounded = req.query.to && req.query.from;
     var query = statisticsModel.find({});
     query.sort('-date');
@@ -66,18 +68,16 @@ exports.getLatest = function (req, res) {
         query.limit(20);
     query.populate('user', '_id alias name profilePic tokens');
     query.populate('admin', '_id alias name profilePic');
-    query.exec(function (err, stats) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+    query.exec().then((stats) => {
         var result = [];
-        for (var i = 0; i < stats.length; i++) {
-            if (stats[i].user)
-                stats[i].user.profilePic = config.serverAddress + "/files/" + stats[i].user.profilePic;
-            if (!timeBounded || (moment(stats[i].date).isAfter(moment(req.query.from)) && moment(stats[i].date).isBefore(moment(req.query.to)))) result.push(stats[i]);
-        }
+        stats.forEach((stat) => {
+            if (stat.user)
+                stat.user.profilePic = config.serverAddress + "/files/" + stat.user.profilePic;
+            if (!timeBounded || (moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to)))) result.push(stat);
+        });
         return res.status(200).jsonp(result);
+    }, (err) => {
+        return next(err);
     });
 };
 

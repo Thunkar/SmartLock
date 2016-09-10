@@ -1,50 +1,110 @@
-﻿var SHA256 = require("crypto-js/sha256"),
-    config = require('../server.js').config,
+﻿const crypto = require("crypto"),
+    async = require('async'),
+    config = require('../utils/services.js').config,
     mongoose = require('mongoose'),
-    user = mongoose.model('UserModel'),
+    User = mongoose.model('UserModel'),
+    moment = require('moment'),
+    CodedError = require('../utils/CodedError.js'),
+    Promise = require('bluebird'),
     winston = require('winston');
 
-var systemLogger = winston.loggers.get('system');
+const systemLogger = winston.loggers.get("system");
+const sessionLogger = winston.loggers.get("session");
 
-exports.generateToken = function () {
-    var pickFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+#%&";
-    var token = "";
-    for (var i = 0; i < 40; i++) {
+const pickFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=-+#%&";
+
+function computeSHA256Hash(data) {
+    return crypto.createHash('sha256').update(data).digest('hex');
+}
+
+function SHA256(data) {
+    return new Promise((resolve, reject) => {
+        let computeHashAsync = async.asyncify(computeSHA256Hash);
+        computeHashAsync(data, (err, hash) => {
+            if(err) return reject(err);
+            return resolve(hash);
+        });
+    });
+};
+
+function generateRandomPassword() {
+    let password = "";
+    for (let i = 0; i < 8; i++) {
+        password += pickFrom.charAt(Math.random() * 59);
+    }
+    return password;
+};
+
+function generateToken() {
+    let token = "";
+    for (let i = 0; i < 40; i++) {
         token += pickFrom.charAt(Math.random() * 59);
     }
     return token;
 };
 
-exports.generateSignature = function (date, token) {
-    var toSign = date + "_" + token;
-    return SHA256(toSign);
-}
+function generateAccessToken() {
+    return { value: generateToken(), expiration: new Date().addDays(config.tokenExpiration) };
+};
 
+function generateSaltedPassword(password, iterations) {
+    const salt = generateToken();
+    return new Promise((resolve, reject) => {
+        crypto.pbkdf2(password.toLowerCase(), salt, iterations, 256, 'sha256', (err, key) => {
+            if (err) return reject(err);
+            const hash = key.toString('hex');
+            return resolve({ salt: salt, hash: hash, iterations: iterations });
+        });
+    });
+};
 
-exports.loginRequired = function (req, res, next) {
-    if (!req.session.user) res.status(403).send("Not authorized");
-    else next();
-}
+function validateSaltedPassword(password, salt, hash, iterations) {
+    return new Promise((resolve, reject) => {
+        crypto.pbkdf2(password.toLowerCase(), salt, iterations, 256, 'sha256', (err, key) => {
+            if (err) return reject(err);
+            const calculatedHash = key.toString('hex');
+            return resolve(calculatedHash === hash);
+        });
+    });
+};
 
-
-exports.authMobileUser = function (req, res, next) {
-    user.findOne({ alias: req.get("alias") }, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+function auth(type, req, res, next) {
+    if (type == "user")
+        var query = User.findOne({ alias: req.session.user.alias });
+    else if (type == "admin")
+    query.exec().then((user) => {
         if (!user) {
-            return res.status(404).send("User does not exist");
+            return next(new CodedError("User does not exist", 404));
         }
-        var token = user.token;
-        var date = req.get("signDate");
-        var sentSignature = req.get("signature");
-        var signature = exports.generateSignature(date, token);
-        if (signature == sentSignature) {
+        req[type] = user;
+        const sentToken = req.get("accessToken");
+        if (sentToken == user.accessToken.value && moment(user.accessToken.expiration).isAfter(moment())) {
             next();
         }
         else {
-            return res.status(403).send("Not authorized");
+            return next(new CodedError("Not authorized", 403));
         }
+    }, (err) => {
+        return next(err);
     });
 };
+
+exports.authenticateUserAndContinue = function (req, res, next) {
+    return auth("user", req, res, next);
+};
+
+exports.authenticateAdminAndContinue = function (req, res, next) {
+    return auth("admin", req, res, next);
+};
+
+exports.generateSignature = function (date, token) { 
+    var toSign = date + "_" + token; 
+    return computeSHA256Hash(toSign); 
+} 
+
+exports.SHA256 = SHA256;
+exports.generateSaltedPassword = generateSaltedPassword;
+exports.generateRandomPassword = generateRandomPassword;
+exports.generateToken = generateToken;
+exports.generateAccessToken = generateAccessToken;
+exports.validateSaltedPassword = validateSaltedPassword;

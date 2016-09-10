@@ -1,4 +1,6 @@
-﻿var config = require("../server.js").config,
+﻿var services = require("../utils/services.js"),
+    config = services.config,
+    CodedError = require("../utils/CodedError.js"),
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
@@ -39,53 +41,46 @@ registerRule.second = 0;
 
 scheduler.scheduleJob(registerRule, exports.register);
 
-exports.unRegister = function (req, res) {
-    if (!config.providerId) return res.status(400).send("No id");
+exports.unRegister = function (req, res, next) {
+    if (!config.providerId) return next(new CodedError("No id", 400));
     var date = moment().format("DD/MM/YYYY_hh:mm:ss");
     var signature = authController.generateSignature(date, config.mainServerSecret);
-    request.post({ url: config.mainServerAddress + "/api/providers/" + config.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, function (err, httpResponse, body) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+    request.post({ url: config.mainServerAddress + "/api/providers/" + config.providerId + "/delete", headers: { 'signDate': date, 'signature': signature } }, (err, httpResponse, body) => {
+        if (err) return next(err);
         if (httpResponse.statusCode != 200) return res.status(httpResponse.statusCode).send(body);
         return res.status(200).send("Success");
     });
 };
 
-exports.doAdminLogin = function (req, res) {
-    adminModel.find({ alias: req.body.alias }, function (err, admin) {
-        if (err) {
-            res.status(500).send(err.message);
-            return systemLogger.error(err.message);
-        }
-        if (!admin) return res.status(404).send("Not found");
+exports.doAdminLogin = function (req, res, next) {
+    adminModel.find({ alias: req.body.alias }).exec().then((admin) => {
+        if (!admin) return next(new CodedError("Not found", 404));
         if (admin.password === req.body.password) {
             req.session.user = { token: admin.token, alias: admin.alias, isAdmin: true };
             return res.status(200).send("Success");
         }
-        else return res.status(401).send("Not authorized");
+        else return next(new CodedError("Not authorized", 401));
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.createNewAdmin = function (req, res) {
+exports.createNewAdmin = function (req, res, next) {
     var newAdmin = new adminModel({
         alias: req.body.alias,
         password: req.body.password,
         token: authController.generateToken(),
         name: req.body.name,
     });
-    newAdmin.save(function (err) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+    newAdmin.save().then(() => {
         stats.generateEvent(stats.eventType.newAdmin, null, newAdmin.name, null, null);
         return res.status(200).send(newAdmin._id);
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.createNewUser = function (req, res) {
+exports.createNewUser = function (req, res, next) {
     var newUser = new userModel({
         alias: req.body.alias,
         password: req.body.password,
@@ -96,23 +91,17 @@ exports.createNewUser = function (req, res) {
         active: true,
         email: req.body.email
     });
-    newUser.save(function (err) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+    newUser.save(() => {
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
         return res.status(200).send(newUser._id);
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.editUser = function (req, res) {
-    userModel.findById(req.params.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        if (!user) return res.status(404).send("User not found");
+exports.editUser = function (req, res, next) {
+    userModel.findById(req.params.user).exec().then((user) => {
+        if (!user) return next(new CodedError("User not found", 404));
         var updatedUser = {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
@@ -122,80 +111,66 @@ exports.editUser = function (req, res) {
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
+            fs.unlink(storagePath + user.profilePic, (err) => { if (err) systemLogger.error(err.message) });
         }
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
         user.password = updatedUser.password;
         user.email = updatedUser.email;
         user.active = updatedUser.active;
-        user.save(function (err) {
-            if (err) {
-                systemLogger.error(err.message);
-                return res.status(500).send(err.message);
-            }
-            return res.status(200).send("Success");
-        });
-    });
-};
-
-exports.activateUser = function (req, res) {
-    userModel.findByIdAndUpdate(req.params.user, { $set: { active: req.body.active } }, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+        return user.save();
+    }).then(() => {
         return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.deleteUser = function (req, res) {
-    userModel.findByIdAndRemove(req.params.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
+exports.activateUser = function (req, res, next) {
+    userModel.findByIdAndUpdate(req.params.user, { $set: { active: req.body.active } }).exec().then((user) => {
         return res.status(200).send("Success");
+    },(err) => {
+        return next(err);
+    });
+};
+
+exports.deleteUser = function (req, res, next) {
+    userModel.findByIdAndRemove(req.params.user).exec().then((user) => {
+        fs.unlink(storagePath + user.profilePic, (err) => { if (err) systemLogger.error(err.message) });
+        return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
     });
 };
 
 
-exports.addNewToken = function (req, res) {
+exports.addNewToken = function (req, res, next) {
     var newToken = {
         _id: mongoose.Types.ObjectId(),
         name: req.body.name,
         doors: req.body.doors,
         validity: req.body.validity,
     };
-    userModel.findByIdAndUpdate(req.params.user, { $push: { tokens: newToken } }, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+    userModel.findByIdAndUpdate(req.params.user, { $push: { tokens: newToken } }).exec().then((user) => {
         stats.generateEvent(stats.eventType.newToken, req.params.user, null, newToken._id, req.body.doors);
         return res.status(200).send(newToken._id);
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.revokeToken = function (req, res) {
-    userModel.findByIdAndUpdate(req.params.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }, function (err) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+exports.revokeToken = function (req, res, next) {
+    userModel.findByIdAndUpdate(req.params.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }).exec().then((err) => {
         stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.body.token, null);
         return res.status(200).jsonp("Removed");
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.getUserInfo = function (req, res) {
-    userModel.findById(req.params.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        if (!user) return res.status(404).send("User not found");
+exports.getUserInfo = function (req, res, next) {
+    userModel.findById(req.params.user).exec().then((user) => {
+        if (!user) return next(new CodedError("User not found", 404));
         var userToSend = {
             alias: user.alias,
             name: user.name,
@@ -205,28 +180,26 @@ exports.getUserInfo = function (req, res) {
             email: user.email
         };
         return res.status(200).jsonp(userToSend);
+    }, (err) => {
+        return next(err);
     });
 };
 
 
-exports.getUsers = function (req, res) {
-    userModel.find({}, function (err, users) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        var result = [];
-        for (var i = 0; i < users.length; i++) {
-            var userToSend = {
-                _id: users[i]._id,
-                alias: users[i].alias,
-                name: users[i].name,
-                profilePic: config.serverAddress + "/files/" + users[i].profilePic,
-                active: users[i].active,
-                email: users[i].email
+exports.getUsers = function (req, res, next) {
+    userModel.find({}).exec().then((users) => {
+        var result = users.map((user) => {
+            return {
+                _id: user._id,
+                alias: user.alias,
+                name: user.name,
+                profilePic: config.serverAddress + "/files/" + user.profilePic,
+                active: user.active,
+                email: user.email
             };
-            result.push(userToSend);
-        }
+        });
         return res.status(200).jsonp(result);
+    }, (err) => {
+        return next(err);
     });
 };

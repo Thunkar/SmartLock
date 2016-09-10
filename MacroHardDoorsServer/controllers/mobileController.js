@@ -1,125 +1,138 @@
-var config = require("../server.js").config,
+var services = require('../utils/services.js'),
+    config = services.config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     statsModel = mongoose.model('StatisticsModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
-    fs = require('fs'),
+    Promise = require('bluebird'),
+    moment = require('moment'),
     winston = require('winston');
 
 var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
 
-exports.login = function (req, res) {
-    userModel.findOne({ alias: req.body.alias }, function (err, user) {
-        if (err) {
-            res.status(500).send(err.message);
-            return systemLogger.error(err.message);
-        }
-        if (!user) return res.status(404).send("Not found");
-        if (user.password === req.body.password) {
+exports.login = function (req, res, next) {
+    var user;
+    userModel.findOne({ alias: req.body.alias }).exec().then((storedUser) => {
+        user = storedUser;
+        if (!user) return next(new CodedError("Not found", 404));
+        return authController.validateSaltedPassword(req.body.password, user.pwd.salt, user.pwd.hash, config.pwdIterations);
+    }).then((valid) => {
+        if (valid) {
             var userToSend = {
                 _id: user._id.toString(),
                 alias: user.alias,
-                token: user.token,
+                accessToken: user.accessToken,
                 active: user.active
             };
+            if (user.accessToken && moment(user.accessToken.expiration).isAfter(moment()))
+                user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
+            else
+                user.accessToken = authController.generateAccessToken();
             return res.status(200).jsonp(userToSend);
+        } else {
+            return next(new CodedError("Not authorized", 401));
         }
-        return res.status(401).send("Not authorized");
+    }, (err) => {
+        return next(err);
     });
 };
 
-
-exports.createNewUser = function (req, res) {
-    var newUser = new userModel({
-        alias: req.body.alias,
-        password: req.body.password,
-        token: authController.generateToken(),
-        name: req.body.name,
-        email: req.body.email,
-        profilePic: req.files.profilePic.name,
-        tokens: [],
-        active: false
+exports.renewAccessToken = function (req, res, next) {
+    userModel.findById(req.params.user).exec().then((user) => {
+        if (!user) return next(new CodedError("Not found", 404));
+        user.accessToken.expiration = new Date().addDays(config.tokenExpiration);
+        return user.save();
+    }).then(() => {
+        return res.status(200).jsonp(user.accessToken);
+    }, (err) => {
+        return next(err);
     });
-    newUser.save(function (err) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+};
+
+exports.createNewUser = function (req, res, next) {
+    authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
+        var newUser = new userModel({
+            alias: req.body.alias,
+            pwd: req.body.password,
+            accessToken: authController.generateAccessToken(),
+            name: req.body.name,
+            email: req.body.email,
+            profilePic: req.files.profilePic.name,
+            tokens: [],
+            active: false
+        });
+        return newUser.save();
+    }).then(() => {
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
         var userToSend = {
             _id: newUser._id.toString(),
             alias: newUser.alias,
-            token: newUser.token,
+            accessToken: newUser.accessToken,
             active: newUser.active
         };
         return res.status(200).jsonp(userToSend);
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.editUser = function (req, res) {
-    userModel.findById(req.params.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        if (!user) return res.status(404).send("User not found");
-        var updatedUser = {
+exports.editUser = function (req, res, next) {
+    var user, updatedUser;
+    userModel.findById(req.params.user).exec().then((storedUser) => {
+        user = storedUser;
+        if (!user) return next(new CodedError("User not found", 404));
+        updatedUser = {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
-            password: req.body.password || user.password,
             email: req.body.email || user.email
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
+            services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
         }
+        var tasks = [];
+        if (req.body.password)
+            tasks.push(authController.generateSaltedPassword(req.body.password, config.pwdIterations));
+        return Promise.all(tasks);
+    }).then((results) => {
+        if (results[0])
+            user.pwd = results[0]
         user.name = updatedUser.name;
         user.profilePic = updatedUser.profilePic;
-        user.password = updatedUser.password;
         user.email = updatedUser.email;
-        user.save(function (err) {
-            if (err) {
-                systemLogger.error(err.message);
-                return res.status(500).send(err.message);
-            }
-            return res.status(200).send("Success");
-        });
-    });
-};
-
-exports.deleteUser = function (req, res) {
-    userModel.findByIdAndRemove(req.body.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        fs.unlink(storagePath + user.profilePic, function (err) { if (err) systemLogger.error(err.message) });
+        return user.save();
+    }).then(() => {
         return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
+    });
+};
+
+exports.deleteUser = function (req, res, next) {
+    userModel.findByIdAndRemove(req.body.user).exec().then((user) => {
+        services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
+        return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
     });
 };
 
 
-exports.revokeToken = function (req, res) {
-    userModel.findByIdAndUpdate(req.body.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }, function (err) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
+exports.revokeToken = function (req, res, next) {
+    userModel.findByIdAndUpdate(req.body.user, { $pull: { tokens: { _id: mongoose.Types.ObjectId(req.body.token) } } }).then(() => {
         stats.generateEvent(stats.eventType.tokenRevoked, req.params.user, null, req.params.token, null);
         return res.status(200).jsonp("Removed");
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.getUserInfo = function (req, res) {
-    userModel.findById(req.params.user, function (err, user) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
-        if (!user) return res.status(404).send("User not found");
+exports.getUserInfo = function (req, res, next) {
+    userModel.findById(req.params.user).exec().then((user) => {
+        if (!user) return next(new CodedError("User not found", 404));
         var userToSend = {
             _id: user._id,
             alias: user.alias,
@@ -130,18 +143,18 @@ exports.getUserInfo = function (req, res) {
             active: user.active
         };
         return res.status(200).jsonp(userToSend);
+    }, (err) => {
+        return next(err);
     });
 };
 
-exports.getUserStats = function (req, res) {
+exports.getUserStats = function (req, res, next) {
     var query = statsModel.find({ user: req.params.user });
     query.sort('-date');
     query.limit(20);
-    query.exec(function (err, stats) {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(200).send(err.message);
-        }
+    query.exec().then((stats) => {
         return res.status(200).jsonp(stats);
+    }, (err) => {
+        return next(err);
     });
 }

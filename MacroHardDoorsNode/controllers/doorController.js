@@ -9,22 +9,22 @@ var openPin = new GPIO(4, 'out');
 var checkPin = new GPIO(14, 'in', 'both');
 var open = checkPin.readSync() == 0;
 
-var openDoor = function() {
+function openDoor() {
     if(open) {
         systemLogger.warn('Door already opened');
         return;
     }
     systemLogger.warn('Opening door');
     openPin.writeSync(1);
-    setTimeout(function () { openPin.writeSync(0) }, 1000);
+    setTimeout(() => { openPin.writeSync(0) }, 1000);
 };
 
-socket.on('connect', function () {
+socket.on('connect', () => {
     socket.emit('handshake', {
         name: config.name,
         section: config.section,
         open: false
-    }, function (data) {
+    }, (data) => {
         if (data) {
             config.id = data.id;
             systemLogger.info("Handshake completed, id: " + data.id);
@@ -39,18 +39,18 @@ socket.on('connect', function () {
 
 socket.on('open', openDoor);
 
-socket.on('error', function (err) {
+socket.on('error', (err) => {
     systemLogger.error("Socket error: " + err.message);
     process.exit(-1);
 });
 
-socket.on('disconnect', function () {
+socket.on('disconnect', () => {
     systemLogger.error("Socket disconnected");
     process.exit(-1);
 });
 
 
-checkPin.watch(function (err, value) {
+checkPin.watch((err, value) => {
     if (err) return systemLogger.error(err.message);
     if (!config.id) return;
     if(open && value == 0 || !open && value == 1) return;

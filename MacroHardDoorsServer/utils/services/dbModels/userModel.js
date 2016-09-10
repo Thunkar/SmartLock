@@ -16,9 +16,16 @@ var tokenSchema = new Schema({
 
 var userSchema = new Schema({
     alias: { type: String, default: "", unique: true, dropDups: true },
-    password: {type: String, default: ""},
+    pwd: {
+        hash: { type: String, default: "" },
+        salt: { type: String, default: "" },  
+        iterations: { type: Number, default: 10000 }
+    },
+    accessToken: {
+        value: { type: String, default: "" },
+        expiration: { type: Date, default: Date.now }
+    },
     name: { type: String, default: "" },
-    token: {type: String, default: ""},
     tokens: [tokenSchema],
     profilePic: { type: String, default: "" },
     active: {type: Boolean, default: false},
