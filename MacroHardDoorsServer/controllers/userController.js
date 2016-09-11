@@ -191,12 +191,28 @@ exports.getUserInfo = function (req, res, next) {
     userModel.findById(req.params.user).exec().then((user) => {
         if (!user) return next(new CodedError("User not found", 404));
         var userToSend = {
+            _id: user._id,
             alias: user.alias,
             name: user.name,
             profilePic: config.serverAddress + "/files/" + user.profilePic,
             tokens: user.tokens,
             active: user.active,
             email: user.email
+        };
+        return res.status(200).jsonp(userToSend);
+    }, (err) => {
+        return next(err);
+    });
+};
+
+
+exports.getAdminInfo = function (req, res, next) {
+    adminModel.findById(req.params.admin).exec().then((admin) => {
+        if (!user) return next(new CodedError("Admin not found", 404));
+        var adminToSend = {
+            _id: admin._id,
+            alias: admin.alias,
+            name: admin.name
         };
         return res.status(200).jsonp(userToSend);
     }, (err) => {
