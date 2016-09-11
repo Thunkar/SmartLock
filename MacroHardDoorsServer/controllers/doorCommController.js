@@ -43,7 +43,7 @@ doorsChannel.on('connection', (socket) => {
                 registeredDoor.socket = socket;
                 doors[registeredDoor.id] = registeredDoor;
                 callback({ id: door.upserted[0]._id });
-                return null;
+                throw new CodedError("Door upserted", 301);
             } else
                 return doorModel.findOne({ name: newDoor.name }).exec();
         }).then((door) => {
@@ -53,6 +53,7 @@ doorsChannel.on('connection', (socket) => {
             doors[registeredDoor.id] = registeredDoor;
             return callback({ id: door.id });
         }, (err) => {
+            if(err.code == 301) return;
             systemLogger.error(err.message);
             return socket.disconnect();
         });

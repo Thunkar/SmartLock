@@ -54,7 +54,7 @@ exports.unRegister = function (req, res, next) {
 
 exports.doAdminLogin = function (req, res, next) {
     var admin;
-    adminModel.find({ alias: req.body.alias }).exec().then((storedAdmin) => {
+    adminModel.findOne({ alias: req.body.alias }).exec().then((storedAdmin) => {
         admin = storedAdmin;
         if (!admin) return next(new CodedError("Not found", 404));
         return authController.validateSaltedPassword(req.body.password, admin.pwd.salt, admin.pwd.hash, admin.pwd.iterations);
