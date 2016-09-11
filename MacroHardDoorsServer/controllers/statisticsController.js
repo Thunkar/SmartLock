@@ -29,6 +29,10 @@ exports.eventType = {
 };
 
 eventsChannel.on('connection', function (socket) {
+    if (!socket.handshake.session.admin) {
+        systemLogger.warn("Not authenticated client trying to connect to events channel");
+        return socket.disconnect();
+    }
     systemLogger.info('New client connected to events channel');
 
     socket.on('disconnect', function () {
