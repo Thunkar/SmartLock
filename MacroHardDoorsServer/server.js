@@ -1,4 +1,6 @@
-﻿var services = require('./utils/services.js'),
+﻿process.env.BLUEBIRD_W_FORGOTTEN_RETURN = 0;
+
+var services = require('./utils/services.js'),
     express = require('express'),
     app = express(),
     io = require('socket.io')(),

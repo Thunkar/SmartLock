@@ -90,8 +90,9 @@ exports.createNewAdmin = function (req, res, next) {
 };
 
 exports.createNewUser = function (req, res, next) {
+    var newUser;
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
-        var newUser = new userModel({
+        newUser = new userModel({
             alias: req.body.alias,
             password: saltedPassword,
             name: req.body.name,
@@ -110,9 +111,11 @@ exports.createNewUser = function (req, res, next) {
 };
 
 exports.editUser = function (req, res, next) {
-    userModel.findById(req.params.user).exec().then((user) => {
+    var updatedUser, user;
+    userModel.findById(req.params.user).exec().then((storedUser) => {
+        user = storedUser;
         if (!user) return next(new CodedError("User not found", 404));
-        var updatedUser = {
+        updatedUser = {
             name: req.body.name || user.name,
             profilePic: user.profilePic,
             password: req.body.password || user.password,
