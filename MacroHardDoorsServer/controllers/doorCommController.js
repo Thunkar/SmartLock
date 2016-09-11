@@ -53,7 +53,7 @@ doorsChannel.on('connection', (socket) => {
             doors[registeredDoor.id] = registeredDoor;
             return callback({ id: door.id });
         }, (err) => {
-            if(err.code == 201) return;
+            if (err.code == 201) return;
             systemLogger.error(err.message);
             return socket.disconnect();
         });
@@ -92,17 +92,15 @@ doorsChannel.on('connection', (socket) => {
 });
 
 exports.openDoor = function (doorName) {
-    return new Promise((resolve, reject) => {
-        return doorModel.findOne({ name: doorName }).exec();
-    }).then((door) => {
-        if (!door) return reject(new Error("Door does not exist"));
-        if (!door.active) return reject(new Error("Door is not active"));
-        else {
-            systemLogger.info("Sent OPEN to door: " + door.name + " with id: " + door.id);
-            doors[door.id].socket.emit('open')
-            return resolve();
-        }
-    }, (err) => {
-        return systemLogger.error(err.message);
+    doorModel.findOne({ name: doorName }).exec().then((door) => {
+        return new Promise((resolve, reject) => {
+            if (!door) return reject(new Error("Door does not exist"));
+            if (!door.active) return reject(new Error("Door is not active"));
+            else {
+                systemLogger.info("Sent OPEN to door: " + door.name + " with id: " + door.id);
+                doors[door.id].socket.emit('open')
+                return resolve();
+            }
+        });
     });
 };
