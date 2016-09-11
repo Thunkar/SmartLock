@@ -65,8 +65,15 @@ function validateSaltedPassword(password, salt, hash, iterations) {
     });
 };
 
-exports.auth = function(req, res, next){
-    if (req.session.user)
+exports.authUser = function(req, res, next){
+    if (req.session.user|| req.session.admin)
+        return next();
+    else
+        return next(new CodedError("Not authorized", 403));
+};
+
+exports.authAdmin = function(req, res, next){
+    if (req.session.admin)
         return next();
     else
         return next(new CodedError("Not authorized", 403));

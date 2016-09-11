@@ -1,9 +1,11 @@
 ﻿var express = require('express'),
     userController = require('../controllers/userController.js'),
+    authController = require('../controllers/authController.js'),
     multer = require('multer');
 
 var router = express.Router();
 
+router.use(authController.authAdmin);
 router.route('/').get(userController.getUsers);
 router.route('/newuser').post([multer({ dest: './uploads/' })], userController.createNewUser);
 router.route('/:user').get(userController.getUserInfo).post([multer({ dest: './uploads/' })], userController.editUser);

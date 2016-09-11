@@ -37,12 +37,12 @@ doorsChannel.on('connection', (socket) => {
         }).then((door) => {
             stats.generateEvent(stats.eventType.nodeHandshake, null, null, null, newDoor.name);
             if (door.upserted) {
-                door.id = door.upserted[0]._id;
-                systemLogger.info("Door " + newDoor.name + " registered with id: " + door.id);
+                newDoor.id = door.upserted[0]._id.toString();
+                systemLogger.info("Door " + newDoor.name + " registered with id: " + newDoor.id);
                 registeredDoor = newDoor;
                 registeredDoor.socket = socket;
                 doors[registeredDoor.id] = registeredDoor;
-                callback({ id: door.upserted[0]._id });
+                callback({ id: newDoor.id });
                 throw new CodedError("Door upserted", 201);
             } else
                 return doorModel.findOne({ name: newDoor.name }).exec();
@@ -92,8 +92,8 @@ doorsChannel.on('connection', (socket) => {
 });
 
 exports.openDoor = function (doorName) {
-    doorModel.findOne({ name: doorName }).exec().then((door) => {
-        return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+        doorModel.findOne({ name: doorName }).exec().then((door) => {
             if (!door) return reject(new Error("Door does not exist"));
             if (!door.active) return reject(new Error("Door is not active"));
             else {
@@ -101,6 +101,8 @@ exports.openDoor = function (doorName) {
                 doors[door.id].socket.emit('open')
                 return resolve();
             }
+        }, (err) => {
+            return reject(err.message);
         });
     });
 };

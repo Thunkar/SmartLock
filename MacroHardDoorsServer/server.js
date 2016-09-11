@@ -7,15 +7,17 @@ var services = require('./utils/services.js'),
     server = require('http').Server(app),
     bodyParser = require('body-parser'),
     session = require('express-session'),
+    sharedsession = require("express-socket.io-session"),
     mongoose = require('mongoose'),
     winston = require('winston');
 
-var eventsChannel = io.of('/events');
-var doorsChannel = io.of('/doorcomms');
-exports.doorsChannel = doorsChannel;
-exports.eventsChannel = eventsChannel;
-
 services.init().then(() => {
+
+    var eventsChannel = io.of('/events').use(sharedsession(services.session.store, { autosave: true }));
+    var doorsChannel = io.of('/doorcomms');
+    exports.doorsChannel = doorsChannel;
+    exports.eventsChannel = eventsChannel;
+
     var config = services.config,
         systemLogger = winston.loggers.get('system'),
         doorCommController = require('./controllers/doorCommController.js'),
@@ -40,6 +42,7 @@ services.init().then(() => {
     app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
     app.use(services.session.store);
     app.enable('trust proxy');
+
 
     var doors = require('./routes/doors.js'),
         users = require('./routes/users.js'),

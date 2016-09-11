@@ -14,29 +14,29 @@ var systemLogger = winston.loggers.get('system');
 
 function ensureValidToken(userId, doorName, tokenId) {
     return new Promise((resolve, reject) => {
-        return userModel.findById(userId).exec();
-    }).then((user) => {
-        if (!user) return reject(new Error("User does not exist"));
-        var token = null;
-        user.tokens.forEach((candidate) => {
-            if (candidate._id == tokenId) token = candidate;
-        })
-        if (!token) return reject(new Error("User does not own that token"));
-        if (token.doors.indexOf(doorName) == -1) return reject(new Error("Token cannot open that door"));
-        if (token.validity.uses == 0) return reject(new Error("Token is used up"));
-        if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return reject(new Error("The token is not active yet"));
-        if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return reject(new Error("The token has expired"));
-        if (token.validity.repeat.length != 0) {
-            if (token.validity.repeat.indexOf(moment().day()) == -1) return reject(new Error("The token cannot be used today"));
-            if (moment(token.validity.from).isAfter(moment(), 'second')) return reject(new Error("The token is not active yet"));
-            if (moment(token.validity.to).isBefore(moment(), 'second')) return reject(new Error("The token has expired"));
-        }
-        if (token.validity.uses != -1) token.validity.uses--;
-        return user.save();
-    }).then(() => {
-        return resolve();
-    }, (err) => {
-        return reject(err);
+        userModel.findById(userId).exec().then((user) => {
+            if (!user) return reject(new Error("User does not exist"));
+            var token = null;
+            user.tokens.forEach((candidate) => {
+                if (candidate._id == tokenId) token = candidate;
+            })
+            if (!token) return reject(new Error("User does not own that token"));
+            if (token.doors.indexOf(doorName) == -1) return reject(new Error("Token cannot open that door"));
+            if (token.validity.uses == 0) return reject(new Error("Token is used up"));
+            if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return reject(new Error("The token is not active yet"));
+            if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return reject(new Error("The token has expired"));
+            if (token.validity.repeat.length != 0) {
+                if (token.validity.repeat.indexOf(moment().day()) == -1) return reject(new Error("The token cannot be used today"));
+                if (moment(token.validity.from).isAfter(moment(), 'second')) return reject(new Error("The token is not active yet"));
+                if (moment(token.validity.to).isBefore(moment(), 'second')) return reject(new Error("The token has expired"));
+            }
+            if (token.validity.uses != -1) token.validity.uses--;
+            return user.save();
+        }).then(() => {
+            return resolve();
+        }, (err) => {
+            return reject(err);
+        });
     });
 };
 

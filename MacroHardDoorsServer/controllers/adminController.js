@@ -63,10 +63,9 @@ exports.doAdminLogin = function (req, res, next) {
             var adminToSend = {
                 _id: admin._id.toString(),
                 alias: admin.alias,
-                name: admin.name,
-                isAdmin: true
+                name: admin.name
             }
-            req.session.user = adminToSend;
+            req.session.admin = adminToSend;
             return res.status(200).send(adminToSend);
         } else return next(new CodedError("Not authorized", 401));
     }, (err) => {

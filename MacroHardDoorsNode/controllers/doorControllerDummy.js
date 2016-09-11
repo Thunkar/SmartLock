@@ -15,7 +15,7 @@ socket.on('connect', () => {
         name: config.name,
         section: config.section,
         open: false
-    }, function (data) {
+    }, (data) => {
         if (data) {
             config.id = data.id;
             systemLogger.info("Handshake completed, id: " + data.id);
