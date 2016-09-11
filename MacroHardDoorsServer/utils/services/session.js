@@ -16,10 +16,6 @@ exports.init = function () {
         const store = new MongoStore({
             mongooseConnection: services.dbLoader.connection
         });
-        store.clear((err) => {
-            if (err) return sessionLogger.error(err.message);
-            else return sessionLogger.info("Sessions cleared");
-        });
         sessionStore = session({
             secret: config.sessionSecret,
             store: store,
