@@ -60,13 +60,14 @@ exports.doAdminLogin = function (req, res, next) {
         return authController.validateSaltedPassword(req.body.password, admin.pwd.salt, admin.pwd.hash, admin.pwd.iterations);
     }).then((valid) => {
         if (valid) {
-            var userToSend = {
+            var adminToSend = {
                 _id: admin._id.toString(),
                 alias: admin.alias,
+                name: admin.name,
                 isAdmin: true
             }
-            req.session.user = userToSend;
-            return res.status(200).send("Success");
+            req.session.user = adminToSend;
+            return res.status(200).send(adminToSend);
         } else return next(new CodedError("Not authorized", 401));
     }, (err) => {
         return next(err);
