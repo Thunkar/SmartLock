@@ -21,7 +21,7 @@
         <div ng-if="!appUser" ng-controller="LoginController" class="col-md-8 col-md-offset-2" style="padding-top: 100px">
             <div class="jumbotron">
                 <div class="loginFormContainer">
-                    <h1>Login</h1>
+                    <h1>Smartlock login</h1>
                     <form class="form-horizontal" role="form">
                         <div class="form-group">
                             <label class="control-label col-sm-2"  for="login">Login:</label>
@@ -67,9 +67,9 @@
                 </div><!--/.nav-collapse -->
             </div><!--/.container-fluid -->
         </nav>
-            <h1>{{user.alias}} - {{user.name}}</h1>
+            <h1>{{appUser.alias}} - {{appUser.name}}</h1>
             <div class="row" >
-                <div class="col-md-4 col-sm-6" ng-repeat="token in user.tokens">
+                <div class="col-md-4 col-sm-6" ng-repeat="token in appUser.tokens">
                 <div class="panel" ng-class="{'panel-default': isValid(token),'panel-warning': !isValid(token)}">
                     <div class="panel-heading">
                         {{token.name}}

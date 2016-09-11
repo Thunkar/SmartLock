@@ -14,11 +14,20 @@ Storage.prototype.getObject = function (key) {
 
 var SmartLock = angular.module('SmartLock', ['ngAnimate', 'ngRoute','ui.bootstrap']);
 
-SmartLock.run(['$rootScope', function($rootScope) {
+SmartLock.run(['$rootScope','$http', function($rootScope,$http) {
 
     $rootScope.checkAuth = function(){
-        $rootScope.appUser = localStorage.getObject("user", null);
-        console.log($rootScope.appUser);
+        var savedUser = localStorage.getObject("user", null);
+        if(savedUser){
+            $http.get("/api/mobile/info/"+savedUser._id).success(function(data){
+                $rootScope.appUser = data;
+            }).error(function(data,status){
+                $rootScope.appUser = null;
+                $rootScope.logout();
+            });
+        }else{
+            $rootScope.appUser = null;
+        }
     };
 
     $rootScope.logout = function(){
@@ -47,7 +56,7 @@ SmartLock.controller('DoorsController', [ '$scope','$location','$http' ,'$modal'
     var reloadUser = function(){
         $http.get("/api/mobile/info/"+$scope.appUser._id).success(function(data){
             console.log(data);
-            $scope.user = data;
+            $scope.appUser = data;
         });
     };
 
@@ -64,7 +73,7 @@ SmartLock.controller('DoorsController', [ '$scope','$location','$http' ,'$modal'
     };
 
     $scope.openDoor= function(token,door){
-        $http.post("/api/mobile/open",{user: $scope.user._id,door:door,token:token._id}).success(function(data,status){
+        $http.post("/api/mobile/open",{user: $scope.appUser._id,door:door,token:token._id}).success(function(data,status){
             reloadUser();
             alert("Opened");
         }).error(function(data,status){

@@ -1,6 +1,16 @@
+
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+};
+
+Storage.prototype.getObject = function (key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
+};
+
 var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute','ui.bootstrap','ui.bootstrap.datetimepicker',"angucomplete-alt"]);
 
-DoorsAdmin.run(['$rootScope', function($rootScope) {
+DoorsAdmin.run(['$rootScope','$http', function($rootScope,$http) {
     var socket = io('/events');
 
     socket.connect();
@@ -19,6 +29,27 @@ DoorsAdmin.run(['$rootScope', function($rootScope) {
     socket.on('disconnect',function() {
         console.log('The client has disconnected!');
     });
+
+    $rootScope.checkAuth = function(){
+        var savedUser = localStorage.getObject("admin", null);
+        if(savedUser){
+            $http.get("/api/users/adminlogin").success(function(data){
+                $rootScope.appUser = data;
+            }).error(function(data,status){
+                $rootScope.appUser = null;
+                $rootScope.logout();
+            });
+        }else{
+            $rootScope.appUser = null;
+        }
+    };
+
+    $rootScope.logout = function(){
+        localStorage.setObject("admin",null);
+        $rootScope.checkAuth();
+    };
+
+    $rootScope.checkAuth();
 
 }]);
 
@@ -57,6 +88,20 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
 DoorsAdmin.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.timeout = 5000;
 }]);
+
+DoorsAdmin.controller('LoginController', [ '$scope','$location','$http' ,'$modal','$log','$routeParams', function ($scope,$location,$http,$modal,$log,$routeParams) {
+    $scope.login = function(){
+        $http.post("/api/users/adminlogin",{alias:$scope.alias,password: CryptoJS.SHA256($scope.password).toString().toUpperCase()}).success(function(data){
+            localStorage.setObject("admin",data);
+            $scope.checkAuth();
+        }).error(function(data,status){
+            alert(data);
+        });
+    };
+
+
+}]);
+
 /*
 DoorsAdmin.controller('sidebarController', function ($scope,$location) {
   var url =   $location.path();
