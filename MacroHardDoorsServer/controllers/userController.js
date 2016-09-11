@@ -125,7 +125,7 @@ exports.editUser = function (req, res, next) {
         };
         if (req.files.profilePic) {
             updatedUser.profilePic = req.files.profilePic.name;
-            services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
+            services.fileUtils.deleteFile(storagePath + user.profilePic).catch((err) => { systemLogger.error(err.message) });
         }
         var tasks = [];
         if (req.body.password)
@@ -155,7 +155,7 @@ exports.activateUser = function (req, res, next) {
 
 exports.deleteUser = function (req, res, next) {
     userModel.findByIdAndRemove(req.params.user).exec().then((user) => {
-        services.fileUtils.deleteFile(storagePath + user.profilePic).then(() => systemLogger.debug("Deleted file"), (err) => { systemLogger.error(err.message) });
+        services.fileUtils.deleteFile(storagePath + user.profilePic).catch((err) => { systemLogger.error(err.message) });
         return res.status(200).send("Success");
     }, (err) => {
         return next(err);

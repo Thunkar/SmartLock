@@ -39,11 +39,11 @@ doorsChannel.on('connection', (socket) => {
             if (door.upserted) {
                 door.id = door.upserted[0]._id;
                 systemLogger.info("Door " + newDoor.name + " registered with id: " + door.id);
-                registeredDoor = door;
+                registeredDoor = newDoor;
                 registeredDoor.socket = socket;
                 doors[registeredDoor.id] = registeredDoor;
                 callback({ id: door.upserted[0]._id });
-                throw new CodedError("Door upserted", 301);
+                throw new CodedError("Door upserted", 201);
             } else
                 return doorModel.findOne({ name: newDoor.name }).exec();
         }).then((door) => {
@@ -53,7 +53,7 @@ doorsChannel.on('connection', (socket) => {
             doors[registeredDoor.id] = registeredDoor;
             return callback({ id: door.id });
         }, (err) => {
-            if(err.code == 301) return;
+            if(err.code == 201) return;
             systemLogger.error(err.message);
             return socket.disconnect();
         });
@@ -65,7 +65,7 @@ doorsChannel.on('connection', (socket) => {
         }
         systemLogger.error("Node " + registeredDoor.name + " with id " + registeredDoor.id + " is dead!");
         delete doors[registeredDoor.id];
-        doorModel.findByIdAndUpdate(registeredDoor.id, { $set: { online: false, active: false } }).exec().then(() => { }, (err) => { if (err) systemLogger.error(err.message); });
+        doorModel.findByIdAndUpdate(registeredDoor.id, { $set: { online: false, active: false } }).exec().catch((err) => { if (err) systemLogger.error(err.message); });
         stats.generateEvent(stats.eventType.nodeOffline, null, null, null, registeredDoor.name);
     });
 
