@@ -20,6 +20,7 @@ services.init().then(() => {
         systemLogger = winston.loggers.get('system'),
         doorCommController = require('./controllers/doorCommController.js'),
         userController = require('./controllers/userController.js'),
+        adminController = require('./controllers/adminController.js'),
         stats = require('./controllers/statisticsController.js'),
         resultController = require('./controllers/resultController.js'),
         doorModel = mongoose.model('DoorModel');
@@ -28,7 +29,7 @@ services.init().then(() => {
     systemLogger.info("Cleaning up...");
     doorModel.remove({}).then(() => {
         stats.generateEvent(stats.eventType.systemStarted, null, null, null, null);
-        userController.register();
+        adminController.register();
         systemLogger.info("Ready to receive handshakes");
     }, (err) => {
         systemLogger.error(err.message);
