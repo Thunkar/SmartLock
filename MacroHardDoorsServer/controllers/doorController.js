@@ -1,4 +1,5 @@
 ﻿var services = require('../utils/services.js'),
+    CodedError = require('../utils/CodedError.js'),
     config = services.config,
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),

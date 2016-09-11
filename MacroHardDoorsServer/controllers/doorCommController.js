@@ -1,4 +1,5 @@
 ﻿var config = require("../server.js").config,
+    CodedError = require('../utils/CodedError.js'),
     doorsChannel = require('../server.js').doorsChannel,
     mongoose = require('mongoose'),
     doorModel = mongoose.model('DoorModel'),
