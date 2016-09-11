@@ -139,7 +139,9 @@
                          <div ng-switch-when="doorOpened" class="timeline-badge info"><i class="fa fa-unlock"></i>
                          </div>
                             <div ng-switch-when="doorClosed" class="timeline-badge info"><i class="fa fa-lock"></i>
-                        </div>     
+                        </div>
+                        <div ng-switch-when="newAdmin" class="timeline-badge warning"><i class="fa fa-user-secret"></i>
+                        </div>
                         <div  class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4 class="timeline-title"  ng-switch-when="userEntry">Door open</h4>
@@ -154,7 +156,8 @@
                                 <h4 class="timeline-title"  ng-switch-when="nodeActivated">Door activated</h4>
                                 <h4 class="timeline-title"  ng-switch-when="nodeDeactivated">Door deactivated</h4>
                                 <h4 class="timeline-title"  ng-switch-when="failedEntry">Entry failed</h4>
-                                 <h4 class="timeline-title"  ng-switch-when="doorOpened">Door opened</h4>
+                                <h4 class="timeline-title"  ng-switch-when="newAdmin">Admin created</h4>
+                                <h4 class="timeline-title"  ng-switch-when="doorOpened">Door opened</h4>
                                 <h4 class="timeline-title"  ng-switch-when="doorClosed">Door closed</h4>
                                 <p><small class="text-muted"><i class="fa fa-clock-o"></i>{{formatDate(event.date)}}</small>
                                 </p>
