@@ -33,7 +33,7 @@ DoorsAdmin.run(['$rootScope','$http', function($rootScope,$http) {
     $rootScope.checkAuth = function(){
         var savedUser = localStorage.getObject("admin", null);
         if(savedUser){
-            $http.get("/api/users/adminlogin").success(function(data){
+            $http.get("/api/admins/"+savedUser._id).success(function(data){
                 $rootScope.appUser = data;
             }).error(function(data,status){
                 $rootScope.appUser = null;
@@ -91,7 +91,7 @@ DoorsAdmin.config(['$httpProvider', function($httpProvider) {
 
 DoorsAdmin.controller('LoginController', [ '$scope','$location','$http' ,'$modal','$log','$routeParams', function ($scope,$location,$http,$modal,$log,$routeParams) {
     $scope.login = function(){
-        $http.post("/api/users/adminlogin",{alias:$scope.alias,password: CryptoJS.SHA256($scope.password).toString().toUpperCase()}).success(function(data){
+        $http.post("/api/admins/adminlogin",{alias:$scope.alias,password: CryptoJS.SHA256($scope.password).toString().toUpperCase()}).success(function(data){
             localStorage.setObject("admin",data);
             $scope.checkAuth();
         }).error(function(data,status){
