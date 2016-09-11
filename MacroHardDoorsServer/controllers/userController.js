@@ -74,8 +74,9 @@ exports.doAdminLogin = function (req, res, next) {
 };
 
 exports.createNewAdmin = function (req, res, next) {
+    var newAdmin;
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
-        var newAdmin = new adminModel({
+        newAdmin = new adminModel({
             alias: req.body.alias,
             pwd: saltedPassword,
             name: req.body.name,

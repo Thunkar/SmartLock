@@ -42,9 +42,10 @@ doorsChannel.on('connection', (socket) => {
                 registeredDoor = door;
                 registeredDoor.socket = socket;
                 doors[registeredDoor.id] = registeredDoor;
-                return callback({ id: door.upserted[0]._id });
-            }
-            return doorModel.findOne({ name: newDoor.name }).exec();
+                callback({ id: door.upserted[0]._id });
+                return null;
+            } else
+                return doorModel.findOne({ name: newDoor.name }).exec();
         }).then((door) => {
             systemLogger.info("Door " + door.name + " re-registered with id: " + door.id);
             registeredDoor = door;
