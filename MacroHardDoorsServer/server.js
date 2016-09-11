@@ -42,11 +42,13 @@ services.init().then(() => {
 
     var doors = require('./routes/doors.js'),
         users = require('./routes/users.js'),
+        admins = require('./routes/admins.js'),
         mobile = require('./routes/mobile.js'),
         statistics = require('./routes/statistics.js');
 
     app.use(config.mountPoint + "/api/doors", doors);
     app.use(config.mountPoint + "/api/users", users);
+    app.use(config.mountPoint + "/api/admins", admins);
     app.use(config.mountPoint + "/api/mobile", mobile);
     app.use(config.mountPoint + "/api/statistics", statistics);
     app.use(express.static(__dirname + "/frontend"));
