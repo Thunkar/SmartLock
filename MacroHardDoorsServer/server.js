@@ -13,14 +13,15 @@ var services = require('./utils/services.js'),
 
 services.init().then(() => {
 
-    var eventsChannel = io.of('/events').use(sharedsession(services.session.store, { autosave: true }));
-    var doorsChannel = io.of('/doorcomms');
+    var config = services.config,
+        systemLogger = winston.loggers.get('system'),
+        eventsChannel = io.of(config.mountPoint + 'events').use(sharedsession(services.session.store, { autosave: true })),
+        doorsChannel = io.of(config.mountPoint + 'doorcomms');
+
     exports.doorsChannel = doorsChannel;
     exports.eventsChannel = eventsChannel;
 
-    var config = services.config,
-        systemLogger = winston.loggers.get('system'),
-        doorCommController = require('./controllers/doorCommController.js'),
+    var doorCommController = require('./controllers/doorCommController.js'),
         userController = require('./controllers/userController.js'),
         adminController = require('./controllers/adminController.js'),
         stats = require('./controllers/statisticsController.js'),
@@ -50,18 +51,14 @@ services.init().then(() => {
         mobile = require('./routes/mobile.js'),
         statistics = require('./routes/statistics.js');
 
-    app.use(config.mountPoint + "/api/doors", doors);
-    app.use(config.mountPoint + "/api/users", users);
-    app.use(config.mountPoint + "/api/admins", admins);
-    app.use(config.mountPoint + "/api/mobile", mobile);
-    app.use(config.mountPoint + "/api/statistics", statistics);
-    app.use(express.static(__dirname + "/frontend"));
+    app.use(config.mountPoint + "api/doors", doors);
+    app.use(config.mountPoint + "api/users", users);
+    app.use(config.mountPoint + "api/admins", admins);
+    app.use(config.mountPoint + "api/mobile", mobile);
+    app.use(config.mountPoint + "api/statistics", statistics);
+    app.use(config.mountPoint, express.static(__dirname + "/frontend"));
 
-    app.get(config.mountPoint + '/', (req, res) => {
-        res.sendFile(__dirname + '/frontend/index.html');
-    });
-
-    app.get(config.mountPoint + '/files/:file', (req, res) => {
+    app.get(config.mountPoint + 'files/:file', (req, res) => {
         res.sendFile(__dirname + '/uploads/' + req.params.file);
     });
 
