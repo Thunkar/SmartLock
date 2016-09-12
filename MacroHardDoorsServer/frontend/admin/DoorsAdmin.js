@@ -11,7 +11,8 @@ var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute', 'ui.boots
 
 DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
     var socketConnected = false;
-    var socket = io('/events');
+    var path = window.location.host+window.location.pathname;
+    var socket = io(path.replace("/admin/","/events"));
 
     socket.on('connect', function () {
         socketConnected = true;
