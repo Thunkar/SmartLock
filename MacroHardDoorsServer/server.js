@@ -56,11 +56,7 @@ services.init().then(() => {
     app.use(config.mountPoint + "api/admins", admins);
     app.use(config.mountPoint + "api/mobile", mobile);
     app.use(config.mountPoint + "api/statistics", statistics);
-    app.use(express.static(__dirname + "/frontend"));
-
-    app.get(config.mountPoint, (req, res) => {
-        res.sendFile(__dirname + '/frontend/index.html');
-    });
+    app.use(config.mountPoint, express.static(__dirname + "/frontend"));
 
     app.get(config.mountPoint + 'files/:file', (req, res) => {
         res.sendFile(__dirname + '/uploads/' + req.params.file);
