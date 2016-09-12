@@ -28,14 +28,14 @@ exports.eventType = {
     doorClosed: "doorClosed"
 };
 
-eventsChannel.on('connection', function (socket) {
+eventsChannel.on('connection', (socket) => {
     if (!socket.handshake.session.admin) {
         systemLogger.warn("Not authenticated client trying to connect to events channel");
         return socket.disconnect();
     }
     systemLogger.info('New client connected to events channel');
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', () => {
         systemLogger.info('Client disconnected to events channel');
     });
 });
@@ -76,7 +76,7 @@ exports.getLatest = function (req, res, next) {
         var result = [];
         stats.forEach((stat) => {
             if (stat.user)
-                stat.user.profilePic = config.serverAddress + "/files/" + stat.user.profilePic;
+                stat.user.profilePic = config.serverAddress + config.mountPoint + "files/" + stat.user.profilePic;
             if (!timeBounded || (moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to)))) result.push(stat);
         });
         return res.status(200).jsonp(result);

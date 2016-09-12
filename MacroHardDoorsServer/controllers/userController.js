@@ -119,7 +119,7 @@ exports.getUserInfo = function (req, res, next) {
             _id: user._id,
             alias: user.alias,
             name: user.name,
-            profilePic: config.serverAddress + "/files/" + user.profilePic,
+            profilePic: config.serverAddress + config.mountPoint + "files/" + user.profilePic,
             tokens: user.tokens,
             active: user.active,
             email: user.email
@@ -137,7 +137,7 @@ exports.getUsers = function (req, res, next) {
                 _id: user._id,
                 alias: user.alias,
                 name: user.name,
-                profilePic: config.serverAddress + "/files/" + user.profilePic,
+                profilePic: config.serverAddress + config.mountPoint + "files/" + user.profilePic,
                 active: user.active,
                 email: user.email
             };
