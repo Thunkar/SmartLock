@@ -24,21 +24,6 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 				lastDonutDoorData=newDonutData;
 			}
 		});
-	}
-	$scope.$on('event',function(){
-		console.log("Event, reloading stats");
-		reloadStats();
-	});
-	//setInterval(reloadStats,1000);
-	reloadStats();
-	var usersDonut=Morris.Donut({
-		element: 'users-donut-chart',
-		data: [{"value":"","label":""}],
-		parseTime:false,
-		resize: true
-	});
-	var lastDonutUserData={};
-	setInterval(function(){
 		$http.get('/api/users').success(function(data,status){
 			$scope.users=data;
 			var activeCount=data.filterBy("active",function(val){return val===true}).length;
@@ -53,36 +38,11 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 				usersDonut.setData(newDonutData);
 				lastDonutUserData=newDonutData;
 			}
-		});},1000);
-	setInterval(function(){
-	$http.get('/api/statistics').success(function(data,status){
-		$scope.stats=data;
-		$scope.userRejections=data.filterBy('event',function(val){return val==='userRejected';});
-	});},1000);
-
-	var formatRelativeDays=function(diff){
-		switch(diff){
-			case 0:
-			return "today";
-			case -1:
-			return "yesterday";
-
-		}
-		return (-diff )+" days ago";
-	}
-	var doorsChart=		Morris.Line({
-		element: 'doors-area-chart',
-		data: [],
-		xkey: 'period',
-		ykeys: ['userEntries', 'userRejections', 'nodesOffline'],
-		labels: ['Accesses', 'Rejections', 'Crashes'],
-		pointSize: 2,
-		hideHover: 'auto',
-		parseTime:false,
-		lineColors:["#76FF03","#FFC107","#F44336"],
-		resize: true
-	});
-	setInterval(function(){
+		});
+		$http.get('/api/statistics').success(function(data,status){
+			$scope.stats=data;
+			$scope.userRejections=data.filterBy('event',function(val){return val==='userRejected';});
+		});
 		$http.get('/api/statistics?from='+moment().subtract(7, 'days').toISOString()+'&to='+new Date().toISOString()).success(function(data,status){
 			var dailyStats=[];
 			var findDailyStats=function(index){
@@ -90,7 +50,7 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 					var date=moment(new Date(dateStr));
 					return date.isSame(moment().subtract(index, 'days'),"day");
 				}));
-			}
+			};
 			for(var i=0;i<7;i++){
 				findDailyStats(i);
 			}
@@ -105,7 +65,44 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 			}
 			doorsChart.setData(dailyData);
 
-		});},1000);
+		});
+	};
+	$scope.$on('event',function(){
+		console.log("Event, reloading stats");
+		reloadStats();
+	});
+
+	reloadStats();
+	var usersDonut=Morris.Donut({
+		element: 'users-donut-chart',
+		data: [{"value":"","label":""}],
+		parseTime:false,
+		resize: true
+	});
+	var lastDonutUserData={};
+
+	var formatRelativeDays=function(diff){
+		switch(diff){
+			case 0:
+			return "today";
+			case -1:
+			return "yesterday";
+
+		}
+		return (-diff )+" days ago";
+	};
+	var doorsChart=		Morris.Line({
+		element: 'doors-area-chart',
+		data: [],
+		xkey: 'period',
+		ykeys: ['userEntries', 'userRejections', 'nodesOffline'],
+		labels: ['Accesses', 'Rejections', 'Crashes'],
+		pointSize: 2,
+		hideHover: 'auto',
+		parseTime:false,
+		lineColors:["#76FF03","#FFC107","#F44336"],
+		resize: true
+	});
 
 	$scope.findToken=function(user,tokenId){
 		return user.tokens[user.tokens.findBy({_id:tokenId},'_id')];
@@ -114,10 +111,17 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 }]);
 
 DoorsAdmin.controller('timelineController', [ '$scope','$location','$http' ,function ($scope,$location,$http) {
-	setInterval(function(){
-	$http.get('/api/statistics').success(function(data,status){
-		$scope.timeline=data;
-	});},1000);
+
+	var reloadStats = function(){
+		$http.get('/api/statistics').success(function(data,status){
+			$scope.timeline=data;
+		});
+	};
+
+	$scope.$on('event',function(){
+		reloadStats();
+	});
+    reloadStats();
 
 	$scope.formatDate=function(date){
 		return " "+moment(new Date(date)).fromNow();
