@@ -22,10 +22,10 @@ exports.init = function () {
             resave: false,
             saveUninitialized: false,
             proxy: true,
-            name: "MacroHardDoors",
+            name: config.providerName,
             cookie: {
                 secure: false,
-                maxAge: null
+                maxAge: config.tokenExpiration*24*60*60*1000
             }
         });
         exports.store = sessionStore;

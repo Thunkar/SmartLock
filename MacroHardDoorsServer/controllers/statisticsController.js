@@ -36,7 +36,7 @@ eventsChannel.on('connection', (socket) => {
     systemLogger.info('New client connected to events channel');
 
     socket.on('disconnect', () => {
-        systemLogger.info('Client disconnected to events channel');
+        systemLogger.info('Client disconnected from events channel');
     });
 });
 

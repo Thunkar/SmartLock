@@ -99,6 +99,8 @@ exports.getAdminInfo = function (req, res, next) {
             alias: admin.alias,
             name: admin.name
         };
+        req.session._garbage = new Date();
+        req.session.touch();
         return res.status(200).jsonp(adminToSend);
     }, (err) => {
         return next(err);

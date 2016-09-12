@@ -124,6 +124,8 @@ exports.getUserInfo = function (req, res, next) {
             active: user.active,
             email: user.email
         };
+        req.session._garbage = new Date();
+        req.session.touch();
         return res.status(200).jsonp(userToSend);
     }, (err) => {
         return next(err);
