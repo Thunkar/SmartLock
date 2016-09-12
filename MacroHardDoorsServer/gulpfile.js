@@ -22,7 +22,7 @@ gulp.task('config:example', (done) => {
         "pwdIterations": 10000,
         "tokenExpiration": 60,
         "serverAddress": "http://localhost",
-        "mountPoint": "/",
+        "mountPoint": "",
         "port": 3000,
         "sessionSecret": "mehueleelpitoacanela",
         "activeDoorsDefault": true,

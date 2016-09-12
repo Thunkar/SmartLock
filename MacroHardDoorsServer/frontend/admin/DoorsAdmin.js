@@ -11,8 +11,8 @@ var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute', 'ui.boots
 
 DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
     var socketConnected = false;
-    var path = window.location.host+window.location.pathname;
-    var socket = io(path.replace("/admin/","/events"));
+    var path = window.location.pathname + '/socket.io';
+    var socket = io('/events', { path: path.replace('/admin/', '') });
 
     socket.on('connect', function () {
         socketConnected = true;
@@ -35,8 +35,9 @@ DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
         var savedUser = localStorage.getObject("admin", null);
         if (savedUser) {
             $http.get("/api/admins/" + savedUser._id).success(function (data) {
-                if (!socketConnected)
+                if (!socketConnected) {
                     socket.connect();
+                }
                 $rootScope.appUser = data;
             }).error(function (data, status) {
                 $rootScope.appUser = null;
@@ -86,7 +87,7 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     }).when("/users/:userId", {
         controller: "userController",
         templateUrl: "users/user.html"
-    }).otherwise({redirectTo: '/stats'});
+    }).otherwise({ redirectTo: '/stats' });
 });
 DoorsAdmin.config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.timeout = 5000;
@@ -110,16 +111,16 @@ DoorsAdmin.controller('LoginController', ['$scope', '$location', '$http', '$moda
 
 
 
-DoorsAdmin.factory('apiRelative', function($q) {
-  return {
-    request: function(config) {
-        if(config.url.startsWith('/api'))
-            config.url =  ".."+config.url ;
-        return config ;
+DoorsAdmin.factory('apiRelative', function ($q) {
+    return {
+        request: function (config) {
+            if (config.url.startsWith('/api'))
+                config.url = ".." + config.url;
+            return config;
+        }
     }
-  }
-}).config(function($httpProvider) {
-  $httpProvider.interceptors.push('apiRelative');
+}).config(function ($httpProvider) {
+    $httpProvider.interceptors.push('apiRelative');
 })
 
 /*

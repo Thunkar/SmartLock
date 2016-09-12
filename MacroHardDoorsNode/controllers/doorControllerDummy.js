@@ -1,5 +1,5 @@
 ﻿var config = require('../door.js').config,
-    socket = require('socket.io-client')(config.serverAddress + '/doorcomms'),
+    socket = require('socket.io-client')(config.serverAddress + '/doorcomms', { path: config.mountPoint + '/socket.io'}),
     winston = require('winston');
 
 var systemLogger = winston.loggers.get('system');

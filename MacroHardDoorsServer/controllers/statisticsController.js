@@ -76,7 +76,7 @@ exports.getLatest = function (req, res, next) {
         var result = [];
         stats.forEach((stat) => {
             if (stat.user)
-                stat.user.profilePic = config.serverAddress + config.mountPoint + "files/" + stat.user.profilePic;
+                stat.user.profilePic = config.serverAddress + config.mountPoint + "/files/" + stat.user.profilePic;
             if (!timeBounded || (moment(stat.date).isAfter(moment(req.query.from)) && moment(stat.date).isBefore(moment(req.query.to)))) result.push(stat);
         });
         return res.status(200).jsonp(result);
