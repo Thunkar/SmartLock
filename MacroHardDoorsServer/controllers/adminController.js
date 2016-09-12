@@ -20,7 +20,7 @@ var storagePath = './uploads/';
 exports.register = function () {
     var formData = {
         name: config.providerName,
-        url: config.serverAddress + config.mountPoint,
+        url: config.serverAddress + config.mountPoint.substring(0, config.mountPoint.length - 1),
         profilePic: fs.createReadStream(config.providerImg)
     };
     var date = moment().format("DD/MM/YYYY_hh:mm:ss");
