@@ -107,6 +107,20 @@ DoorsAdmin.controller('LoginController', ['$scope', '$location', '$http', '$moda
 
 }]);
 
+
+
+DoorsAdmin.factory('apiRelative', function($q) {
+  return {
+    request: function(config) {
+        if(config.url.startsWith('/api'))
+            config.url =  ".."+config.url ;
+        return config ;
+    }
+  }
+}).config(function($httpProvider) {
+  $httpProvider.interceptors.push('apiRelative');
+})
+
 /*
  DoorsAdmin.controller('sidebarController', function ($scope,$location) {
  var url =   $location.path();

@@ -39,6 +39,18 @@ SmartLock.run(['$rootScope','$http', function($rootScope,$http) {
 
 }]);
 
+SmartLock.factory('apiRelative', function($q) {
+  return {
+    request: function(config) {
+        if(config.url.startsWith('/api'))
+            config.url =  "."+config.url ;
+        return config ;
+    }
+  }
+}).config(function($httpProvider) {
+  $httpProvider.interceptors.push('apiRelative');
+})
+
 SmartLock.controller('LoginController', [ '$scope','$location','$http' ,'$modal','$log','$routeParams', function ($scope,$location,$http,$modal,$log,$routeParams) {
     $scope.login = function(){
         $http.post("/api/mobile/userlogin",{alias:$scope.alias,password: CryptoJS.SHA256($scope.password).toString().toUpperCase()}).success(function(data){
