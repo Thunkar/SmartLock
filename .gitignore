@@ -198,6 +198,9 @@ MacroHardDoorsNode/config.cnf
 MacroHardDoorsServer/uploads/
 .settings/
 MacroHardDoorsCentral/config.cnf
+MacroHardDoorsCentral/example_config.cnf
+MacroHardDoorsNode/example_config.cnf
+MacroHardDoorsServer/example_config.cnf
 MacroHardDoorsServer/Code
 MacroHardDoorsServer/ironman.jpg
 MacroHardDoorsServer/te.png

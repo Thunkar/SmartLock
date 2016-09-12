@@ -34,7 +34,7 @@ gulp.task('config:example', (done) => {
     fs.writeFile('example_config.cnf', JSON.stringify(example, null, 4), done);
 });
 
-gulp.task('config:admin', (done) => {
+gulp.task('config:admin', () => {
     const options = {
         user: config.dbUser,
         pass: config.dbPass,
@@ -72,5 +72,7 @@ gulp.task('config:admin', (done) => {
             name: argv.n.toString(),
         });
         return newAdmin.save();
+    }).then(() => {
+        return mongoose.disconnect();
     });
 });
