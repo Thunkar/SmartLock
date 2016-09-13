@@ -106,3 +106,18 @@ exports.getAdminInfo = function (req, res, next) {
         return next(err);
     });
 };
+
+exports.getAdmins = function (req, res, next) {
+    adminModel.find({}).exec().then((admins) => {
+        var result = admins.map((admin) => {
+            return {
+                _id: user._id,
+                alias: user.alias,
+                name: user.name
+            };
+        });
+        return res.status(200).jsonp(result);
+    }, (err) => {
+        return next(err);
+    });
+};

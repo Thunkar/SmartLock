@@ -16,21 +16,49 @@ var systemLogger = winston.loggers.get('system');
 var storagePath = './uploads/';
 
 exports.createNewUser = function (req, res, next) {
-    var newUser;
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
-        newUser = new userModel({
+        var newUser = new userModel({
             alias: req.body.alias,
-            password: saltedPassword,
+            pwd: req.body.password,
             name: req.body.name,
+            email: req.body.email,
             profilePic: req.files.profilePic.name,
             tokens: [],
-            active: true,
-            email: req.body.email
+            active: false
         });
         return newUser.save();
     }).then(() => {
         stats.generateEvent(stats.eventType.newUser, newUser._id, null, null, null);
-        return res.status(200).send(newUser._id);
+        var userToSend = {
+            _id: newUser._id.toString(),
+            alias: newUser.alias,
+            accessToken: newUser.accessToken,
+            active: newUser.active
+        };
+        return res.status(200).jsonp(userToSend);
+    }, (err) => {
+        return next(err);
+    });
+};
+
+exports.login = function (req, res, next) {
+    var user;
+    userModel.findOne({ alias: req.body.alias }).exec().then((storedUser) => {
+        user = storedUser;
+        if (!user) return next(new CodedError("Not found", 404));
+        return authController.validateSaltedPassword(req.body.password, user.pwd.salt, user.pwd.hash, config.pwdIterations);
+    }).then((valid) => {
+        if (valid) {
+            var userToSend = {
+                _id: user._id.toString(),
+                alias: user.alias,
+                active: user.active
+            };
+            req.session.user = userToSend;
+            return res.status(200).jsonp(userToSend);
+        } else {
+            return next(new CodedError("Not authorized", 401));
+        }
     }, (err) => {
         return next(err);
     });
@@ -38,6 +66,7 @@ exports.createNewUser = function (req, res, next) {
 
 exports.editUser = function (req, res, next) {
     var updatedUser, user;
+    if(!req.session.admin || (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
     userModel.findById(req.params.user).exec().then((storedUser) => {
         user = storedUser;
         if (!user) return next(new CodedError("User not found", 404));
@@ -87,7 +116,6 @@ exports.deleteUser = function (req, res, next) {
     });
 };
 
-
 exports.addNewToken = function (req, res, next) {
     var newToken = {
         _id: mongoose.Types.ObjectId(),
@@ -124,13 +152,26 @@ exports.getUserInfo = function (req, res, next) {
             active: user.active,
             email: user.email
         };
-        req.session._garbage = new Date();
-        req.session.touch();
+        if (req.params.user == req.session.user._id) {
+            req.session._garbage = new Date();
+            req.session.touch();
+        }
         return res.status(200).jsonp(userToSend);
     }, (err) => {
         return next(err);
     });
 };
+
+exports.getUserStats = function (req, res, next) {
+    var query = statsModel.find({ user: req.params.user });
+    query.sort('-date');
+    query.limit(20);
+    query.exec().then((stats) => {
+        return res.status(200).jsonp(stats);
+    }, (err) => {
+        return next(err);
+    });
+}
 
 exports.getUsers = function (req, res, next) {
     userModel.find({}).exec().then((users) => {
