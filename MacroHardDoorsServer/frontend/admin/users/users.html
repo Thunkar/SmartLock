@@ -1,4 +1,5 @@
   <script type="text/ng-template" id="addUser.html">
+      <form name="addUserForm">
     <div class="modal-header">
         <h3 class="modal-title">Add User</h3>
     </div>
@@ -7,39 +8,40 @@
           <div class="form-group" style="margin-bottom:10px">
             <label class="control-label col-sm-3">Name:</label>
             <div class="col-sm-6">
-                <input class="form-control" placeholder="Enter user name" ng-model="name">
+                <input required class="form-control" placeholder="Enter user name" ng-model="name">
             </div>
         </div>
         <div class="form-group" style="margin-bottom:10px">
             <label class="control-label col-sm-3">Alias:</label>
             <div class="col-sm-6">
-                <input class="form-control" placeholder="Enter user alias" ng-model="alias">
+                <input required class="form-control" placeholder="Enter user alias" ng-model="alias">
             </div>
         </div>
         <div class="form-group" style="margin-bottom:10px">
             <label class="control-label col-sm-3">Password:</label>
             <div class="col-sm-6">
-                <input class="form-control" type="password" placeholder="Enter password" ng-model="password">
+                <input required class="form-control" type="password" placeholder="Enter password" ng-model="password">
         </div>
         </div>
                 <div class="form-group" style="margin-bottom:10px">
             <label class="control-label col-sm-3">Email:</label>
             <div class="col-sm-6">
-                <input class="form-control" type="email" placeholder="Enter email" ng-model="mail">
+                <input required class="form-control" type="email" placeholder="Enter email" ng-model="mail">
         </div>
         </div>
         <div class="form-group" style="margin-bottom:10px">
-        <label class="control-label col-sm-3"  for="image" class="rem">Image:</label>
+        <label class="control-label col-sm-3"  for="image">Image:</label>
             <div class="col-sm-6">
-                <input  type="file" accept="image/*" id="image" name="image"/>
+                <input required type="file" accept="image/*" id="image" name="image"/>
             </div>
         </div>
     </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-primary" ng-click="ok()">OK</button>
-  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  <button type="button" class="btn btn-warning" ng-click="cancel()">Cancel</button>
 </div>
+      </form>
 </script>
 <div class="row">
     <div class="col-lg-12">
