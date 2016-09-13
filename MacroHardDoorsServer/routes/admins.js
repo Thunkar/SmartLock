@@ -13,5 +13,6 @@ router.route('/register').post([multer({ dest: './uploads/' })], adminController
 router.route('/unregister').post(adminController.unRegister);
 router.route('/newadmin').post([multer({ dest: './uploads/' })], adminController.createNewAdmin);
 router.route('/:admin').get(adminController.getAdminInfo);
+router.route('/:admin/delete').post(adminController.deleteAdmin);
 
 module.exports = router;
