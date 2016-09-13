@@ -111,9 +111,9 @@ exports.getAdmins = function (req, res, next) {
     adminModel.find({}).exec().then((admins) => {
         var result = admins.map((admin) => {
             return {
-                _id: user._id,
-                alias: user.alias,
-                name: user.name
+                _id: admin._id,
+                alias: admin.alias,
+                name: admin.name
             };
         });
         return res.status(200).jsonp(result);
