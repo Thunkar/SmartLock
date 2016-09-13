@@ -152,7 +152,7 @@ exports.getUserInfo = function (req, res, next) {
             active: user.active,
             email: user.email
         };
-        if (req.params.user == req.session.user._id) {
+        if (req.session.user && (req.params.user == req.session.user._id)) {
             req.session._garbage = new Date();
             req.session.touch();
         }
