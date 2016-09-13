@@ -46,18 +46,14 @@ DoorsAdmin.controller('addUserCtrl',  ['$http', '$scope','$modalInstance', funct
 		formData.append("alias", $scope.alias);
 		formData.append("password", CryptoJS.SHA256($scope.password).toString().toUpperCase());
 		formData.append("email",$scope.mail);
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', window.location.origin + '/api/users/newuser');
-		xhr.onload = function () {
-			if (xhr.status === 200) {
-				$modalInstance.close();
-				$scope.$apply();
-			} else {
-				console.log('Something went terribly wrong...');
-			}
-
-		};
-		xhr.send(formData);
+		$http.post('/api/users/newuser', formData, {
+			transformRequest: angular.identity,
+			headers: { 'Content-Type': undefined }
+		}).success(function (data, status) {
+			$modalInstance.close();
+		}).error(function(data, status){
+			alert(data);
+		});
 
 	};
 

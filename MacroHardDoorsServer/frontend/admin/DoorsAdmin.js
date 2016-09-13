@@ -7,12 +7,12 @@ Storage.prototype.getObject = function (key) {
     return value && JSON.parse(value);
 };
 
-var DoorsAdmin = angular.module('DoorsAdmin', ['ngAnimate', 'ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', "angucomplete-alt"]);
+var DoorsAdmin = angular.module('DoorsAdmin', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker']);
 
 DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
     var socketConnected = false;
     var path = window.location.pathname + '/socket.io';
-    var socket = io('/events', { path: path.replace('/admin/', '') });
+    var socket = io('/events', {path: path.replace('/admin/', '')});
 
     socket.on('connect', function () {
         socketConnected = true;
@@ -64,7 +64,8 @@ Array.prototype.filterBy = function (attr, validation) {
             findings.push(this[i]);
     }
     return findings;
-}
+};
+
 Array.prototype.findBy = function (item, attr) {
     if (attr === undefined)
         return this.indexOf(item);
@@ -73,7 +74,8 @@ Array.prototype.findBy = function (item, attr) {
             return i;
     }
     return -1;
-}
+};
+
 DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     $routeProvider.when("/stats", {
         controller: "statsController",
@@ -87,28 +89,33 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     }).when("/users/:userId", {
         controller: "userController",
         templateUrl: "users/user.html"
-    }).otherwise({ redirectTo: '/stats' });
+    }).when("/admins", {
+        controller: "adminsController",
+        templateUrl: "admins/admins.html"
+    }).otherwise({redirectTo: '/stats'});
 });
+
 DoorsAdmin.config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.timeout = 5000;
 }]);
 
 DoorsAdmin.controller('LoginController', ['$scope', '$location', '$http', '$modal', '$log', '$routeParams', function ($scope, $location, $http, $modal, $log, $routeParams) {
+
     $scope.login = function () {
-        $http.post("/api/admins/adminlogin", {
-            alias: $scope.alias,
-            password: CryptoJS.SHA256($scope.password).toString().toUpperCase()
-        }).success(function (data) {
-            localStorage.setObject("admin", data);
-            $scope.checkAuth();
-        }).error(function (data, status) {
-            alert(data);
-        });
+        if ($scope.loginForm.$valid) {
+            $http.post("/api/admins/adminlogin", {
+                alias: $scope.alias,
+                password: CryptoJS.SHA256($scope.password).toString().toUpperCase()
+            }).success(function (data) {
+                localStorage.setObject("admin", data);
+                $scope.checkAuth();
+            }).error(function (data, status) {
+                alert(data);
+            });
+        }
     };
 
-
 }]);
-
 
 
 DoorsAdmin.factory('apiRelative', function ($q) {
@@ -121,16 +128,4 @@ DoorsAdmin.factory('apiRelative', function ($q) {
     }
 }).config(function ($httpProvider) {
     $httpProvider.interceptors.push('apiRelative');
-})
-
-/*
- DoorsAdmin.controller('sidebarController', function ($scope,$location) {
- var url =   $location.path();
- var element = $('ul.nav a').filter(function() {
- return this.href == url || url.href.indexOf(this.href) == 0;
- }).addClass('active').parent().parent().addClass('in').parent();
- if (element.is('li')) {
- element.addClass('active');
- }
- });
- });*/
+});

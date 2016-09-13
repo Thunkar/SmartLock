@@ -37,19 +37,17 @@ DoorsAdmin.controller('userController', [ '$scope','$location','$http' ,'$modal'
 			formData.append("email",$scope.editedUser.email);
 		if($scope.editedUser.active!==undefined)
 			formData.append("active",$scope.editedUser.active);
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', window.location.origin + '/api/users/'+userId);
-		xhr.onload = function () {
-			if (xhr.status === 200) {
-				$scope.editedUser={};
-				reloadUser();
-				$scope.$apply();
-			} else {
-				console.log('Something went terribly wrong...');
-			}
-		};
-		xhr.send(formData);
-	}
+
+		$http.post('/api/users/'+userId, formData, {
+				transformRequest: angular.identity,
+				headers: { 'Content-Type': undefined }
+			}).success(function (data, status) {
+			$scope.editedUser={};
+			reloadUser();
+		}).error(function(data, status){
+			alert(data);
+		});
+	};
 
 	$scope.addToken=function(){
 		var modalInstance = $modal.open({

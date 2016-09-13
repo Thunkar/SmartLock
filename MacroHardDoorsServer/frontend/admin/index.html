@@ -50,21 +50,21 @@
     <div class="jumbotron">
         <div class="loginFormContainer">
             <h1>Login</h1>
-            <form class="form-horizontal" role="form">
+            <form class="form-horizontal" name="loginForm">
                 <div class="form-group">
-                    <label class="control-label col-sm-2"  for="login">Login:</label>
+                    <label class="control-label col-sm-2">Login:</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="login" name="login" ng-model="alias" />
+                        <input required type="text" class="form-control" ng-model="alias" >
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:10px">
-                    <label class="control-label col-sm-2" for="password">Password:</label>
+                    <label class="control-label col-sm-2">Password:</label>
                     <div class="col-sm-10">
-                        <input class="form-control"  type="password" id="password" name="password" ng-model="password" />
+                        <input required class="form-control"  type="password" ng-model="password" >
                     </div>
                 </div>
                 <div class="actions">
-                    <input class="btn btn-lg btn-primary pull-right" ng-click="login()" value="Login"/>
+                    <button class="btn btn-lg btn-primary pull-right" ng-click="login()" >Login</button>
                 </div>
                 <div class="clearfix"></div>
             </form>
@@ -126,6 +126,9 @@
                           <li>
                             <a href="#/doors"><i class="fa fa-key fa-fw"></i> Doors</a>
                         </li>
+                        <li>
+                            <a href="#/admins"><i class="fa fa-user fa-fw"></i> Admins</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -181,6 +184,7 @@
 
     <script src="stats/statsController.js"></script>
 
+    <script src="admins/adminsController.js"></script>
 </body>
 
 </html>

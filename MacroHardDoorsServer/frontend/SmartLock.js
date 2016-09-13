@@ -53,6 +53,7 @@ SmartLock.factory('apiRelative', function($q) {
 
 SmartLock.controller('LoginController', [ '$scope','$location','$http' ,'$modal','$log','$routeParams', function ($scope,$location,$http,$modal,$log,$routeParams) {
     $scope.login = function(){
+        
         $http.post("/api/mobile/userlogin",{alias:$scope.alias,password: CryptoJS.SHA256($scope.password).toString().toUpperCase()}).success(function(data){
             localStorage.setObject("user",data);
             $scope.checkAuth();
