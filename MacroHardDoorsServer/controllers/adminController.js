@@ -107,6 +107,15 @@ exports.getAdminInfo = function (req, res, next) {
     });
 };
 
+
+exports.deleteAdmin = function (req, res, next) {
+    adminModel.findByIdAndRemove(req.params.admin).exec().then((admin) => {
+        return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
+    });
+};
+
 exports.getAdmins = function (req, res, next) {
     adminModel.find({}).exec().then((admins) => {
         var result = admins.map((admin) => {

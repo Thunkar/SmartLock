@@ -16,8 +16,9 @@ var systemLogger = winston.loggers.get('system');
 var storagePath = './uploads/';
 
 exports.createNewUser = function (req, res, next) {
+    var newUser;
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
-        var newUser = new userModel({
+        newUser = new userModel({
             alias: req.body.alias,
             pwd: req.body.password,
             name: req.body.name,
@@ -66,7 +67,7 @@ exports.login = function (req, res, next) {
 
 exports.editUser = function (req, res, next) {
     var updatedUser, user;
-    if(!req.session.admin || !req.session.user._id || (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
+    if(req.session.user && (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
     userModel.findById(req.params.user).exec().then((storedUser) => {
         user = storedUser;
         if (!user) return next(new CodedError("User not found", 404));
