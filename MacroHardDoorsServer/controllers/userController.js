@@ -20,7 +20,7 @@ exports.createNewUser = function (req, res, next) {
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
         newUser = new userModel({
             alias: req.body.alias,
-            pwd: req.body.password,
+            pwd: saltedPassword,
             name: req.body.name,
             email: req.body.email,
             profilePic: req.files.profilePic.name,
