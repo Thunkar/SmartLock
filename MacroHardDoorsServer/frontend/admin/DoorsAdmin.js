@@ -7,7 +7,7 @@ Storage.prototype.getObject = function (key) {
     return value && JSON.parse(value);
 };
 
-var DoorsAdmin = angular.module('DoorsAdmin', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker']);
+var DoorsAdmin = angular.module('DoorsAdmin', ['ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', "angucomplete-alt"]);
 
 DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
     var socketConnected = false;
