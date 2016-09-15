@@ -22,7 +22,7 @@ DoorsAdmin.controller('adminsController', ['$scope','$location','$http','$modal'
     };
     
     $scope.deleteAdmin=function(admin){
-        $http.post('/api/admin/'+admin._id+'/delete',{}).success(function(data,status){
+        $http.post('/api/admins/'+admin._id+'/delete',{}).success(function(data,status){
             if(status==200){
                 reloadAdmins();
             }

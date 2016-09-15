@@ -60,7 +60,9 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 					period:formatRelativeDays(-i),
 					userEntries:dailyStats[i].filterBy("event",function(val){return val==='userEntry';}).length,
 					userRejections:dailyStats[i].filterBy("event",function(val){return val==='userRejected';}).length,
-					nodesOffline:dailyStats[i].filterBy("event",function(val){return val==='nodeOffline';}).length
+					nodesOffline:dailyStats[i].filterBy("event",function(val){return val==='nodeOffline';}).length,
+					doorOpened:dailyStats[i].filterBy("event",function(val){return val==='doorOpened';}).length,
+					doorClosed:dailyStats[i].filterBy("event",function(val){return val==='doorClosed';}).length
 				});
 			}
 			doorsChart.setData(dailyData);
@@ -95,12 +97,12 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 		element: 'doors-area-chart',
 		data: [],
 		xkey: 'period',
-		ykeys: ['userEntries', 'userRejections', 'nodesOffline'],
-		labels: ['Accesses', 'Rejections', 'Crashes'],
+		ykeys: ['userEntries', 'userRejections', 'nodesOffline','doorOpened','doorClosed'],
+		labels: ['Accesses', 'Rejections', 'Crashes','Door opened','Door closed'],
 		pointSize: 2,
 		hideHover: 'auto',
 		parseTime:false,
-		lineColors:["#76FF03","#FFC107","#F44336"],
+		lineColors:["#76FF03","#9C27B0","#F44336","#304FFE","#FFC107"],
 		resize: true
 	});
 
