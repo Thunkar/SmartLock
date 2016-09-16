@@ -38,7 +38,7 @@ exports.register = function () {
 var registerRule = new scheduler.RecurrenceRule();
 
 registerRule.hour = 5;
-registerRule.minute = 1;
+registerRule.minute = 2;
 
 scheduler.scheduleJob(registerRule, exports.register);
 

@@ -29,7 +29,8 @@ gulp.task('config:example', (done) => {
         "mainServerAddress": "http://smartlock.cloudapp.net",
         "mainServerSecret": "cosamuysecreta",
         "providerName": "Local",
-        "providerImg": "test.jpg"
+        "providerImg": "test.jpg",
+        "logLevel": "debug"
     }
     fs.writeFile('example_config.cnf', JSON.stringify(example, null, 4), done);
 });

@@ -66,6 +66,17 @@ services.init().then(() => {
         res.sendFile(__dirname + '/uploads/' + req.params.file);
     });
 
+    if (config.logLevel == "debug") {
+        app.use(function (req, res, next) {
+            var user = { username: "unknown" };
+            if (req.session && req.session.user)
+                var user = req.session.user;
+            var logLine = "[" + user.username + "] " + "[" + req.originalUrl + "] ";
+            systemLogger.debug(logLine);
+            next();
+        });
+    }
+
     app.use(resultController.genericErrorHandler);
 
     io.attach(server);
