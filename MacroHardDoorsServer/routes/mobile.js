@@ -7,9 +7,9 @@
 var router = express.Router();
 
 router.route('/userlogin').post(userController.login);
+router.route('/newuser').post([multer({ dest: './uploads/' })], userController.createNewUser);
 
 router.use(authController.authUser);
-router.route('/newuser').post([multer({ dest: './uploads/' })], userController.createNewUser);
 router.route('/info/:user').get(userController.getUserInfo).post([multer({ dest: './uploads/' })], userController.editUser);
 router.route('/stats/:user').get(userController.getUserStats);
 router.route('/revoketoken').post(userController.revokeToken);
