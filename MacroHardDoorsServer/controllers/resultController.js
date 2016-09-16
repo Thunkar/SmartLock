@@ -11,7 +11,7 @@ exports.resultSender = function(req, res, next) {
 }
 
 exports.genericErrorHandler = function(err, req, res, next){
-    systemLogger.error('['+ req.originalUrl +']' + err.message);
+    systemLogger.error('['+ req.originalUrl +'] ' + err.message);
     if (!err.code) err.code = 500;
     return res.status(err.code).send(err.message);
 }

@@ -54,6 +54,17 @@ services.init().then(() => {
         mobile = require('./routes/mobile.js'),
         statistics = require('./routes/statistics.js');
 
+    if (config.logLevel == "debug") {
+        app.use((req, res, next) => {
+            var user = { username: "unknown" };
+            if (req.session && req.session.user)
+                var user = req.session.user;
+            var logLine = "[" + user.username + "] " + "[" + req.originalUrl + "] ";
+            systemLogger.debug(logLine);
+            next();
+        });
+    }
+
     app.use(config.mountPoint + "/api/doors", doors);
     app.use(config.mountPoint + "/api/users", users);
     app.use(config.mountPoint + "/api/tokens", tokens);
@@ -65,17 +76,6 @@ services.init().then(() => {
     app.get(config.mountPoint + '/files/:file', (req, res) => {
         res.sendFile(__dirname + '/uploads/' + req.params.file);
     });
-
-    if (config.logLevel == "debug") {
-        app.use(function (req, res, next) {
-            var user = { username: "unknown" };
-            if (req.session && req.session.user)
-                var user = req.session.user;
-            var logLine = "[" + user.username + "] " + "[" + req.originalUrl + "] ";
-            systemLogger.debug(logLine);
-            next();
-        });
-    }
 
     app.use(resultController.genericErrorHandler);
 
