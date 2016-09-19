@@ -31,6 +31,9 @@ exports.createTokenPattern = function (req, res, next) {
 exports.getTokenPattern = function (req, res, next) {
     tokenModel.findById(req.params.token).exec().then((token) => {
         if (!token) return next(new CodedError("Token not found", 404));
+        return userModel.find({ 'tokens._id': token._id }).exec();
+    }).then((users) => {
+        token.users = users;
         return res.status(200).jsonp(token);
     }, (err) => {
         return next(err);
@@ -58,19 +61,7 @@ exports.bulkInsertTokenPattern = function (req, res, next) {
     var pattern;
     tokenModel.findById(req.params.token).exec().then((token) => {
         pattern = token;
-        return userModel.find({ _id: { $in: req.body.users } }).exec();
-    }).then((users) => {
-        var tasks = [];
-        users.forEach((user) => {
-            var newToken = {
-                _id: mongoose.Types.ObjectId(),
-                name: pattern.name,
-                doors: pattern.doors,
-                validity: pattern.validity,
-            };
-            tasks.push(userModel.findByIdAndUpdate(user.id, { $push: { tokens: newToken } }).exec);
-        });
-        return Promise.all(tasks);
+        return userModel.update({ _id: { $in: req.body.users } }, { $push: { tokens: patterns } }, { multi: true }).exec();
     }).then(() => {
         return res.status(200).send("Success");
     }, (err) => {
