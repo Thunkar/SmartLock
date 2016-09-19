@@ -5,12 +5,18 @@
     scheduler = require('node-schedule'),
     winston = require('winston');
 
+Date.prototype.addDays = function (days) {
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
 var systemLogger = winston.loggers.get('system');
 
 var storagePath = './uploads/';
 
 exports.addProvider = function (req, res, next) {
-    providerModel.update({ name: req.body.name }, { $set: { name: req.body.name, url: req.body.url, profilePic: req.files.profilePic.name } }, { upsert: true }).exec().then((provider) => {
+    providerModel.update({ name: req.body.name }, { $set: { name: req.body.name, url: req.body.url, profilePic: req.files.profilePic.name, lastRegistered: new Date() } }, { upsert: true }).exec().then((provider) => {
         return res.status(200).send(provider._id);
     }, (err) => {
         return next(err);
@@ -19,7 +25,7 @@ exports.addProvider = function (req, res, next) {
 
 exports.removeProviders = function () {
     systemLogger.info("Cleaning up...");
-    providerModel.remove({}).exec().then(() => {
+    providerModel.remove({ $gte: { lastRegistered: new Date().addDays(-3) } }).exec().then(() => {
         return fileUtils.rmdirAsync(storagePath);
     }).then(() => {
         return fileUtils.ensureExists(storagePath);
@@ -32,9 +38,7 @@ exports.removeProviders = function () {
 
 var cleaningRule = new scheduler.RecurrenceRule();
 
-cleaningRule.hour = 5;
 cleaningRule.minute = 0;
-cleaningRule.second = 30;
 
 scheduler.scheduleJob(cleaningRule, exports.removeProviders);
 
