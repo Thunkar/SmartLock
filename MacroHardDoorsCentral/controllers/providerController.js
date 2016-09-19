@@ -44,10 +44,6 @@ scheduler.scheduleJob(cleaningRule, exports.removeProviders);
 
 exports.getProviders = function (req, res, next) {
     providerModel.find({}).exec().then((providers) => {
-        if (err) {
-            systemLogger.error(err.message);
-            return res.status(500).send(err.message);
-        }
         providers.forEach((provider) => {
             provider.profilePic = config.serverAddress + "files/" + provider.profilePic;
         });
