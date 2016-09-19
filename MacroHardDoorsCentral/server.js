@@ -22,7 +22,7 @@ var systemLogger = winston.loggers.get('system');
 
 mongoose.connect(config.dbAddress, function (err) {
     if (err) {
-       systemLogger.error("could not connect to DB: " + err);
+        systemLogger.error("could not connect to DB: " + err);
     }
     else {
         systemLogger.info("Connected to DB");
@@ -31,6 +31,15 @@ mongoose.connect(config.dbAddress, function (err) {
 });
 
 var providers = require('./routes/providers.js');
+
+
+if (config.logLevel == "debug") {
+    app.use((req, res, next) => {
+        var logLine = "[" + req.originalUrl + "] ";
+        systemLogger.debug(logLine);
+        next();
+    });
+}
 
 app.use("/api/providers", providers);
 
