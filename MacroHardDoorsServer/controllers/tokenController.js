@@ -29,7 +29,9 @@ exports.createTokenPattern = function (req, res, next) {
 };
 
 exports.getTokenPattern = function (req, res, next) {
-    tokenModel.findById(req.params.token).exec().then((token) => {
+    var token;
+    tokenModel.findById(req.params.token).exec().then((storedToken) => {
+        var token = storedToken;
         if (!token) return next(new CodedError("Token not found", 404));
         return userModel.find({ 'tokens._id': token._id }).exec();
     }).then((users) => {
@@ -62,6 +64,18 @@ exports.bulkInsertTokenPattern = function (req, res, next) {
     tokenModel.findById(req.params.token).exec().then((token) => {
         pattern = token;
         return userModel.update({ _id: { $in: req.body.users } }, { $push: { tokens: pattern } }, { multi: true }).exec();
+    }).then(() => {
+        return res.status(200).send("Success");
+    }, (err) => {
+        return next(err);
+    });
+}
+
+exports.bulkDeleteTokenPattern = function (req, res, next) {
+    var pattern;
+    tokenModel.findById(req.params.token).exec().then((token) => {
+        pattern = token;
+        return userModel.update({ _id: { $in: req.body.users } }, { $pull: { tokens: pattern } }, { multi: true }).exec();
     }).then(() => {
         return res.status(200).send("Success");
     }, (err) => {
