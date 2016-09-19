@@ -8,7 +8,8 @@
 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="token in tokens">
     <div class="panel panel-default" >
         <div class="panel-heading">
-            {{token.name}}
+            {{token.name}}<span ng-show="token.default"> (default)</span>
+              <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editToken(token)"><span class="fa fa-pencil"></span></button>
         </div>
         <div class="panel-body">
             <p>Doors: <span ng-repeat="door in token.doors">{{door}}, </span></p>
@@ -55,11 +56,10 @@
     <div class="modal-header">
         <h2 class="modal-title">Assign users</h2>
     </div>
-    <form class="modal-body form-horizontal"  style="overflow:hidden" >
-    <divq ng-include="'newTokenFields.html'">
-
+    <div class="modal-body">
+         <h3>Assign to users</h3>
+    <user-selector users="users" selected-users="selectedUsers"></user-selector>
     </div>
-    </form>
     <div class="modal-footer">
         <button class="btn btn-primary" ng-click="ok()">OK</button>
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>

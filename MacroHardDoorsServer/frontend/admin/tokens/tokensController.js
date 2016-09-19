@@ -51,6 +51,25 @@ DoorsAdmin.controller('tokensController', ['$scope','$location','$http','$modal'
 		});
 	};
 
+	$scope.editToken = function(token){
+		$http.get("/api/tokens/"+token._id).success(function(completeToken,status){
+			var modalInstance = $modal.open({
+			templateUrl: 'tokenAssignation.html',
+			controller: 'tokenAssignationController',
+			windowClass: 'token-modal-window',
+			resolve: {
+				token:function(){return completeToken;}
+			}
+		});
+
+		modalInstance.result.then(function () {
+			reloadTokens();
+		}, function () {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+		});
+	}
+
 	$scope.deleteToken = function(token){
 		$http.post("/api/tokens/"+token._id+"/delete",{}).success(function(data){
 			reloadTokens();
@@ -124,7 +143,7 @@ DoorsAdmin.controller('addTokenPatternController', ['$scope','$location','$http'
 			}
 		}
 		$http.post("/api/tokens",token).success(function(tokenId,status){
-			$http.post("/api/tokens/"+tokenId,{users:ids}).success(function(data,status){
+			$http.post("/api/tokens/"+tokenId+"/bulkinsert",{users:ids}).success(function(data,status){
 				$modalInstance.close();
 			});
 		});
@@ -136,6 +155,45 @@ DoorsAdmin.controller('addTokenPatternController', ['$scope','$location','$http'
 
 }]);
 
-DoorsAdmin.controller('tokenAssignationController', ['$scope','$location','$http','$modal','$log' ,'token', function ($scope,$location,$http,$modal,$log,token) {
+DoorsAdmin.controller('tokenAssignationController', ['$scope','$location','$http','$modal','$modalInstance','$log' ,'token', function ($scope,$location,$http,$modal,modalInstance,$log,token) {
+
+	var originalUsers = [];
+
+	$http.get('/api/users').success(function(data,status){
+		$scope.users=data;
+		$scope.selectedUsers = [];
+		for (var i = data.length - 1; i >= 0; i--) {
+			var user = data[i];
+			if(token.users.contains(user._id)){
+				$scope.selectedUsers[i] = true;
+			}
+		}
+		angular.extend(originalUsers,$scope.selectedUsers);
+	});
+
+	$scope.ok = function(){
+		var toAssign = [];
+		var toRemove = [];
+		for (var i = $scope.users.length - 1; i >= 0; i--) {
+			if(originalUsers[i]&&!$scope.selectedUsers[i]){
+				toRemove.push($scope.users[i]._id);
+			}
+			if(!originalUsers[i]&&$scope.selectedUsers[i]){
+				toAssign.push($scope.users[i]._id);
+			}
+		}
+		$http.post("/api/tokens/"+token._id+"/bulkinsert",{users:toAssign}).success(function(data,status){
+			$http.post("/api/tokens/"+token._id+"/bulkdelete",{users:toRemove}).success(function(data,status){
+				$modalInstance.close();
+			});
+		});
+	}
+
+	$scope.cancel = function(){
+		$modalInstance.dismiss('cancel');
+	};
 
 }]);
+
+
+
