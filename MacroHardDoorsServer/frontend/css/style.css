@@ -5,9 +5,7 @@
 .colPadding{
 	padding: 0px 10px;
 }
-.token-modal-window .modal-dialog{
-	width: 90%;
-}
+
 .leftSeparator {
     border-left-width: 1px;
     border-left-color: #ccc;
@@ -30,4 +28,39 @@
 }
 .content-row{
 	padding: 10px 0px;
+}
+
+.responsive-square{
+    text-align:left;
+  position:relative;
+  width:100%;
+}
+
+.responsive-square:after{
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+
+.responsive-square .square-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.token-modal-window .modal-dialog{
+  width: 90%;
+  margin:30px auto;
+}
+
+@media( min-width:768px ){
+  .token-modal-window .modal-dialog{
+    width: 700px;
+  }
+}
+
+@media( min-width:992px ){
+  .token-modal-window .modal-dialog{
+    width: 800px;
+  }
 }

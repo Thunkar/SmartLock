@@ -92,6 +92,9 @@ DoorsAdmin.config(function ($routeProvider, $locationProvider) {
     }).when("/admins", {
         controller: "adminsController",
         templateUrl: "admins/admins.html"
+    }).when("/tokens", {
+        controller: "tokensController",
+        templateUrl: "tokens/tokens.html"
     }).otherwise({redirectTo: '/stats'});
 });
 
@@ -117,6 +120,23 @@ DoorsAdmin.controller('LoginController', ['$scope', '$location', '$http', '$moda
 
 }]);
 
+DoorsAdmin.filter('pages', function() {
+  return function(input, currentPage, pageSize) {
+    //check if there is an array to work with so you don't get an error on the first digest
+    if(angular.isArray(input)) {
+        if(currentPage===undefined||currentPage===null){
+            currentPage = 1;
+        }
+      //arrays are 0-base, so subtract 1 from the currentPage value to calculate the slice start
+      var start = (currentPage-1)*pageSize;
+      //slice extracts up to, but not including, the element indexed at the end parameter,
+      //so just multiply the currentPage by the pageSize to get the end parameter
+      var end = currentPage*pageSize;
+      return input.slice(start, end);
+    }
+  };
+});
+
 
 DoorsAdmin.factory('apiRelative', function ($q) {
     return {
@@ -128,4 +148,30 @@ DoorsAdmin.factory('apiRelative', function ($q) {
     }
 }).config(function ($httpProvider) {
     $httpProvider.interceptors.push('apiRelative');
+});
+
+DoorsAdmin.directive('userSelector',function(){
+    return {
+        templateUrl : 'userSelector.html',
+        scope:{
+            users:'=',
+            selectedUsers:'='
+        },
+        link : function(scope, element, attr) {
+            scope.itemsPerPage = 20;
+            scope.$watch('selectAll',function(newVal,oldVal){
+                if(newVal!=oldVal){
+                    if(newVal){
+                        for (var i = scope.users.length - 1; i >= 0; i--) {
+                            scope.selectedUsers[i] = true;
+                        }
+                    }else{
+                        for (var i = scope.users.length - 1; i >= 0; i--) {
+                            scope.selectedUsers[i] = false;
+                        }
+                    }
+                }
+            });
+        }
+    }
 });

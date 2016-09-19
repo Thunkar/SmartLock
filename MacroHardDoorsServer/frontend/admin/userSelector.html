@@ -1,0 +1,31 @@
+<div class="form-horizontal">
+	    <div class="form-group" style="margin-bottom:10px">
+        <label class="control-label col-sm-3">Search:</label>
+        <div class="col-sm-6">
+            <input class="form-control" placeholder="Filter" ng-model="userSearch">
+        </div>
+    </div>
+</div>
+<table class="table table-striped">
+	<thead>
+	<tr>
+		<th>Alias</th>
+		<th>Name</th>
+		<th><input type="checkbox" ng-model="selectAll"> Select</th>
+	</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in users | filter:userSearch | pages: currentPage : itemsPerPage"> 
+			<td>{{user.alias}}</td>
+			<td>{{user.name}}</td>
+			<td><input type="checkbox" ng-model="selectedUsers[users.indexOf(user)]"></td>
+		</tr>
+	</tbody>
+</table>
+<div style="text-align:center">
+	<pagination ng-show="users.length>itemsPerPage"
+	    total-items="(users | filter:userSearch).length" 
+	    ng-model="currentPage" 
+	    items-per-page="itemsPerPage">
+	</pagination>
+</div>

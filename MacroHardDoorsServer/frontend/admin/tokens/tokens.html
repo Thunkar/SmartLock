@@ -1,0 +1,67 @@
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Tokens</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="token in tokens">
+    <div class="panel panel-default" >
+        <div class="panel-heading">
+            {{token.name}}
+        </div>
+        <div class="panel-body">
+            <p>Doors: <span ng-repeat="door in token.doors">{{door}}, </span></p>
+            <p>Validity: from {{getFromString(token)}} to {{getToString(token)}} <span
+                    ng-show="token.validity.repeat.length>0">on <span ng-repeat="day in token.validity.repeat">{{getDayString(day)}}, </span></span>
+            </p>
+            <p><span ng-show="token.validity.uses>0">{{token.validity.uses}} uses left</span></p>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-danger pull-right" ng-click="deleteToken(token)">Revoke
+                token
+            </button>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<button class="btn btn-success pull-right" ng-click="newToken()">Add token</button>
+<div class="clearfix"></div>
+
+<script type="text/ng-template" id="addTokenPattern.html">
+    <div class="modal-header">
+        <h2 class="modal-title">Create Token</h2>
+    </div>
+    <form class="modal-body form-horizontal"  style="overflow:hidden" >
+    <div ng-include="'newTokenFields.html'"></div>
+
+    <h3>Assign to users</h3>
+    <user-selector users="users" selected-users="selectedUsers"></user-selector>
+            <div class="form-group" style="margin-bottom:10px;">
+        <label class="control-label col-sm-3">Default token:</label>
+        <div class="col-sm-6" style="display:inline;padding-top:5px">
+            <input ng-model="newToken.default" type="checkbox">
+        </div>
+    </div>
+    </form>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+
+</script>
+
+<script type="text/ng-template" id="tokenAssignation.html">
+    <div class="modal-header">
+        <h2 class="modal-title">Assign users</h2>
+    </div>
+    <form class="modal-body form-horizontal"  style="overflow:hidden" >
+    <divq ng-include="'newTokenFields.html'">
+
+    </div>
+    </form>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

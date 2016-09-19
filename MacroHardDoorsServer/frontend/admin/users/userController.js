@@ -105,102 +105,32 @@ DoorsAdmin.controller('userController', [ '$scope','$location','$http' ,'$modal'
 
 }]);
 DoorsAdmin.controller('addTokenCtrl', ['$http', '$scope','$modalInstance','user' , function ($http, $scope, $modalInstance,user) {
-	$scope.uses=0;
-	$scope.dates={}
-	$scope.dates.startDate=new Date();
-	$scope.dates.startTime=new Date();
-	$scope.dates.endDate=new Date();
-	$scope.dates.endTime=new Date();
-	$scope.dates.startDailyTime=new Date();
-	$scope.dates.endDailyTime=new Date();
-	$scope.days=[];
-	$scope.addedDoors=[];
-
-	$scope.incrementUses=function(){
-		$scope.uses++;
-	}
-
-	$scope.decrementUses=function(){
-		if($scope.uses>0)
-			$scope.uses--;
-	}
-
-	var updateDates=function(){
-		var startDate=$scope.dates.startDate;
-		var startTime=$scope.dates.startTime;
-		if(startDate&&startTime)
-			$scope.startDateTime=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate(),startTime.getHours(),startTime.getMinutes(),startTime.getSeconds(),startTime.getMilliseconds());
-		var endDate=$scope.dates.endDate;
-		var endTime=$scope.dates.endTime;
-		if(endDate&&endTime)
-			$scope.endDateTime=new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate(),endTime.getHours(),endTime.getMinutes(),endTime.getSeconds(),endTime.getMilliseconds());
-
-	}
-	$scope.updateDates=updateDates;
-	updateDates();
-	$scope.$watch('dates.startDate', function(newVal, oldVal){
-		updateDates();
-	});
-	$scope.$watch('dates.startTime', function(newVal, oldVal){
-		updateDates();
-	});
-	$scope.$watch('dates.endDate', function(newVal, oldVal){
-		updateDates();
-	});
-	$scope.$watch('dates.endDate', function(newVal, oldVal){
-		updateDates();
-	});
-	$scope.$watch('doorToAdd',function(newVal,oldVal){
-		if($scope.doorToAdd!==undefined){
-			var door=$scope.doorToAdd.originalObject;
-			if($scope.addedDoors.findBy(door,'name')===-1)
-				$scope.addedDoors.push(door);
-			$scope.doorToAdd=undefined;
-		}
-	});
-
-	$scope.deleteAddedDoor=function(index){
-		$scope.addedDoors.splice(index,1);
-	}
-
-	$scope.doorFormatter=function(query){
-		return {
-			door:query
-		}
-	}
-
-	$scope.prettyDate=function(date){
-		return moment(date).format('MMMM Do YYYY, h:mm:ss a')
-	}
-
-	$scope.setDaily=function(boolean){
-		$scope.daily=boolean;
-	}
+    $scope.newToken = {};
 
 	$scope.ok = function () {
 		var doors=[];
-		for(var i=0;i<$scope.addedDoors.length;i++){
-			doors.push($scope.addedDoors[i].name);
+		for(var i=0;i<$scope.newToken.addedDoors.length;i++){
+			doors.push($scope.newToken.addedDoors[i].name);
 		}
 		var days=[];
-		for(var i=0;i<$scope.days.length;i++){
-			if($scope.days[i])
+		for(var i=0;i<$scope.newToken.days.length;i++){
+			if($scope.newToken.days[i])
 				days.push(i);
 		}
 		var from={};
 		var to={};
-		var uses=$scope.unlimitedUses? -1:$scope.uses;
+		var uses=$scope.newToken.unlimitedUses? -1:$scope.newToken.uses;
 
-		if($scope.daily){
-			from=$scope.dates.startDailyTime;
-			to=$scope.dates.endDailyTime;
+		if($scope.newToken.daily){
+			from=$scope.newToken.dates.startDailyTime;
+			to=$scope.newToken.dates.endDailyTime;
 		}else{
-			from=$scope.startDateTime;
-			to=$scope.endDateTime;
+			from=$scope.newToken.startDateTime;
+			to=$scope.newToken.endDateTime;
 			days=[];
 		}
 		var token={
-			name:$scope.name,
+			name:$scope.newToken.name,
 			user:user,
 			doors:doors,
 			validity:{

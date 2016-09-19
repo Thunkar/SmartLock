@@ -1,4 +1,5 @@
 DoorsAdmin.controller('adminsController', ['$scope','$location','$http','$modal','$log' , function ($scope,$location,$http,$modal,$log) {
+
     var reloadAdmins=function(){
         $http.get('/api/admins').success(function(data,status){
             $scope.admins=data;

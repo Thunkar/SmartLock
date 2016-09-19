@@ -75,7 +75,11 @@
             </div>
             <div class="panel-body">
             <div class="row">
-                <img class="col-xs-6 img-responsive" ng-src="{{user.profilePic}}"/>
+                <div class="col-xs-6">
+                    <div class="responsive-square">
+                        <img class="square-content"  ng-src="{{user.profilePic}}">
+                    </div>
+                </div>
                 <div  class="col-xs-6"><p>Full name:</p> <p> {{user.name}} </p></div>
             </div>
             </div>

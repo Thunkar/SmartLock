@@ -97,12 +97,12 @@ DoorsAdmin.controller('statsController', [ '$scope','$location','$http' ,functio
 		element: 'doors-area-chart',
 		data: [],
 		xkey: 'period',
-		ykeys: ['userEntries', 'userRejections', 'nodesOffline','doorOpened','doorClosed'],
-		labels: ['Accesses', 'Rejections', 'Crashes','Door opened','Door closed'],
+		ykeys: ['userEntries', 'userRejections', 'nodesOffline','doorOpened'],
+		labels: ['Accesses', 'Rejections', 'Crashes','Door opened'],
 		pointSize: 2,
 		hideHover: 'auto',
 		parseTime:false,
-		lineColors:["#76FF03","#9C27B0","#F44336","#304FFE","#FFC107"],
+		lineColors:["#76FF03","#FFC107","#F44336","#5bc0de"],
 		resize: true
 	});
 
