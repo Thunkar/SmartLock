@@ -61,7 +61,7 @@ exports.bulkInsertTokenPattern = function (req, res, next) {
     var pattern;
     tokenModel.findById(req.params.token).exec().then((token) => {
         pattern = token;
-        return userModel.update({ _id: { $in: req.body.users } }, { $push: { tokens: patterns } }, { multi: true }).exec();
+        return userModel.update({ _id: { $in: req.body.users } }, { $push: { tokens: pattern } }, { multi: true }).exec();
     }).then(() => {
         return res.status(200).send("Success");
     }, (err) => {
