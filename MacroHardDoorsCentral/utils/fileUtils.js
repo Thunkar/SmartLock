@@ -5,9 +5,9 @@ const mkdirp = require('mkdirp'),
     rimraf = require('rimraf'),
     winston = require('winston');
 
-const servicesLogger = winston.loggers.get('services');
+const systemLogger = winston.loggers.get('system');
 
-servicesLogger.info("Loading file utils");
+systemLogger.info("Loading file utils");
 
 exports.ensureExists = function (path) {
     return new Promise(function (resolve, reject) {
