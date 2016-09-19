@@ -19,7 +19,8 @@ exports.createTokenPattern = function (req, res, next) {
     var newToken = new tokenModel({
         name: req.body.name,
         doors: req.body.doors,
-        validity: req.body.validity
+        validity: req.body.validity,
+        default: req.body.default
     });
     newToken.save().then(() => {
         return res.status(200).send(newToken._id);
@@ -31,7 +32,7 @@ exports.createTokenPattern = function (req, res, next) {
 exports.getTokenPattern = function (req, res, next) {
     var token;
     tokenModel.findById(req.params.token).exec().then((storedToken) => {
-        var token = storedToken;
+        token = storedToken;
         if (!token) return next(new CodedError("Token not found", 404));
         return userModel.find({ 'tokens._id': token._id }).exec();
     }).then((users) => {
