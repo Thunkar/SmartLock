@@ -9,7 +9,8 @@ var tokenSchema = new Schema({
         to: { type: Date, default: Date.now },
         repeat: [String],
         uses: { type: Number, default: 0 }
-    }
+    },
+    default: { type: Boolean, default: false }
 });
 
 var userSchema = new Schema({

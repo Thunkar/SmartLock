@@ -4,6 +4,7 @@
     mongoose = require('mongoose'),
     userModel = mongoose.model('UserModel'),
     adminModel = mongoose.model('AdminModel'),
+    tokenModel = mongoose.model('TokenModel'),
     authController = require('./authController.js'),
     stats = require('./statisticsController.js'),
     fs = require('fs'),
@@ -18,13 +19,15 @@ var storagePath = './uploads/';
 exports.createNewUser = function (req, res, next) {
     var newUser;
     authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
+        return tokenModel.find({ default: true }).exec();
+    }).then((defaultTokens) => {
         newUser = new userModel({
             alias: req.body.alias,
             pwd: saltedPassword,
             name: req.body.name,
             email: req.body.email,
             profilePic: req.files.profilePic.name,
-            tokens: [],
+            tokens: defaultTokens,
             active: false
         });
         return newUser.save();
@@ -67,7 +70,7 @@ exports.login = function (req, res, next) {
 
 exports.editUser = function (req, res, next) {
     var updatedUser, user;
-    if(req.session.user && (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
+    if (req.session.user && (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
     userModel.findById(req.params.user).exec().then((storedUser) => {
         user = storedUser;
         if (!user) return next(new CodedError("User not found", 404));
