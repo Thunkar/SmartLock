@@ -31,12 +31,21 @@ exports.createTokenPattern = function (req, res, next) {
 
 exports.getTokenPattern = function (req, res, next) {
     var token;
-    tokenModel.findById(req.params.token).exec().then((storedToken) => {
+    tokenModel.findById(req.params.token).lean().exec().then((storedToken) => {
         token = storedToken;
         if (!token) return next(new CodedError("Token not found", 404));
-        return userModel.find({ 'tokens._id': token._id }).exec();
+        return userModel.find({ 'tokens._id': token._id }).lean().exec();
     }).then((users) => {
-        token.users = users;
+        token.users = users.map((user) => {
+            return {
+                _id: user._id,
+                alias: user.alias,
+                name: user.name,
+                profilePic: config.serverAddress + config.mountPoint + "/files/" + user.profilePic,
+                active: user.active,
+                email: user.email
+            };
+        });
         return res.status(200).jsonp(token);
     }, (err) => {
         return next(err);
