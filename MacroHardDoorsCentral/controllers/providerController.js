@@ -25,7 +25,7 @@ exports.addProvider = function (req, res, next) {
 
 exports.removeProviders = function () {
     systemLogger.info("Cleaning up...");
-    providerModel.remove({ $gte: { lastRegistered: new Date().addDays(-3) } }).exec().then(() => {
+    providerModel.remove({ $lte: { lastRegistered: new Date().addDays(-3) } }).exec().then(() => {
         return fileUtils.rmdirAsync(storagePath);
     }).then(() => {
         return fileUtils.ensureExists(storagePath);
