@@ -20,6 +20,8 @@ exports.eventType = {
     newAdmin: "newAdmin",
     tokenRevoked: "tokenRevoked",
     newToken: "newToken",
+    newTokenPattern: "newTokenPattern",
+    tokenPatternRevoked: "tokenPatternRevoked",
     systemStarted: "systemStarted",
     nodeDeactivated: "nodeDeactivated",
     nodeActivated: "nodeActivated",

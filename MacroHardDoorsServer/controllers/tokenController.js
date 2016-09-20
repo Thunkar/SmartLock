@@ -23,6 +23,7 @@ exports.createTokenPattern = function (req, res, next) {
         default: req.body.default
     });
     newToken.save().then(() => {
+        stats.generateEvent(stats.eventType.newTokenPattern, null, null, newToken._id, req.body.doors);
         return res.status(200).send(newToken._id);
     }, (err) => {
         return next(err);
@@ -54,7 +55,8 @@ exports.getTokenPattern = function (req, res, next) {
 
 
 exports.deleteTokenPattern = function (req, res, next) {
-    tokenModel.findByIdAndRemove(req.params.token).exec().then((token) => {
+    tokenModel.findByIdAndRemove(req.params.token).exec().then(() => {
+        stats.generateEvent(stats.eventType.tokenPatternRevoked, null, null, req.params.token, null);
         return res.status(200).send("Success");
     }, (err) => {
         return next(err);
