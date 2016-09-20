@@ -167,7 +167,7 @@ DoorsAdmin.controller('tokenAssignationController', ['$scope','$location','$http
 		$scope.selectedUsers = [];
 		for (var i = data.length - 1; i >= 0; i--) {
 			var user = data[i];
-			if(token.users.indexOf(user._id)){
+			if(token.users.findBy(user,"_id")!==-1){
 				$scope.selectedUsers[i] = true;
 			}
 		}
