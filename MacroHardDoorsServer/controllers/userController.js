@@ -17,8 +17,9 @@ var systemLogger = winston.loggers.get('system');
 var storagePath = './uploads/';
 
 exports.createNewUser = function (req, res, next) {
-    var newUser;
-    authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((saltedPassword) => {
+    var newUser, saltedPassword;
+    authController.generateSaltedPassword(req.body.password, config.pwdIterations).then((generatedPassword) => {
+        saltedPassword = generatedPassword;
         return tokenModel.find({ default: true }).exec();
     }).then((defaultTokens) => {
         newUser = new userModel({

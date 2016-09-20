@@ -59,7 +59,9 @@ services.init().then(() => {
             var user = { alias: "unknown" };
             if (req.session && req.session.user)
                 var user = req.session.user;
-            var logLine = "[" + user.alias + "] " + "[" + req.originalUrl + "] ";
+            if (req.session && req.session.admin)
+                var user = req.session.admin;
+            var logLine = "[" + user.alias + "] " + "[" + req.method + "] " + "[" + req.originalUrl + "] ";
             systemLogger.debug(logLine);
             next();
         });
