@@ -108,7 +108,7 @@ DoorsAdmin.controller('addTokenCtrl', ['$http', '$scope','$modalInstance','user'
     $scope.newToken = {};
 
 	$scope.ok = function () {
-		if((scope.newToken.startDateTime&&scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
+		if(($scope.newToken.startDateTime&&$scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
 			var doors=[];
 			for(var i=0;i<$scope.newToken.addedDoors.length;i++){
 				doors.push($scope.newToken.addedDoors[i].name);

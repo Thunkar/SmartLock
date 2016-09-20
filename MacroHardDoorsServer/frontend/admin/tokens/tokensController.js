@@ -104,7 +104,7 @@ DoorsAdmin.controller('addTokenPatternController', ['$scope','$location','$http'
 	});
 
 	$scope.ok = function(){
-		if($scope.addTokenForm.$valid&&(scope.newToken.startDateTime&&scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
+		if($scope.addTokenForm.$valid&&($scope.newToken.startDateTime&&$scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
 			var doors=[];
 			for(var i=0;i<$scope.newToken.addedDoors.length;i++){
 				doors.push($scope.newToken.addedDoors[i].name);
