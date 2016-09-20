@@ -22,12 +22,13 @@ exports.createNewUser = function (req, res, next) {
         saltedPassword = generatedPassword;
         return tokenModel.find({ default: true }).exec();
     }).then((defaultTokens) => {
+        var profilePicName = req.files.profilePic ? req.files.profilePic.name : undefined;
         newUser = new userModel({
             alias: req.body.alias,
             pwd: saltedPassword,
             name: req.body.name,
             email: req.body.email,
-            profilePic: req.files.profilePic.name,
+            profilePic: profilePicName,
             tokens: defaultTokens,
             active: false
         });
@@ -37,7 +38,6 @@ exports.createNewUser = function (req, res, next) {
         var userToSend = {
             _id: newUser._id.toString(),
             alias: newUser.alias,
-            accessToken: newUser.accessToken,
             active: newUser.active
         };
         return res.status(200).jsonp(userToSend);
