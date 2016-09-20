@@ -104,54 +104,58 @@ DoorsAdmin.controller('addTokenPatternController', ['$scope','$location','$http'
 	});
 
 	$scope.ok = function(){
-		var doors=[];
-		for(var i=0;i<$scope.newToken.addedDoors.length;i++){
-			doors.push($scope.newToken.addedDoors[i].name);
-		}
-		var days=[];
-		for(var i=0;i<$scope.newToken.days.length;i++){
-			if($scope.newToken.days[i])
-				days.push(i);
-		}
-		var from={};
-		var to={};
-		var uses=$scope.newToken.unlimitedUses? -1:$scope.newToken.uses;
-
-		if($scope.newToken.daily){
-			from=$scope.newToken.dates.startDailyTime;
-			to=$scope.newToken.dates.endDailyTime;
-		}else{
-			from=$scope.newToken.startDateTime;
-			to=$scope.newToken.endDateTime;
-			days=[];
-		}
-		var token={
-			name:$scope.newToken.name,
-			doors:doors,
-			validity:{
-				from: from,
-				to: to,
-				repeat:days,
-				uses:uses
-			},
-			default:$scope.newToken.default
-		}
-		var ids = [];
-		for (var i = $scope.users.length - 1; i >= 0; i--) {
-			if($scope.selectedUsers[i]){
-				ids.push($scope.users[i]._id);
+		if($scope.addTokenForm.$valid&&(scope.newToken.startDateTime&&scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
+			var doors=[];
+			for(var i=0;i<$scope.newToken.addedDoors.length;i++){
+				doors.push($scope.newToken.addedDoors[i].name);
 			}
-		}
-		$http.post("/api/tokens",token).success(function(tokenId,status){
-			$http.post("/api/tokens/"+tokenId+"/bulkinsert",{users:ids}).success(function(data,status){
-				$modalInstance.close();
-			});
-		});
-	};
+			var days=[];
+			for(var i=0;i<$scope.newToken.days.length;i++){
+				if($scope.newToken.days[i])
+					days.push(i);
+			}
+			var from={};
+			var to={};
+			var uses=$scope.newToken.unlimitedUses? -1:$scope.newToken.uses;
 
-	$scope.cancel = function(){
-		$modalInstance.dismiss('cancel');
-	};
+			if($scope.newToken.daily){
+				from=$scope.newToken.dates.startDailyTime;
+				to=$scope.newToken.dates.endDailyTime;
+			}else{
+				from=$scope.newToken.startDateTime;
+				to=$scope.newToken.endDateTime;
+				days=[];
+			}
+			var token={
+				name:$scope.newToken.name,
+				doors:doors,
+				validity:{
+					from: from,
+					to: to,
+					repeat:days,
+					uses:uses
+				},
+				default:$scope.newToken.default
+			}
+			var ids = [];
+			for (var i = $scope.users.length - 1; i >= 0; i--) {
+				if($scope.selectedUsers[i]){
+					ids.push($scope.users[i]._id);
+				}
+			}
+			$http.post("/api/tokens",token).success(function(tokenId,status){
+				$http.post("/api/tokens/"+tokenId+"/bulkinsert",{users:ids}).success(function(data,status){
+					$modalInstance.close();
+				});
+			});
+		}else{
+			alert("Form is not valid");
+		}
+		};
+
+		$scope.cancel = function(){
+			$modalInstance.dismiss('cancel');
+		};
 
 }]);
 

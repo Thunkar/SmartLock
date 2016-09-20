@@ -108,41 +108,45 @@ DoorsAdmin.controller('addTokenCtrl', ['$http', '$scope','$modalInstance','user'
     $scope.newToken = {};
 
 	$scope.ok = function () {
-		var doors=[];
-		for(var i=0;i<$scope.newToken.addedDoors.length;i++){
-			doors.push($scope.newToken.addedDoors[i].name);
-		}
-		var days=[];
-		for(var i=0;i<$scope.newToken.days.length;i++){
-			if($scope.newToken.days[i])
-				days.push(i);
-		}
-		var from={};
-		var to={};
-		var uses=$scope.newToken.unlimitedUses? -1:$scope.newToken.uses;
-
-		if($scope.newToken.daily){
-			from=$scope.newToken.dates.startDailyTime;
-			to=$scope.newToken.dates.endDailyTime;
-		}else{
-			from=$scope.newToken.startDateTime;
-			to=$scope.newToken.endDateTime;
-			days=[];
-		}
-		var token={
-			name:$scope.newToken.name,
-			user:user,
-			doors:doors,
-			validity:{
-				from: from,
-				to: to,
-				repeat:days,
-				uses:uses
+		if((scope.newToken.startDateTime&&scope.newToken.endDateTime)||($scope.newToken.dates.startDailyTime&&$scope.newToken.dates.endDailyTime)){
+			var doors=[];
+			for(var i=0;i<$scope.newToken.addedDoors.length;i++){
+				doors.push($scope.newToken.addedDoors[i].name);
 			}
+			var days=[];
+			for(var i=0;i<$scope.newToken.days.length;i++){
+				if($scope.newToken.days[i])
+					days.push(i);
+			}
+			var from={};
+			var to={};
+			var uses=$scope.newToken.unlimitedUses? -1:$scope.newToken.uses;
+
+			if($scope.newToken.daily){
+				from=$scope.newToken.dates.startDailyTime;
+				to=$scope.newToken.dates.endDailyTime;
+			}else{
+				from=$scope.newToken.startDateTime;
+				to=$scope.newToken.endDateTime;
+				days=[];
+			}
+			var token={
+				name:$scope.newToken.name,
+				user:user,
+				doors:doors,
+				validity:{
+					from: from,
+					to: to,
+					repeat:days,
+					uses:uses
+				}
+			}
+			$http.post('/api/users/'+user+'/tokens',token).success(function(data,status){
+				$modalInstance.close();
+			});
+		}else{
+			alert("Form is not valid");
 		}
-		$http.post('/api/users/'+user+'/tokens',token).success(function(data,status){
-			$modalInstance.close();
-		});
 	};
 
 	$scope.cancel = function () {
