@@ -155,16 +155,19 @@ DoorsAdmin.controller('addTokenPatternController', ['$scope','$location','$http'
 
 }]);
 
-DoorsAdmin.controller('tokenAssignationController', ['$scope','$location','$http','$modal','$modalInstance','$log' ,'token', function ($scope,$location,$http,$modal,modalInstance,$log,token) {
+DoorsAdmin.controller('tokenAssignationController', ['$scope','$location','$http','$modal','$modalInstance','$log' ,'token', function ($scope,$location,$http,$modal,$modalInstance,$log,token) {
 
 	var originalUsers = [];
+	if(!token.users){
+		token.users = [];
+	}
 
 	$http.get('/api/users').success(function(data,status){
 		$scope.users=data;
 		$scope.selectedUsers = [];
 		for (var i = data.length - 1; i >= 0; i--) {
 			var user = data[i];
-			if(token.users.contains(user._id)){
+			if(token.users.indexOf(user._id)){
 				$scope.selectedUsers[i] = true;
 			}
 		}
