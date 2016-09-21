@@ -17,7 +17,7 @@ exports.init = function () {
             mongooseConnection: services.dbLoader.connection
         });
         sessionStore = session({
-            secret: config.sessionSecret,
+            secret: config.providerSecret,
             store: store,
             resave: false,
             saveUninitialized: false,

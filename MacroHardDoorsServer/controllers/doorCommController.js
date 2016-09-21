@@ -2,6 +2,7 @@
     config = services.config,
     CodedError = require('../utils/CodedError.js'),
     doorsChannel = require('../server.js').doorsChannel,
+    authController = require('./authController.js'),
     mongoose = require('mongoose'),
     doorModel = mongoose.model('DoorModel'),
     stats = require('./statisticsController.js'),
@@ -20,6 +21,11 @@ doorsChannel.on('connection', (socket) => {
 
     socket.on('handshake', (data, callback) => {
         var newDoor;
+        var signature = authController.generateSignature(data.signDate, config.providerSecret);
+        if (signature != data.signature) {
+            systemLogger.error("Bad node signature");
+            return socket.disconnect();
+        }
         doorModel.findOne({ name: data.name }).exec().then((door) => {
             if (door && doors[door.id]) {
                 systemLogger.warn("Duplicated door name trying to register in the system: " + door.name);
