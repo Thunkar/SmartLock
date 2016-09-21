@@ -152,7 +152,13 @@ exports.getUserInfo = function (req, res, next) {
             _id: user._id,
             alias: user.alias,
             name: user.name,
-            profilePic: config.serverAddress + config.mountPoint + "/files/" + user.profilePic,
+            profilePic: function () {
+                if (user.profilePic)
+                    return config.serverAddress + config.mountPoint + "/files/" + user.profilePic;
+                else
+                    return config.serverAddress + config.mountPoint + "/files/profile.png";
+
+            } (),
             tokens: user.tokens,
             active: user.active,
             email: user.email
@@ -185,7 +191,13 @@ exports.getUsers = function (req, res, next) {
                 _id: user._id,
                 alias: user.alias,
                 name: user.name,
-                profilePic: config.serverAddress + config.mountPoint + "/files/" + user.profilePic,
+                profilePic: function () {
+                    if (user.profilePic)
+                        return config.serverAddress + config.mountPoint + "/files/" + user.profilePic;
+                    else
+                        return config.serverAddress + config.mountPoint + "/files/profile.png";
+
+                } (),
                 active: user.active,
                 email: user.email
             };
