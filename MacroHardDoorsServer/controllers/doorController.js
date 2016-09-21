@@ -31,8 +31,8 @@ function ensureValidToken(userId, doorName, tokenId) {
             if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return reject(new Error("The token has expired"));
             if (token.validity.repeat.length != 0) {
                 if (token.validity.repeat.indexOf(moment().day()) == -1) return reject(new Error("The token cannot be used today"));
-                if (minutesOfDay(moment(token.validity.from)) > moment()) return reject(new Error("The token is not active yet"));
-                if (minutesOfDay(moment(token.validity.to)) < moment()) return reject(new Error("The token has expired"));
+                if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) return reject(new Error("The token is not active yet"));
+                if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) return reject(new Error("The token has expired"));
             }
             if (token.validity.uses != -1) token.validity.uses--;
             return user.save();
