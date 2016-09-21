@@ -1,4 +1,4 @@
-﻿var SHA256 = require("crypto"),
+﻿var crypto = require("crypto"),
     config = require('../server.js').config;
 
 function computeSHA256Hash(data) {
