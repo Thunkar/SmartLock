@@ -73,14 +73,18 @@ SmartLock.controller('DoorsController', [ '$scope','$location','$http' ,'$modal'
         });
     };
 
+    function minutesOfDay(m){
+        return m.minutes() + m.hours() * 60;
+    }
+
     $scope.isValid = function(token){
         if (token.validity.uses == 0) return false;
         if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return false;
         if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return false;
         if (token.validity.repeat.length != 0) {
             if (token.validity.repeat.indexOf(moment().day()) == -1) return false;
-            if (moment(token.validity.from).isAfter(moment(), 'second')) return false;
-            if (moment(token.validity.to).isBefore(moment(), 'second')) return false;
+            if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) return false;
+            if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) return false;
         }
         return true;
     };

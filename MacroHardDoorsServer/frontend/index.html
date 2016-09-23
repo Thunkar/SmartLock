@@ -74,9 +74,10 @@
                     <div class="panel-heading">
                         {{token.name}}
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body" style="height:60px;">
                         <div ng-show="!isValid(token)">
-                            <p>Token is not valid a this time</p>
+                            <p ng-show="token.validity.uses!=0">Token is not valid a this time</p>
+                            <p ng-show="token.validity.uses==0">No uses left in token</p>
                         </div>
                         <div ng-show="isValid(token)">
                             <div class="btn-group-vertical" role="group" style="width: 100%">
@@ -85,8 +86,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel-footer" ng-show="token.validity.uses!=-1">
-                        <span>{{token.validity.uses}} uses left</span>
+                    <div class="panel-footer" style="text-align:right;" >
+                        <span ng-show="token.validity.uses!=-1">{{token.validity.uses}} uses left</span>
+                        <span ng-show="token.validity.uses==-1">Unlimited uses</span>
                     </div>
                 </div>
             </div>
