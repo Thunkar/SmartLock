@@ -1,17 +1,19 @@
-﻿var SHA256 = require("crypto-js/sha256"),
+﻿var crypto = require("crypto"),
     config = require('../server.js').config;
 
-
-function generateSignature(date) {
-    var toSign = date + "_" + config.mainServerSecret;
-    return SHA256(toSign);
+function computeSHA256Hash(data) {
+    return crypto.createHash('sha256').update(data).digest('hex');
 }
 
+function generateSignature(date, token) {
+    var toSign = date + "_" + token;
+    return computeSHA256Hash(toSign);
+}
 
 exports.authAndContinue = function (req, res, next) {
     var date = req.get("signDate");
     var sentSignature = req.get("signature");
-    var signature = generateSignature(date);
+    var signature = generateSignature(date, config.mainServerSecret);
     if (signature == sentSignature) {
         next();
     }

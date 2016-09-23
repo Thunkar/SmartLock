@@ -7,6 +7,7 @@ var services = require('./utils/services.js'),
     server = require('http').Server(app),
     bodyParser = require('body-parser'),
     session = require('express-session'),
+    favicon = require('serve-favicon'),
     sharedsession = require("express-socket.io-session"),
     mongoose = require('mongoose'),
     winston = require('winston');
@@ -78,6 +79,8 @@ services.init().then(() => {
     app.get(config.mountPoint + '/files/:file', (req, res) => {
         res.sendFile(__dirname + '/uploads/' + req.params.file);
     });
+
+    app.use(favicon(__dirname + '/uploads/favicon.ico'));
 
     app.use(resultController.genericErrorHandler);
 

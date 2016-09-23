@@ -12,6 +12,10 @@
 
 var systemLogger = winston.loggers.get('system');
 
+function minutesOfDay(m){
+  return m.minutes() + m.hours() * 60;
+}
+
 function ensureValidToken(userId, doorName, tokenId) {
     return new Promise((resolve, reject) => {
         userModel.findById(userId).exec().then((user) => {
@@ -27,8 +31,8 @@ function ensureValidToken(userId, doorName, tokenId) {
             if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return reject(new Error("The token has expired"));
             if (token.validity.repeat.length != 0) {
                 if (token.validity.repeat.indexOf(moment().day()) == -1) return reject(new Error("The token cannot be used today"));
-                if (moment(token.validity.from).isAfter(moment(), 'second')) return reject(new Error("The token is not active yet"));
-                if (moment(token.validity.to).isBefore(moment(), 'second')) return reject(new Error("The token has expired"));
+                if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) return reject(new Error("The token is not active yet"));
+                if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) return reject(new Error("The token has expired"));
             }
             if (token.validity.uses != -1) token.validity.uses--;
             return user.save();

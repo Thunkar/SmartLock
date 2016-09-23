@@ -22,12 +22,13 @@ exports.createNewUser = function (req, res, next) {
         saltedPassword = generatedPassword;
         return tokenModel.find({ default: true }).exec();
     }).then((defaultTokens) => {
+        var profilePicName = req.files.profilePic ? req.files.profilePic.name : undefined;
         newUser = new userModel({
             alias: req.body.alias,
             pwd: saltedPassword,
             name: req.body.name,
             email: req.body.email,
-            profilePic: req.files.profilePic.name,
+            profilePic: profilePicName,
             tokens: defaultTokens,
             active: false
         });
@@ -37,7 +38,6 @@ exports.createNewUser = function (req, res, next) {
         var userToSend = {
             _id: newUser._id.toString(),
             alias: newUser.alias,
-            accessToken: newUser.accessToken,
             active: newUser.active
         };
         return res.status(200).jsonp(userToSend);
@@ -152,7 +152,13 @@ exports.getUserInfo = function (req, res, next) {
             _id: user._id,
             alias: user.alias,
             name: user.name,
-            profilePic: config.serverAddress + config.mountPoint + "/files/" + user.profilePic,
+            profilePic: function () {
+                if (user.profilePic)
+                    return config.serverAddress + config.mountPoint + "/files/" + user.profilePic;
+                else
+                    return config.serverAddress + config.mountPoint + "/files/profile.png";
+
+            } (),
             tokens: user.tokens,
             active: user.active,
             email: user.email
@@ -185,7 +191,13 @@ exports.getUsers = function (req, res, next) {
                 _id: user._id,
                 alias: user.alias,
                 name: user.name,
-                profilePic: config.serverAddress + config.mountPoint + "/files/" + user.profilePic,
+                profilePic: function () {
+                    if (user.profilePic)
+                        return config.serverAddress + config.mountPoint + "/files/" + user.profilePic;
+                    else
+                        return config.serverAddress + config.mountPoint + "/files/profile.png";
+
+                } (),
                 active: user.active,
                 email: user.email
             };

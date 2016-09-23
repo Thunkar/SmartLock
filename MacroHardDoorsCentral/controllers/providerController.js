@@ -1,6 +1,7 @@
 ﻿var config = require("../server.js").config,
     fileUtils = require('../utils/fileUtils.js'),
     mongoose = require('mongoose'),
+    Promise = require('bluebird'),
     providerModel = mongoose.model('ProviderModel'),
     scheduler = require('node-schedule'),
     winston = require('winston');
@@ -25,10 +26,14 @@ exports.addProvider = function (req, res, next) {
 
 exports.removeProviders = function () {
     systemLogger.info("Cleaning up...");
-    providerModel.remove({ lastRegistered: { $lte: new Date().addDays(-3) } }).exec().then(() => {
-        return fileUtils.rmdirAsync(storagePath);
-    }).then(() => {
-        return fileUtils.ensureExists(storagePath);
+    var threeDaysAgo = new Date().addDays(-3);
+    providerModel.find({ lastRegistered: { $lt: threeDaysAgo } }).exec().then((providers) => {
+        var tasks = [];
+        providers.forEach((provider) => {
+            taks.push(fileUtils.deleteFile(storagePath + provider.profilePic));
+            tasks.push(provider.remove());
+        });
+        return Promise.all(tasks);
     }).then(() => {
         return systemLogger.info("Ready");
     }, (err) => {
