@@ -34,8 +34,9 @@
           </div>
           </div>
           <div class="panel-footer" >
-            <button ng-show="door.active" ng-disabled="!door.online" class="btn btn-danger pull-right" ng-click="deactivateDoor(door)">Deactivate door</button>
-             <button ng-show="!door.active" ng-disabled="!door.online" class="btn btn-info pull-right" ng-click="activateDoor(door)">Activate door</button>
+          <button ng-show="door.active" ng-disabled="!door.online" class="btn btn-primary pull-left" ng-click="openDoor(door)">Open</button>
+            <button ng-show="door.active" ng-disabled="!door.online" class="btn btn-danger pull-right" ng-click="deactivateDoor(door)">Deactivate</button>
+             <button ng-show="!door.active" ng-disabled="!door.online" class="btn btn-info pull-right" ng-click="activateDoor(door)">Activate</button>
               <div class="clearfix"></div>
           </div>
       </div>

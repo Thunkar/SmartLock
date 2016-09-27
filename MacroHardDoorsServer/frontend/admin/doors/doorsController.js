@@ -20,4 +20,9 @@ DoorsAdmin.controller('doorsController', [ '$scope','$location','$http' ,functio
 			reloadDoors();
 		});
 	}
+	$scope.openDoor=function(door){
+		$http.post("/api/admins/open",{door:door.name}).success(function(data){
+			alert("Opened");
+		});
+	}
 }]);
