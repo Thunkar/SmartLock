@@ -4,7 +4,15 @@
 	</div>
 </div>
 
-  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="door in doors">
+<form class="form-horizontal">
+    <div class="form-group" style="margin-bottom:10p">
+        <div class="col-sm-4 col-sm-offset-4">
+            <input class="form-control" placeholder="Filter" ng-model="search">
+        </div>
+    </div>
+</form>
+<div class="row">
+  <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="door in doors | filter : search">
       <div ng-class="!door.online ?  'panel-danger ' : !door.active? 'panel-warning': 'panel-green'" class="panel " >
           <div class="panel-heading">
               {{door.name}}
@@ -31,4 +39,5 @@
               <div class="clearfix"></div>
           </div>
       </div>
+</div>
 </div>

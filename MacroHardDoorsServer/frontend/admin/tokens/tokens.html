@@ -5,7 +5,15 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="token in tokens">
+<form class="form-horizontal">
+    <div class="form-group" style="margin-bottom:10p">
+        <div class="col-sm-4 col-sm-offset-4">
+            <input class="form-control" placeholder="Filter" ng-model="search">
+        </div>
+    </div>
+</form>
+<div class="row">
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="token in tokens | filter : search">
     <div class="panel panel-default" >
         <div class="panel-heading">
             {{token.name}}<span ng-show="token.default"> (default)</span>
@@ -25,6 +33,7 @@
             <div class="clearfix"></div>
         </div>
     </div>
+</div>
 </div>
 <button class="btn btn-success pull-right" ng-click="newToken()">Add token</button>
 <div class="clearfix"></div>

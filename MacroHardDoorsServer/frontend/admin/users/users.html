@@ -49,7 +49,15 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="user in users">
+<form class="form-horizontal">
+    <div class="form-group" style="margin-bottom:10p">
+        <div class="col-sm-4 col-sm-offset-4">
+            <input class="form-control" placeholder="Filter" ng-model="search">
+        </div>
+    </div>
+</form>
+<div class="row">
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="user in users | filter : search">
     <div ng-class="user.active ? 'panel-default ' : 'panel-danger '" class="panel " >
         <div class="panel-heading">
             {{user.alias}}
@@ -60,7 +68,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu">
-                    
+
                     <li><a ng-show="user.active" href="javascript:void(0)" ng-click="setUserActive(user,false)">Deactivate</a>
                     </li>
                     <li><a ng-show="!user.active" href="javascript:void(0)" ng-click="setUserActive(user,true)">Activate</a>
@@ -68,7 +76,7 @@
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)"  ng-click="deleteUser(user,$index)">Delete</a>
                     </li>
-                    
+
                 </ul>
             </div>
         </div>
@@ -82,8 +90,10 @@
             </div>
             <div  class="col-xs-6">            
                <div class="responsive-square">
-                <div class="square-content"><p>Full name:</p> <p> {{user.name}} </p>
-                </div></div></div>
+                    <div class="square-content"><p>Full name:</p> <p> {{user.name}} </p>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
         <div class="panel-footer">
@@ -91,6 +101,7 @@
             <div class="clearfix"></div>
         </div>
     </div>
+</div>
 </div>
 <button class="btn btn-success pull-right" ng-click="addUser()">Add user</button>
 <div class="clearfix"></div>
