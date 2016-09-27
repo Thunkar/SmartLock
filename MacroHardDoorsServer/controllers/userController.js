@@ -71,7 +71,7 @@ exports.login = function (req, res, next) {
 
 exports.editUser = function (req, res, next) {
     var updatedUser, user;
-    if (req.session.user && (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
+    if (!req.session.admin && req.session.user && (req.session.user._id != req.params.user)) return next(new CodedError("Not authorized", 403));
     userModel.findById(req.params.user).exec().then((storedUser) => {
         user = storedUser;
         if (!user) return next(new CodedError("User not found", 404));
