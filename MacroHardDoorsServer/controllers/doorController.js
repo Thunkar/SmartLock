@@ -56,6 +56,14 @@ exports.open = function (req, res, next) {
     });
 };
 
+exports.openAdmin = function (req, res, next) {
+    doorCommController.openDoor(req.body.door).then(() => {
+        return res.status(200).send("Opening door");
+    }, (err) => {
+        return next(err);
+    });
+}
+
 exports.toggleDoor = function (req, res, next) {
     doorModel.update({ name: req.params.door }, { $set: { active: req.body.active } }).exec().then(() => {
         if (req.body.active)
