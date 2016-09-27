@@ -82,7 +82,7 @@ SmartLock.controller('DoorsController', [ '$scope','$location','$http' ,'$modal'
         if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return false;
         if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return false;
         if (token.validity.repeat.length != 0) {
-            if (token.validity.repeat.indexOf(moment().day()) == -1) return false;
+            if (token.validity.repeat.indexOf(moment().day().toString()) == -1) return false;
             if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) return false;
             if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) return false;
         }
