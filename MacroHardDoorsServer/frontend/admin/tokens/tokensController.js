@@ -60,19 +60,24 @@ DoorsAdmin.controller('tokensController', ['$scope','$location','$http','$modal'
 			resolve: {
 				token:function(){return completeToken;}
 			}
-		});
+			});
 
-		modalInstance.result.then(function () {
-			reloadTokens();
-		}, function () {
-			$log.info('Modal dismissed at: ' + new Date());
-		});
+			modalInstance.result.then(function () {
+				reloadTokens();
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
 		});
 	}
 
 	$scope.deleteToken = function(token){
-		$http.post("/api/tokens/"+token._id+"/delete",{}).success(function(data){
-			reloadTokens();
+		var tokenId = token._id;
+		$http.get("/api/tokens/"+tokenId).success(function(completeToken,status){
+			$http.post("/api/tokens/"+tokenId+"/bulkdelete",{users:completeToken.users.map(function(user){return user._id})}).success(function(data,status){
+				$http.post("/api/tokens/"+tokenId+"/delete",{}).success(function(data){
+					reloadTokens();
+				});
+			});
 		});
 	};
 

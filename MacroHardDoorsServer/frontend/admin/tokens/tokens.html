@@ -11,7 +11,7 @@
             {{token.name}}<span ng-show="token.default"> (default)</span>
               <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editToken(token)"><span class="fa fa-pencil"></span></button>
         </div>
-        <div class="panel-body">
+        <div class="panel-body" style="height:10em;">
             <p>Doors: <span ng-repeat="door in token.doors">{{door}}, </span></p>
             <p>Validity: from {{getFromString(token)}} to {{getToString(token)}} <span
                     ng-show="token.validity.repeat.length>0">on <span ng-repeat="day in token.validity.repeat">{{getDayString(day)}}, </span></span>
