@@ -21,7 +21,8 @@ DoorsAdmin.run(['$rootScope', '$http', function ($rootScope, $http) {
     // Add a connect listener
     socket.on('event', function (data) {
         console.log('Received a message from the server!', data);
-        if (data.type === 'nodeHandshake' || data.type === 'nodeOffline' || data.type === 'nodeActivated' || data.type === 'nodeDeactivated')
+        if (data.type === 'nodeHandshake' || data.type === 'nodeOffline' || data.type === 'nodeActivated' || data.type === 'nodeDeactivated'
+            || data.type === 'doorOpened'|| data.type === 'doorClosed')
             $rootScope.$broadcast('doorEvent', data);
         $rootScope.$broadcast('event', data);
     });

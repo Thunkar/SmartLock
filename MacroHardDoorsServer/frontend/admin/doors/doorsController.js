@@ -5,6 +5,7 @@ DoorsAdmin.controller('doorsController', [ '$scope','$location','$http' ,functio
 		});
 	}
 	reloadDoors();
+	
 	$scope.$on('doorEvent',function(){
 		console.log("Door event, reloading");
 		reloadDoors();
