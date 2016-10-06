@@ -16,8 +16,16 @@ fs.readdirSync("./utils/services/dbModels").filter(function (file) {
 });
 
 var options = {
-    user: config.dbUser,
-    pass: config.dbPass,
+    user: function() { 
+        if(config.dbUser)
+            return config.dbUser;
+            else return undefined;
+    }(),
+    pass: function() { 
+        if(config.dbPass)
+            return config.dbPass;
+            else return undefined;
+    }(),
     replset: function () {
         if (config.rsName)
             return { rs_name: config.rsName }
