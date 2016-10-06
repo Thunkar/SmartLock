@@ -3,6 +3,7 @@ const session = require('express-session'),
     MongoStore = require('connect-mongo')(session),
     config = require('../services.js').config,
     services = require("../services.js"),
+    slug = require("slug"),
     winston = require('winston');
 
 const servicesLogger = winston.loggers.get('services');
@@ -22,7 +23,7 @@ exports.init = function () {
             resave: false,
             saveUninitialized: false,
             proxy: true,
-            name: config.providerName,
+            name: slug(config.providerName),
             cookie: {
                 secure: false,
                 maxAge: config.tokenExpiration*24*60*60*1000
