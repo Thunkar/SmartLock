@@ -23,7 +23,7 @@ function init() {
         async.eachSeries(files, (file, callback) => {
             var service = require("./services/" + file);
             services[file.replace('.js', '')] = service;
-            service.init().then(callback);
+            service.init().then(callback).catch(callback);
         }, (err) => {
             if(err) return reject(err);
             servicesLogger.info("Service loading completed");
