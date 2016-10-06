@@ -1,5 +1,7 @@
 ﻿var fs = require('fs'),
-    winston = require('winston');
+    winston = require('winston'),
+    Promise = require('bluebird'),
+    async = require('async');
 
 var services = {};
 
