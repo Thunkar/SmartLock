@@ -1,9 +1,10 @@
-﻿var config = require('../services.js').config,
+﻿const config = require('../services.js').config,
+    Promise = require('bluebird'),
     winston = require('winston'),
     winstonConfig = require('winston/lib/winston/config'),
     colors = require('colors');
 
-var logLevels = {
+const logLevels = {
     levels: {
         error: 0,
         warn: 1,
@@ -20,11 +21,11 @@ var logLevels = {
 
 colors.setTheme({
     SYSTEM: 'red',
-    SERVICES: 'green',
-    BOOTSTRAP: 'yellow'
+    SERVICES: 'yellow',
+    SESSION: 'green'
 });
 
-var formatter = function (category, colorize) {
+function formatter(category, colorize) {
     return function (options) {
         if (colorize)
             return colors[category]('[' + category + '] ') + winstonConfig.colorize(options.level, '[' + options.level.toUpperCase() + '] ') + colors.grey('[' + new Date(options.timestamp()).toGMTString() + '] ') + (undefined !== options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta, null, 4) : '');
@@ -66,6 +67,39 @@ winston.loggers.add('system', {
     ]
 });
 
+winston.loggers.add('session', {
+    transports: [
+        new winston.transports.Console({
+            name: "console",
+            handleExceptions: true,
+            humanReadableUnhandledException: true,
+            levels: logLevels.levels,
+            level: config.logLevel,
+            colorize: true,
+            prettyPrint: true,
+            timestamp: function () {
+                return Date.now();
+            },
+            formatter: formatter("SESSION", true)
+        }),
+        new winston.transports.File({
+            filename: 'logs/error.log',
+            name: "file",
+            handleExceptions: true,
+            humanReadableUnhandledException: true,
+            levels: logLevels.levels,
+            level: 'error',
+            colorize: true,
+            prettyPrint: true,
+            json: false,
+            timestamp: function () {
+                return Date.now();
+            },
+            formatter: formatter("SESSION", false)
+        })
+    ]
+});
+
 winston.loggers.add('services', {
     transports: [
         new winston.transports.Console({
@@ -100,3 +134,9 @@ winston.loggers.add('services', {
 });
 
 winston.addColors(logLevels.colors);
+
+exports.init = function() {
+    return new Promise(() => {
+        return resolve();
+    });
+}

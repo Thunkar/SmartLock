@@ -3,6 +3,7 @@
 
 var adminSchema = new Schema({
     alias: { type: String, default: "", unique: true, dropDups: true },
+    password: { type: String, default: "" },
     pwd: {
         hash: { type: String, default: "" },
         salt: { type: String, default: "" },

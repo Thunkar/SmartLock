@@ -27,6 +27,7 @@
     "rimraf": "^2.5.4",
     "serve-favicon": "^2.3.0",
     "session-file-store": "0.0.24",
+    "slug": "^0.9.1",
     "socket.io": "^1.4.5",
     "winston": "^2.1.1"
   },
