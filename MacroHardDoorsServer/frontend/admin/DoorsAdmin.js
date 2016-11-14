@@ -142,7 +142,7 @@ DoorsAdmin.filter('pages', function() {
 DoorsAdmin.factory('apiRelative', function ($q) {
     return {
         request: function (config) {
-            if (config.url.startsWith('/api'))
+            if (config.url.indexOf('/api')===0)
                 config.url = ".." + config.url;
             return config;
         }
