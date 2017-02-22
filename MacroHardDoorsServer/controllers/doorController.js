@@ -19,20 +19,21 @@ function minutesOfDay(m){
 function ensureValidToken(userId, doorName, tokenId) {
     return new Promise((resolve, reject) => {
         userModel.findById(userId).exec().then((user) => {
-            if (!user) return reject(new Error("User does not exist"));
+            if (!user) throw new Error("User does not exist");
+            if(!user.active) throw new Error("User is not active");
             var token = null;
             user.tokens.forEach((candidate) => {
                 if (candidate._id == tokenId) token = candidate;
             })
-            if (!token) return reject(new Error("User does not own that token"));
-            if (token.doors.indexOf(doorName) == -1) return reject(new Error("Token cannot open that door"));
-            if (token.validity.uses == 0) return reject(new Error("Token is used up"));
-            if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) return reject(new Error("The token is not active yet"));
-            if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) return reject(new Error("The token has expired"));
+            if (!token) throw new Error("User does not own that token");
+            if (token.doors.indexOf(doorName) == -1) throw new Error("Token cannot open that door");
+            if (token.validity.uses == 0) throw new Error("Token is used up");
+            if (token.validity.repeat.length == 0 && moment(token.validity.from).isAfter(moment())) throw new Error("The token is not active yet");
+            if (token.validity.repeat.length == 0 && moment(token.validity.to).isBefore(moment())) throw new Error("The token has expired");
             if (token.validity.repeat.length != 0) {
-                if (token.validity.repeat.indexOf(moment().day()) == -1) return reject(new Error("The token cannot be used today"));
-                if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) return reject(new Error("The token is not active yet"));
-                if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) return reject(new Error("The token has expired"));
+                if (token.validity.repeat.indexOf(moment().day()) == -1) throw new Error("The token cannot be used today");
+                if (minutesOfDay(moment(token.validity.from)) > minutesOfDay(moment())) throw new Error("The token is not active yet");
+                if (minutesOfDay(moment(token.validity.to)) < minutesOfDay(moment())) throw new Error("The token has expired");
             }
             if (token.validity.uses != -1) token.validity.uses--;
             return user.save();
