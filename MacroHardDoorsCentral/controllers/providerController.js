@@ -30,7 +30,7 @@ exports.removeProviders = function () {
     providerModel.find({ lastRegistered: { $lt: threeDaysAgo } }).exec().then((providers) => {
         var tasks = [];
         providers.forEach((provider) => {
-            taks.push(fileUtils.deleteFile(storagePath + provider.profilePic));
+            tasks.push(fileUtils.deleteFile(storagePath + provider.profilePic));
             tasks.push(provider.remove());
         });
         return Promise.all(tasks);
